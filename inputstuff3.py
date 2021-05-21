@@ -164,19 +164,30 @@ class Molecule:
                     print("error: expecting " + str(Npt) + " points, but read " + str(idx) + " points\n")
                     
     def inputN(self,D):
-        N = inputValidInt("\nEnter N for each dimension (max 99):\n",1,99)
+        N = scipy.zeros(D,int)
+        for i in range(0,D):
+            validN = False
+            while (not validN):
+                N[i] = inputValidInt("\nEnter N for dimension " + str(i+1) + " (max 99):\n",1,99)
+                if (N[i] % 2 == 1):
+                    validN = True
+                else:
+                    print("error: N must be odd for the FGH method")
         return N
     
     def inputL(self,D):
-        validL = False
-        while (not validL):
-            Lmin = inputFloat("\nEnter minimum L for dimension " + str(i+1) + ":\n")
-            Lmax = inputFloat("\nEnter maximum L for dimension " + str(i+1) + ":\n")
-            if (Lmax > Lmin):
-                validL = True
-            else:
-                print("error: max L must be greater than min L")
-        return (Lmax-Lmin)
+        L = scipy.zeros(D,float)
+        for i in range(0,D):
+            validL = False
+            while (not validL):
+                Lmin = inputFloat("\nEnter minimum L for dimension " + str(i+1) + ":\n")
+                Lmax = inputFloat("\nEnter maximum L for dimension " + str(i+1) + ":\n")
+                if (Lmax > Lmin):
+                    validL = True
+                else:
+                    print("error: max L must be greater than min L")
+            L[i] = Lmax - Lmin
+        return L
 
     def inputmu(self,D):
         mu = scipy.zeros(D,float)
@@ -185,3 +196,8 @@ class Molecule:
         return mu
 
 
+
+
+
+
+    

@@ -4,6 +4,7 @@ import scipy as scipy
 import scipy.linalg
 import math
 import sys
+import time
 
 #Remove the numpy print limits
 np.set_printoptions(threshold=sys.maxsize)
@@ -47,7 +48,7 @@ def cmatrixgen(NValue, LValue):
 
 
 #A function to calculate the invidivdual values for the VMatrix
-def Vab(d, NValue, LValue, KValue, deltax, dimensionCounterArray):
+def Vab(d, NValue, LValue, VModel, VType, deltax, dimensionCounterArray):
     #Deltacounter is used to makes sure that the value being calculated is in the diagonal of the matrix
     Deltacounter = 0
     #Total is the value returned for the calculation
@@ -58,11 +59,20 @@ def Vab(d, NValue, LValue, KValue, deltax, dimensionCounterArray):
             Deltacounter += 1
         Vcounter += 1
     #If the deltacounter amount equals the amount of dimensions, perform a summation for the formula
-    #Otherwise, the total will remain 0.0
+    #Otherwise, the total will remain 0.0 
     if (Deltacounter == d):
         for counter in range(d):
-            xj = ((dimensionCounterArray[(counter*2)+1])*deltax)+(deltax/2.0)
-            total += 0.5*KValue*(xj-(LValue*0.5))**2
+            realdeltax = (float(LValue[(d-1)-counter])/float(NValue[(d-1)-counter]))
+            if(VType[counter] == 0):
+                xj = ((dimensionCounterArray[(counter*2)+1])*realdeltax)+(realdeltax/2.0)
+                total += 0.5*VModel[(d-1)-counter].k*(xj-(LValue[(d-1)-counter]*0.5))**2
+            elif(VType[counter] == 1):
+                xj = ((dimensionCounterArray[(counter*2)+1])*realdeltax)+(realdeltax/2.0)
+                #total += De*(1-math.exp(-a*xj))**2
+                total += (VModel[(d-1)-counter].De)*((1.0-math.exp(-(VModel[(d-1)-counter].a)*(xj-(LValue[(d-1)-counter]*0.5))))**2.0)
+            else:
+                pass
+                #This should never happen
     return(total)        
 
 #A function to calculate the individual values for the TMatrix
@@ -82,41 +92,84 @@ def Tab(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray):
                 pass
         #If deltacounter equals the dimensions - 1, add the formula to the total for that C value
         if (Deltacounter == (d-1)):
-                total += c_matrix_insert[dimensionCounterArray[(T*2)+1], dimensionCounterArray[T*2]]    
-    return(total*((-1.0*1.0**2)/(2.0*mu)))        
+                #print(dimensionCounterArray)
+                try:
+                    total += (c_matrix_insert[T][dimensionCounterArray[(T*2)+1], dimensionCounterArray[T*2]])*((-1.0*1.0**2)/(2.0*mu[(d-1)-T])) 
+                except:
+                    print("Trying to access: "+str(dimensionCounterArray[(T*2)+1])+", "+str(dimensionCounterArray[T*2]))
+                    print(c_matrix_insert[T])
+                    print("TAB error")
+                    
+
+    return(total)        
+    #return(total*((-1.0*1.0**2)/(2.0*mu)))        
+
+def AlphaCalc(D, counterarray, NValues):
+    output = 0
+    for a in reversed(range(D)):
+            if(a+1 == D):
+                output += counterarray[(a*2)+1]*1 
+            else:
+                output += counterarray[(a*2)+1]*(np.prod(NValues[:(D-1)-a]))
+    return output
+
+def BetaCalc(D, counterarray, NValues):
+    output = 0
+    for b in reversed(range(D)):
+            if(b+1 == D):
+                output += counterarray[(b*2)]*1   
+            else:
+                output += counterarray[(b*2)]*(np.prod(NValues[:(D-1)-b]))   
+    return output
+
+def DCAAdvance(D, counterArray, NValues):
+    counterArray[(D*2)-1,0] += 1
+    NValueC = 0
+    jlcounter = 0
+    for c in reversed(range(len(counterArray))):
+        if (counterArray[c]>= NValues[NValueC]):
+            counterArray[c] = 0
+            counterArray[c-1] += 1
+        jlcounter += 1
+        if(jlcounter >= 2):
+            jlcounter = 0
+            NValueC +=1
+    return counterArray
 
 #The function to calculate a TMatrix using the mol class from input
 def TMatrixCalc(mol, D, VType):
     #Establish variables needed
     dimensions = D
-    NValue = mol.N[0]
-    LValue = mol.L[0]
-    mu = mol.mu[0]
-    deltax = (float(LValue)/float(NValue))
+    NValue = mol.N
+    LValue = mol.L
+    mu = mol.mu
+    #Move deltax to functions that need it
+    #deltax = (float(LValue)/float(NValue))
     #Create the array for the x dimensional counters
     dimensionCounterArray = scipy.zeros((dimensions*2,1), int)
 
     #Create the TMatrix and the TFlagMatrix
     #The alpha and beta values are used to create the TMatrix in the correct position
-    tmatrix = scipy.zeros((NValue**dimensions, NValue**dimensions), float)
-    tflag = scipy.zeros((NValue**dimensions, NValue**dimensions), int)
+    tmatrix = scipy.zeros((np.prod(NValue), np.prod(NValue)), float)
+    tflag = scipy.zeros((np.prod(NValue), np.prod(NValue)), int)
     alpha = 0
     beta = 0
     
     #Create the C_Matrix
-    c_matrix = cmatrixgen(NValue, LValue)
+    c_matrix = []
+    for x in reversed(range(len(NValue))):
+        #c_matrix.append(cmatrixgen(NValue[(dimensions-1)-x], LValue[(dimensions-1)-x]))
+        c_matrix.append(cmatrixgen(NValue[x], LValue[x]))
+
 
     #Calculate the TMatrix
-    for i in range((NValue**dimensions)*(NValue**dimensions)):
+    for i in range((np.prod(NValue))*(np.prod(NValue))):
         #Counts X componenets of counterarray and multiplies it times N^(current dimension being used - 1) for alpha
-        alpha = 0
-        for a in reversed(range(len(dimensionCounterArray)/2)):
-            alpha += dimensionCounterArray[(a*2)+1]*(NValue**(dimensions-(a+1)))
-        #Counts Y componenets of counterarray and multiplies it times N^(current dimension being used - 1) for beta
-        beta = 0
-        for b in reversed(range(len(dimensionCounterArray)/2)):
-            beta += dimensionCounterArray[(b*2)]*(NValue**(dimensions-(b+1)))    
+        alpha = AlphaCalc(dimensions, dimensionCounterArray, NValue)
+        beta = BetaCalc(dimensions, dimensionCounterArray, NValue) 
 
+        #print("Alpha: "+str(alpha)+" Beta:"+str(beta))
+        #print(dimensionCounterArray)
         #Set the t matrix if the flag hasn't been set
         if tflag[alpha, beta] == 0:
             tmatrix[alpha, beta] = (Tab(dimensions, NValue, LValue, mu, c_matrix, dimensionCounterArray))
@@ -126,11 +179,7 @@ def TMatrixCalc(mol, D, VType):
             tflag[beta, alpha] = 1  
 
         #Adds +1 to the last dimension's X/Y value and checks to see if values need to add 1 to the next dimension counter / sets the current value to 0
-        dimensionCounterArray[(dimensions*2)-1,0] += 1
-        for c in reversed(range(len(dimensionCounterArray))):
-            if (dimensionCounterArray[c]>= NValue):
-                dimensionCounterArray[c] = 0
-                dimensionCounterArray[c-1] += 1
+        dimensionCounterArray = DCAAdvance(dimensions, dimensionCounterArray, NValue)
 
     return tmatrix
 
@@ -138,37 +187,29 @@ def TMatrixCalc(mol, D, VType):
 def VMatrixCalc(mol, D, VType):
     #Establish variables needed
     dimensions = D
-    NValue = mol.N[0]
-    LValue = mol.L[0]
-    KValue = mol.Vmodel[0].k
-    mu = mol.mu[0]
-    deltax = (float(LValue)/float(NValue))
+    NValue = mol.N
+    LValue = mol.L
+    VModel = mol.Vmodel
+    VType = mol.Vtype
+    #Reference a mol.Vmodel[0].k
+    mu = mol.mu
+    #deltax = (float(LValue)/float(NValue))
     #Create the array for the x dimensional counters
     dimensionCounterArray = scipy.zeros((dimensions*2,1), int)
 
     #Create the VMatrix
     #The alpha and beta values are used to create the VMatrix in the correct position
-    vmatrix = scipy.zeros((NValue**dimensions, NValue**dimensions), float)
+    vmatrix = scipy.zeros((np.prod(NValue), np.prod(NValue)), float)
     alpha = 0
     beta = 0
 
     #Calculate the VMatrix
-    for i in range((NValue**dimensions)*(NValue**dimensions)):
-        #Counts X componenets of counterarray and multiplies it times N^(current dimension being used - 1) for alpha
-        alpha = 0
-        for a in reversed(range(len(dimensionCounterArray)/2)):
-            alpha += dimensionCounterArray[(a*2)+1]*(NValue**(dimensions-(a+1)))
-        #Counts Y componenets of counterarray and multiplies it times N^(current dimension being used - 1) for beta
-        beta = 0
-        for b in reversed(range(len(dimensionCounterArray)/2)):
-            beta += dimensionCounterArray[(b*2)]*(NValue**(dimensions-(b+1)))    
+    for i in range((np.prod(NValue))*(np.prod(NValue))):
+        alpha = AlphaCalc(dimensions, dimensionCounterArray, NValue)
+        beta = BetaCalc(dimensions, dimensionCounterArray, NValue)  
 
-        vmatrix[alpha, beta] =  (Vab(dimensions, NValue, LValue, KValue, deltax, dimensionCounterArray))
+        vmatrix[alpha, beta] =  (Vab(dimensions, NValue, LValue, VModel, VType, 0, dimensionCounterArray))
 
         #Adds +1 to the last dimension's X/Y value and checks to see if values need to add 1 to the next dimension counter / sets the current value to 0
-        dimensionCounterArray[(dimensions*2)-1,0] += 1
-        for c in reversed(range(len(dimensionCounterArray))):
-            if (dimensionCounterArray[c]>= NValue):
-                dimensionCounterArray[c] = 0
-                dimensionCounterArray[c-1] += 1
+        dimensionCounterArray = DCAAdvance(dimensions, dimensionCounterArray, NValue)
     return vmatrix

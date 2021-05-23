@@ -1,5 +1,6 @@
 import inputparam
-import matrixfunctionsv7 as matfunc
+import Tmatrix
+import Vmatrix
 import scipy
 import numpy as np
 
@@ -15,7 +16,7 @@ for i in range(0,D):
     print ("the number of points in dimension " + str(i+1) + " is " + str(mol.N[i]))
 
 #hmatrix = matfunc.mdhmatrix(mol, D, Vtype)
-hmatrix = matfunc.TMatrixCalc(mol, D, Vtype) + matfunc.VMatrixCalc(mol, D, Vtype)
+hmatrix = Tmatrix.TMatrixCalc(mol, D, Vtype) + Vmatrix.VMatrixCalc(mol, D, Vtype)
 print(hmatrix)
 print("hmatrix done")
 hmateigenv = scipy.linalg.eigvals(hmatrix)

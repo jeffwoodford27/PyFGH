@@ -3,7 +3,8 @@ import matrixfunctionsv7 as matfunc
 import scipy
 import numpy as np
 
-
+#Remove the numpy print limits
+np.set_printoptions(threshold=sys.maxsize)
 
 D = inputparam.inputValidInt("\nEnter the number of dimensions:\n",1,5)
 Vtype = inputparam.inputValidInt("\nEnter Potential Energy Method (0 = model, 1 = file):\n",0,1)

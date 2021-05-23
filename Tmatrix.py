@@ -4,7 +4,6 @@ import scipy as scipy
 import scipy.linalg
 import pyfghutil
 import math
-import sys
 import time
 
 #A function to calculate the BMatrix
@@ -15,7 +14,7 @@ def bmatrixgen(NValue, LValue):
     difb_matrix = scipy.zeros((NValue, 1), float)   
     scroll = 0
     for a in difb_matrix:
-        for b in range((NValue-1)/2):
+        for b in range(int((NValue-1)/2)):
             difb_matrix[scroll] += ((b+1)*math.sin(( (b+1)*2*math.pi*scroll)/ NValue))
         scroll +=1
     #Use the dif_bmatrix to set the values of the BMatrix
@@ -34,7 +33,7 @@ def cmatrixgen(NValue, LValue):
     #Calculate the similar values shared between x,y differences to improve efficiency
     difc_matrix = scipy.zeros((NValue, 1), float)
     for a in range(NValue):
-        for b in range((NValue-1)/2):
+        for b in range(int((NValue-1)/2)):
             difc_matrix[a] += (((b+1)*(b+1))*math.cos(((b+1)*2*math.pi*a)/ NValue))
         difc_matrix[a] *= (-8.0*(math.pi*math.pi)/(float(NValue)*(float(LValue)*float(LValue))))
     #Push the difc_matrix values to their respective c_matrix spots

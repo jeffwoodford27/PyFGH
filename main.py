@@ -3,6 +3,7 @@ import Tmatrix
 import Vmatrix
 import scipy
 import numpy as np
+import sys
 
 #Remove the numpy print limits
 np.set_printoptions(threshold=sys.maxsize)

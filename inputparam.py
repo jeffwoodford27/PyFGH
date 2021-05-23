@@ -17,12 +17,11 @@ class InputError(Exception):
 def inputValidInt (prompt, intmin, intmax):
     validinput = False
     while (not validinput):
-        inputint = input(prompt)
-        if (type(inputint) is int):
-            for i in range(intmin,intmax+1):
-                if (inputint == i):
-                    validinput = True
-                    break
+        inputint = int(input(prompt))
+        for i in range(intmin,intmax+1):
+            if (inputint == i):
+                validinput = True
+                break
     return inputint
 
 # Input: a prompt for keyboard entry of a float
@@ -31,23 +30,19 @@ def inputValidInt (prompt, intmin, intmax):
 def inputNonNegativeFloat (prompt):
     validinput = False
     while (not validinput):
-        inputfloat = input(prompt)
-        if (type(inputfloat) is int):
-            inputfloat = float(inputfloat)
-        if ((type(inputfloat) is float) and (inputfloat >= 0)):
+        inputfloat = float(input(prompt))
+        if (inputfloat >= 0):
             validinput = True
     return inputfloat
 
-# Input: a prompt for keyboardd entry of a float
+# Input: a prompt for keyboard entry of a float
 # Output: the float that is input, provided that it is positive.
 
 def inputPositiveFloat (prompt):
     validinput = False
     while (not validinput):
-        inputfloat = input(prompt)
-        if (type(inputfloat) is int):
-            inputfloat = float(inputfloat)
-        if ((type(inputfloat) is float) and (inputfloat > 0)):
+        inputfloat = float(input(prompt))
+        if (inputfloat > 0):
             validinput = True
     return inputfloat
 
@@ -57,11 +52,11 @@ def inputPositiveFloat (prompt):
 def inputFloat (prompt):
     validinput = False
     while (not validinput):
-        inputfloat = input(prompt)
-        if (type(inputfloat) is int):
-            inputfloat = float(inputfloat)
-        if (type(inputfloat) is float):
-            validinput = True
+        inputfloat = float(input(prompt))
+#        if (type(inputfloat) is int):
+#            inputfloat = float(inputfloat)
+#        if (type(inputfloat) is float):
+        validinput = True
     return inputfloat
 
 # Input: a prompt for keyboard entry of a filename

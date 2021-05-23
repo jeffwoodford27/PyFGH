@@ -1,4 +1,4 @@
-import inputstuff3 as inputparam
+import inputparam
 import matrixfunctionsv7 as matfunc
 import scipy
 import numpy as np

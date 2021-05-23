@@ -4,7 +4,6 @@ import scipy as scipy
 import scipy.linalg
 import pyfghutil
 import math
-import sys
 import time
 
 #A function to calculate the invidivdual values for the VMatrix

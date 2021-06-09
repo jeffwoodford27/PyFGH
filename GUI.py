@@ -1,8 +1,9 @@
 import multiprocessing
 import tkinter
 import tkinter as tk
-from tkinter import ttk, messagebox, NW
+from tkinter import ttk, messagebox, NW, END
 from tkinter.filedialog import askopenfilename
+from tkinter.ttk import Style
 
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
@@ -12,8 +13,9 @@ Author: Josiah Randleman
 
 # Creating tkinter window
 window = tk.Tk()
+style = Style()
 window.title('PyFGH')
-window.geometry('910x325')
+window.geometry('910x425')
 
 # Water molecule icon in the top left conner
 window.iconbitmap(default='icon.ico')
@@ -55,6 +57,11 @@ q_equation1 = ttk.Combobox(window, width=15, textvariable=n)
 # creates values inside of the choice box
 q_equation1["values"] = ('OH\u2081 Bond Stretch', 'OH\u2082 Bond Stretch', 'Symmetric Stretch', 'Asymmetric Stretch')
 
+"""
+btn = ttk.Button(window, text="Get Value", command=return_value)
+btn.place(relx="0.5", rely="0.1")
+"""
+
 # Label
 ttk.Label(window, text="Q\u2082:", font=("Times New Roman", 15)).place(x=590, y=47)
 f = tk.StringVar()
@@ -77,7 +84,7 @@ d = tk.StringVar()
 N1text = ttk.Combobox(window, width=15, textvariable=d)
 
 # Entry
-ttk.Entry(window, font=("Times New Roman", 10)).place(x=40, y=100, width=100)
+text1 = ttk.Entry(window, font=("Times New Roman", 10))
 c = tk.StringVar()
 N1box = ttk.Combobox(window, textvariable=c)
 
@@ -87,7 +94,7 @@ h = tk.StringVar()
 L1text = ttk.Combobox(window, width=15, textvariable=h)
 
 # Entry
-ttk.Entry(window, font=("Times New Roman", 10)).place(x=185, y=100, width=100)
+text2 = ttk.Entry(window, font=("Times New Roman", 10))
 i = tk.StringVar()
 L1box = ttk.Combobox(window, textvariable=i)
 
@@ -97,7 +104,7 @@ h = tk.StringVar()
 N2text = ttk.Combobox(window, width=15, textvariable=h)
 
 # Entry
-ttk.Entry(window, font=("Times New Roman", 10)).place(x=340, y=100, width=100)
+text3 = ttk.Entry(window, font=("Times New Roman", 10))
 i = tk.StringVar()
 N2box = ttk.Combobox(window, textvariable=i)
 
@@ -107,7 +114,7 @@ h = tk.StringVar()
 L2text = ttk.Combobox(window, width=15, textvariable=h)
 
 # Entry
-ttk.Entry(window, font=("Times New Roman", 10)).place(x=495, y=100, width=100)
+text4 = ttk.Entry(window, font=("Times New Roman", 10))
 i = tk.StringVar()
 L2box = ttk.Combobox(window, textvariable=i)
 
@@ -117,7 +124,7 @@ h = tk.StringVar()
 N3text = ttk.Combobox(window, width=15, textvariable=h)
 
 # Entry
-ttk.Entry(window, font=("Times New Roman", 10)).place(x=645, y=100, width=100)
+text5 = ttk.Entry(window, font=("Times New Roman", 10))
 i = tk.StringVar()
 N3box = ttk.Combobox(window, textvariable=i)
 
@@ -127,7 +134,7 @@ h = tk.StringVar()
 L3text = ttk.Combobox(window, width=15, textvariable=h)
 
 # Entry
-ttk.Entry(window, font=("Times New Roman", 10)).place(x=800, y=100, width=100)
+text6 = ttk.Entry(window, font=("Times New Roman", 10))
 i = tk.StringVar()
 L3box = ttk.Combobox(window, textvariable=i)
 
@@ -170,7 +177,7 @@ d = tk.StringVar()
 v1 = ttk.Combobox(window, width=32, textvariable=d)
 
 v1[
-    "values"] = 'Model-Harmonic Oscillator', 'Model-Morse Oscillator', 'Read Structures and Energies from File', 'Compute on The Fly'
+    "values"] = 'Model-Harmonic Oscillator', 'Model-Morse Oscillator'
 
 # Label
 ttk.Label(window, text="V for Q\u2082:", font=("Times New Roman", 15)).place(x=305, y=205)
@@ -178,14 +185,14 @@ d = tk.StringVar()
 v2 = ttk.Combobox(window, width=32, textvariable=d)
 
 v2[
-    "values"] = 'Model-Harmonic Oscillator', 'Model-Morse Oscillator', 'Read Structures and Energies from File', 'Compute on The Fly'
+    "values"] = 'Model-Harmonic Oscillator', 'Model-Morse Oscillator'
 
 ttk.Label(window, text="V for Q\u2083:", font=("Times New Roman", 15)).place(x=615, y=205)
 d = tk.StringVar()
 v3 = ttk.Combobox(window, width=32, textvariable=d)
 
 v3[
-    "values"] = 'Model-Harmonic Oscillator', 'Model-Morse Oscillator', 'Read Structures and Energies from File', 'Compute on The Fly'
+    "values"] = 'Model-Harmonic Oscillator', 'Model-Morse Oscillator'
 
 # Button
 exit = tk.Button(window, text='Exit', bd='10', bg='red', fg='white',
@@ -193,7 +200,13 @@ exit = tk.Button(window, text='Exit', bd='10', bg='red', fg='white',
 
 
 def output():
-    messagebox.askyesno("PyFGH", "Would you like to save the data to a text file?")
+    if q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
+        messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
+
+    elif q_equation1.get() == 'OH\u2082 Bond Stretch' and q_equation2.get() == 'OH\u2082 Bond Stretch':
+        messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
+    else:
+        messagebox.askyesno("PyFGH", "Would you like to save the data to a text file?")
 
 
 calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',
@@ -201,7 +214,7 @@ calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',
 
 
 # This will clear the data in the choice boxes  !!! Clear N1 and L2 choice boxes !!!
-# TODO: add other boxes to this clear list!!!
+# This definition works! This clears everything in the window!!!
 def clear_data():
     cores.set('')
     molecule.set('')
@@ -213,7 +226,12 @@ def clear_data():
     v1.set('')
     v2.set('')
     v3.set('')
-    N1text.delete(1, "end")
+    text1.delete(0, END)
+    text2.delete(0, END)
+    text3.delete(0, END)
+    text4.delete(0, END)
+    text5.delete(0, END)
+    text6.delete(0, END)
 
 
 clear = tk.Button(window, text='Clear', bd='10', bg='blue', fg='white',
@@ -233,6 +251,12 @@ def t0():
 
 tbutton = tk.Button(window, text='Display T equation', bd='10', bg='orange', fg='white',
                     command=t0).place(x=232, y=260)
+
+readbutton = tk.Button(window, text='Read Structures and Energies from File', bd='10', bg='gray', fg='white',
+                       command=open_file).place(x=360, y=320)
+
+compute = tk.Button(window, text='Compute on the fly', bd='10', bg='gray', fg='white',
+                    command=open_file).place(x=410, y=370)
 
 # Adding combobox drop down list
 # cores['values'] = (multiprocessing.cpu_count())
@@ -257,4 +281,10 @@ v2.place(x=380, y=207)
 v2.current()
 v3.place(x=690, y=207)
 v3.current()
+text1.place(x=40, y=100, width=100)
+text2.place(x=185, y=100, width=100)
+text3.place(x=340, y=100, width=100)
+text4.place(x=495, y=100, width=100)
+text5.place(x=645, y=100, width=100)
+text6.place(x=800, y=100, width=100)
 window.mainloop()

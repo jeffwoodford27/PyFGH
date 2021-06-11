@@ -1,9 +1,12 @@
 import multiprocessing
+import sys
 import tkinter
 import tkinter as tk
+from fileinput import filename
 from tkinter import ttk, messagebox, NW, END
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
+import os
 
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
@@ -144,6 +147,7 @@ ttk.Label(window, text="Equilibrium Coordinates:", font=("Times New Roman", 10))
 
 # Allows the user to chose a file in their file explorer
 def open_file():
+    global filename
     tkinter.Tk().withdraw()
     filename = askopenfilename()
     print(filename)
@@ -199,6 +203,29 @@ exit = tk.Button(window, text='Exit', bd='10', bg='red', fg='white',
                  command=window.destroy).place(x=365, y=260)
 
 
+def apioutput():
+    print(molecule.get())
+    print(q_equation1.get())
+    print(q_equation2.get())
+    print(q_equation3.get())
+    print(text1.get())
+    print(text2.get())
+    print(text3.get())
+    print(text4.get())
+    print(text5.get())
+    print(text6.get())
+    print(t.get())
+    print(g.get())
+    print(v1.get())
+    print(v2.get())
+    print(v3.get())
+    print(filename)
+
+
+x1 = q_equation1.get()
+y = 85
+
+
 def output():
     if q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
         messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
@@ -206,7 +233,13 @@ def output():
     elif q_equation1.get() == 'OH\u2082 Bond Stretch' and q_equation2.get() == 'OH\u2082 Bond Stretch':
         messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
     else:
-        messagebox.askyesno("PyFGH", "Would you like to save the data to a text file?")
+        box: bool = tk.messagebox.askyesno("PyFGH", "Would you like to save the data to a text file?")
+        if box:
+            print('This yes button works')
+        else:
+            print('The no button works')
+            apioutput()
+            window.destroy()
 
 
 calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',

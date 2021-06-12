@@ -1,12 +1,9 @@
 import multiprocessing
-import sys
 import tkinter
 import tkinter as tk
-from fileinput import filename
 from tkinter import ttk, messagebox, NW, END
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
-import os
 
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
@@ -146,6 +143,7 @@ ttk.Label(window, text="Equilibrium Coordinates:", font=("Times New Roman", 10))
 
 
 # Allows the user to chose a file in their file explorer
+# TODO: Error somewhere in this. When you select to open a file, then run the code in API.py the variables do not transfer. Fix this!!!
 def open_file():
     global filename
     tkinter.Tk().withdraw()
@@ -158,7 +156,7 @@ open = tk.Button(window, text='Open', bd='5', bg='black', fg='white',
                  command=open_file).place(x=795, y=150)
 
 # Label
-# TODO: look back at the slides in the chemistry google drive. When user selects an approximation, display an image of the selected equation!!!
+# TODO: look back at the slides in the chemistry google drive. When user selects an approximation, display an image of the selected equation!!! Cosmetic!
 ttk.Label(window, text="T:", font=("Times New Roman", 20)).place(x=50, y=150)
 b = tk.StringVar()
 t = ttk.Combobox(window, width=15, textvariable=b)
@@ -222,11 +220,24 @@ def apioutput():
     print(filename)
 
 
-x1 = q_equation1.get()
-y = 85
-
-
 def output():
+    global molecule_api
+    global q_equation1_api
+    global q_equation2_api
+    global q_equation3_api
+    global text1_api
+    global text2_api
+    global text3_api
+    global text4_api
+    global text5_api
+    global text6_api
+    global t_api
+    global g_api
+    global v1_api
+    global v2_api
+    global v3_api
+    #global filename_api
+
     if q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
         messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
 
@@ -236,9 +247,43 @@ def output():
         box: bool = tk.messagebox.askyesno("PyFGH", "Would you like to save the data to a text file?")
         if box:
             print('This yes button works')
+            molecule_api = molecule.get()
+            q_equation1_api = q_equation1.get()
+            q_equation2_api = q_equation2.get()
+            q_equation3_api = q_equation3.get()
+            text1_api = text1.get()
+            text2_api = text2.get()
+            text3_api = text3.get()
+            text4_api = text4.get()
+            text5_api = text5.get()
+            text6_api = text6.get()
+            t_api = t.get()
+            g_api = g.get()
+            v1_api = v1.get()
+            v2_api = v2.get()
+            v3_api = v3.get()
+            #filename_api = filename
+            #apioutput()
+            window.destroy()
         else:
             print('The no button works')
-            apioutput()
+            molecule_api = molecule.get()
+            q_equation1_api = q_equation1.get()
+            q_equation2_api = q_equation2.get()
+            q_equation3_api = q_equation3.get()
+            text1_api = text1.get()
+            text2_api = text2.get()
+            text3_api = text3.get()
+            text4_api = text4.get()
+            text5_api = text5.get()
+            text6_api = text6.get()
+            t_api = t.get()
+            g_api = g.get()
+            v1_api = v1.get()
+            v2_api = v2.get()
+            v3_api = v3.get()
+            #filename_api = filename
+            #apioutput()
             window.destroy()
 
 
@@ -246,7 +291,6 @@ calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',
                       command=output).place(x=420, y=250)
 
 
-# This will clear the data in the choice boxes  !!! Clear N1 and L2 choice boxes !!!
 # This definition works! This clears everything in the window!!!
 def clear_data():
     cores.set('')

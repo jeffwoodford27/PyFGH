@@ -1,9 +1,12 @@
 import multiprocessing
 import tkinter
 import tkinter as tk
-from tkinter import ttk, messagebox, NW, END
+from tkinter import ttk, messagebox, NW, END, DISABLED
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
+
+import self
+from public import public
 
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
@@ -44,7 +47,7 @@ def cpu_count():
 # Label
 ttk.Label(window, text="Molecule Specification:", font=("Times New Roman", 10)).place(x=200, y=50)
 m = tk.StringVar()
-molecule = ttk.Combobox(window, width=10, textvariable=m)
+molecule = ttk.Combobox(window, width=10, textvariable=m, state='readonly')
 
 # creates values inside of the choice box
 molecule["values"] = u'H\u2082O'
@@ -55,7 +58,8 @@ n = tk.StringVar()
 q_equation1 = ttk.Combobox(window, width=15, textvariable=n)
 
 # creates values inside of the choice box
-q_equation1["values"] = ('OH\u2081 Bond Stretch', 'OH\u2082 Bond Stretch', 'Symmetric Stretch', 'Asymmetric Stretch')
+q_equation1["values"] = (
+    'OH\u2081 Bond Stretch', 'OH\u2082 Bond Stretch', 'Symmetric Stretch', 'Asymmetric Stretch')
 
 """
 btn = ttk.Button(window, text="Get Value", command=return_value)
@@ -68,7 +72,8 @@ f = tk.StringVar()
 q_equation2 = ttk.Combobox(window, width=15, textvariable=f)
 
 # creates values inside of the choice box
-q_equation2["values"] = ('OH\u2081 Bond Stretch', 'OH\u2082 Bond Stretch', 'Symmetric Stretch', 'Asymmetric Stretch')
+q_equation2["values"] = (
+    'OH\u2081 Bond Stretch', 'OH\u2082 Bond Stretch', 'Symmetric Stretch', 'Asymmetric Stretch')
 
 # Label
 ttk.Label(window, text="Q\u2083:", font=("Times New Roman", 15)).place(x=755, y=47)
@@ -162,7 +167,8 @@ b = tk.StringVar()
 t = ttk.Combobox(window, width=15, textvariable=b)
 
 # creates values inside of the choice box
-t["values"] = ('None', 'Approximation 1', 'Approximation 2', 'Approximation 3', 'Approximation 4', 'Approximation 5')
+t["values"] = (
+    'None', 'Approximation 1', 'Approximation 2', 'Approximation 3', 'Approximation 4', 'Approximation 5')
 
 # Label
 ttk.Label(window, text="G:", font=("Times New Roman", 20)).place(x=405, y=150)
@@ -221,6 +227,45 @@ def apioutput():
 
 
 def output():
+    class outputAPI:
+        molecule_api = molecule.get()
+        q_equation1_api = q_equation1.get()
+        q_equation2_api = q_equation2.get()
+        q_equation3_api = q_equation3.get()
+        text1_api = text1.get()
+        text2_api = text2.get()
+        text3_api = text3.get()
+        text4_api = text4.get()
+        text5_api = text5.get()
+        text6_api = text6.get()
+        t_api = t.get()
+        g_api = g.get()
+        v1_api = v1.get()
+        v2_api = v2.get()
+        v3_api = v3.get()
+
+        def __init__(self, molecule_api):
+            self.v3_api = v3_api
+            self.v2_api = v2_api
+            self.v1_api = v1_api
+            self.g_api = g_api
+            self.t_api = t_api
+            self.text6_api = text6_api
+            self.text5_api = text5_api
+            self.text4_api = text4_api
+            self.text3_api = text3_api
+            self.text2_api = text2_api
+            self.text1_api = text1_api
+            self.q_equation3_api = q_equation3_api
+            self.q_equation2_api = q_equation2_api
+            self.q_equation1_api = q_equation1_api
+            self._molecule_api = molecule_api
+
+    # print(test.molecule1)
+
+    # window.destroy()
+
+    """
     global molecule_api
     global q_equation1_api
     global q_equation2_api
@@ -236,55 +281,40 @@ def output():
     global v1_api
     global v2_api
     global v3_api
-    #global filename_api
-
+    # global filename_api
+        for x in text1:
+            if x % 2 != 0:
+                messagebox.showerror("PyFGH", "ERROR, Must be even!!!")
+        """
+    # This is where error checking takes place.
     if q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
         messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
 
     elif q_equation1.get() == 'OH\u2082 Bond Stretch' and q_equation2.get() == 'OH\u2082 Bond Stretch':
         messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
+
     else:
+        def test():
+            molecule_api = molecule.get()
+            return molecule_api
+
         box: bool = tk.messagebox.askyesno("PyFGH", "Would you like to save the data to a text file?")
         if box:
             print('This yes button works')
-            molecule_api = molecule.get()
-            q_equation1_api = q_equation1.get()
-            q_equation2_api = q_equation2.get()
-            q_equation3_api = q_equation3.get()
-            text1_api = text1.get()
-            text2_api = text2.get()
-            text3_api = text3.get()
-            text4_api = text4.get()
-            text5_api = text5.get()
-            text6_api = text6.get()
-            t_api = t.get()
-            g_api = g.get()
-            v1_api = v1.get()
-            v2_api = v2.get()
-            v3_api = v3.get()
-            #filename_api = filename
-            #apioutput()
+            #print(test())
+            print(outputAPI.molecule_api, "works")
+            # filename_api = filename
+            # apioutput()
             window.destroy()
         else:
             print('The no button works')
-            molecule_api = molecule.get()
-            q_equation1_api = q_equation1.get()
-            q_equation2_api = q_equation2.get()
-            q_equation3_api = q_equation3.get()
-            text1_api = text1.get()
-            text2_api = text2.get()
-            text3_api = text3.get()
-            text4_api = text4.get()
-            text5_api = text5.get()
-            text6_api = text6.get()
-            t_api = t.get()
-            g_api = g.get()
-            v1_api = v1.get()
-            v2_api = v2.get()
-            v3_api = v3.get()
-            #filename_api = filename
-            #apioutput()
+            print(outputAPI.molecule_api, "works")
+            # print(outputAPI.molecule_api)
+            # filename_api = filename
+            # apioutput()
             window.destroy()
+
+
 
 
 calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',
@@ -329,11 +359,33 @@ def t0():
 tbutton = tk.Button(window, text='Display T equation', bd='10', bg='orange', fg='white',
                     command=t0).place(x=232, y=260)
 
-readbutton = tk.Button(window, text='Read Structures and Energies from File', bd='10', bg='gray', fg='white',
-                       command=open_file).place(x=360, y=320)
 
-compute = tk.Button(window, text='Compute on the fly', bd='10', bg='gray', fg='white',
-                    command=open_file).place(x=410, y=370)
+def open_file2():
+    if v1.get() == 'Model-Harmonic Oscillator':
+        messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
+    elif v1.get() == 'Model-Morse Oscillator':
+        messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
+    elif v2.get() == 'Model-Harmonic Oscillator':
+        messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
+    elif v2.get() == 'Model-Morse Oscillator':
+        messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
+    elif v3.get() == 'Model-Harmonic Oscillator':
+        messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
+    elif v3.get() == 'Model-Morse Oscillator':
+        messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
+    else:
+        global filename2
+        tkinter.Tk().withdraw()
+        filename2 = askopenfilename()
+        print(filename2)
+        window.destroy()
+
+
+readbutton = tk.Button(window, text='Read Structures and Energies from File', bd='10', bg='gray', fg='white',
+                       command=open_file2).place(x=360, y=320)
+# Disabled the compute button for now
+# compute = tk.Button(window, text='Compute on the fly', bd='10', bg='gray', fg='white',
+#                    command=open_file).place(x=410, y=370)
 
 # Adding combobox drop down list
 # cores['values'] = (multiprocessing.cpu_count())

@@ -308,6 +308,7 @@ def output():
             window.destroy()
         else:
             print('The no button works')
+            print(outputAPI.molecule_api, "works")
             # print(outputAPI.molecule_api)
             # filename_api = filename
             # apioutput()

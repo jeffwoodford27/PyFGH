@@ -7,8 +7,8 @@ intarrayD = [0, -1.4249788189, 1.4249788189]
 intarrayF = [-0.121268999, 0.9623132614, 0.9623132614]
 a_matrix = [[2, 1, 0, 0, 0], [1, 4, 1, 0, 0], [0, 1, 4, 1, 0], [0, 0, 1, 4, 1], [0, 0, 0, 1, 2]]
 inv_a_matrix = linalg.inv(a_matrix)
-print("The original matrix is: " + str(a_matrix))
-print("The inverted matrix is: " + str(linalg.inv(a_matrix)))
+# print("The original matrix is: " + str(a_matrix))
+# print("The inverted matrix is: " + str(linalg.inv(a_matrix)))
 
 T1 = [1, 2, 3]
 T2 = [4, 5, 6]
@@ -46,58 +46,63 @@ def k_vector(y_array):
 def arbitrary_k_vector(y_array):
     y_length = len(y_array)
     iterated_y_array = []
-    dummy_index = (y_length, y_length)
-    empty_matrix = np.zeros(dummy_index)
-    empty_matrix[0][0] = 2
-    empty_matrix[0][1] = 1
-    empty_matrix[y_length-1][y_length-1] = 2
-    empty_matrix[y_length-1][y_length-2] = 1
+    m_matrix = np.zeros((y_length, y_length))
+    m_matrix[0][0] = 2
+    m_matrix[0][1] = 1
+    m_matrix[y_length-1][y_length-1] = 2
+    m_matrix[y_length-1][y_length-2] = 1
     for i in range(y_length-2):
-        empty_matrix[i+1][i] = 1
-        empty_matrix[i+1][i+1] = 4
-        empty_matrix[i+1][i+2] = 1
-    inv_emp_matrix = linalg.inv(empty_matrix)
-    for i in range(y_length):
-        if i == 0:
-            iterated_y_array.append(3*(y_array[i+1]-y_array[i]))
-            iterated_y_array.append(3*(y_array[i+2]-y_array[i]))
-        elif 0 < i < y_length-2:
-            iterated_y_array.append(3*(y_array[i+2]-y_array[i]))
-        elif i == y_length-2:
-            iterated_y_array.append(3*(y_array[i+1]-y_array[i]))
-    k_array = np.matmul(inv_emp_matrix, iterated_y_array)
+        m_matrix[i+1][i] = 1
+        m_matrix[i+1][i+1] = 4
+        m_matrix[i+1][i+2] = 1
+    inv_m_matrix = linalg.inv(m_matrix)
+    iterated_y_array.append(3 * (y_array[1] - y_array[0]))
+    iterated_y_array.append(3 * (y_array[2] - y_array[0]))
+    for i in range(1, y_length-2):
+        iterated_y_array.append(3*(y_array[i+2]-y_array[i]))
+    iterated_y_array.append(3*(y_array[y_length-1]-y_array[y_length-2]))
+    k_array = np.matmul(inv_m_matrix, iterated_y_array)
     return k_array
 
 
-"""
-def derivative(y_array):
-    This function looks at all the points given to it and determines if the slope is
-    linear or quadratic based on the point before it, if each of the slopes are linear it
-    outputs linear, if the square root of each of the slopes is linear it outputs Quadratic
-    y_linear = 0
-    y_quad = 0
-    first_der_array = []
-    for i in range(len(y_array)-1):
-        if y_array[i+1] - y_array[i] == 1:
-            y_linear += 1
-            if y_linear == len(y_array)-1:
-                slope = "Linear"
-                first_der = 1
-                second_der = 0
-                return slope, first_der, second_der
-        elif math.sqrt(y_array[i+1]) - math.sqrt(y_array[i]) == 1:
-            y_quad += 1
-            if y_quad == len(y_array)-1:
-                slope = "Quadratic"
-                for j in range(len(y_array)):
-                    first_der_array.append(2*math.sqrt(y_array[j]))
-                second_der = 2
-                return slope, first_der_array, second_der
-        else:
-            return "Something went wrong"
+def eckart_translation(position_matrix, mass_vector, n_atoms):
+    # r_vector has rx, ry, and rz stored inside of it, we add all the masses calculate rx, ry, and rz then scale 
+    # the entire r vector by dividing by the total mass. Then the position matrix is altered by the value of the r
+    # vector for the corresponding position. This moves the center of mass of the molecule to the origin.
+    total_mass = 0
+    r_vector = np.zeros(n_atoms)
+    for i in range(len(mass_vector)):
+        total_mass += mass_vector[i]
+    for i in range(n_atoms):
+        r_vector[0] += position_matrix[i][0]
+        r_vector[1] += position_matrix[i][1]
+        r_vector[2] += position_matrix[i][2]
+    r_vector = r_vector/total_mass
+    for i in range(n_atoms):
+        position_matrix[i][0] = position_matrix[i][0] - r_vector[0]
+        position_matrix[i][1] = position_matrix[i][1] - r_vector[1]
+        position_matrix[i][2] = position_matrix[i][2] - r_vector[2]
+    return position_matrix
+
+
+def eckart_rotation(n_atoms, eq_matrix, dis_matrix, mass_vector):
+    # the upper and lower sums compare the equilibrium matrix and the displacement matrix, the comparison is scaled by
+    # the mass of the molecule at that point. By diving the two values and taking the arc tangent we can get the angle
+    # of the difference between the two matrices. Using the 3x3 rotation matrix and passing the angle to it we can then
+    # rotate the displacement matrix to the appropriate position.
+    upper_sum = 0
+    lower_sum = 0
+    for i in range(n_atoms):
+        upper_sum += (mass_vector[i]*((dis_matrix[i][0]*eq_matrix[1][i])-(eq_matrix[i][0])*dis_matrix[1][i]))
+        lower_sum += (mass_vector[i]*((eq_matrix[i][0]*dis_matrix[i][0])+(eq_matrix[1][i]*dis_matrix[1][i])))
+    angle_theta = np.arctan(upper_sum/lower_sum)
+    rotation_matrix = [[np.cos(angle_theta), -np.sin(angle_theta), 0], [np.sin(angle_theta), np.cos(angle_theta), 0],
+                       [0, 0, 1]]
+    updated_dis_matrix = np.matmul(rotation_matrix, dis_matrix)
+    return updated_dis_matrix
+
 
 """
-
 print("the dot product of array A and array D is: " + str(dot_product(intarrayA, intarrayD)))
 # The result should be 0
 
@@ -128,3 +133,12 @@ print("First derivative using arbitrary length (Quad): ", arbitrary_k_vector([1,
 print("First derivative using arbitrary length (Quad): ", arbitrary_k_vector([1, 4, 9, 16, 25, 36, 49]))
 print("Second derivative using arbitrary length (Quad): ",
       arbitrary_k_vector(arbitrary_k_vector([1, 4, 9, 16, 25, 36, 49])))
+"""
+
+
+print("The center of mass is: ", eckart_translation([[0, 0, 0], [1, 0, 1], [1, 0, -1]], [16, 1.008, 1.008], 3))
+print("Eckart rotation: \n", eckart_rotation(3, [[0, -.1216899, 0], [-1.4249788189, .9623132614, 0],
+                                               [1.4249788189, .9623132614, 0]], [[-.0172834238, -.1211710472, 0],
+                                                                                 [-1.2884569406, .8571139503, 0],
+                                                                                 [1.5627573484, 1.0659580057, 0]],
+                                           [16, 1.00782, 1.00782]))

@@ -1,12 +1,11 @@
 import multiprocessing
+import sys
 import tkinter
 import tkinter as tk
 from tkinter import ttk, messagebox, NW, END, DISABLED
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
 from util import API_Class
-import self
-from public import public
 
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
@@ -77,8 +76,8 @@ q_equation2["values"] = (
 
 # Label
 ttk.Label(window, text="Q\u2083:", font=("Times New Roman", 15)).place(x=755, y=47)
-f = tk.StringVar()
-q_equation3 = ttk.Combobox(window, width=15, textvariable=f)
+f2 = tk.StringVar()
+q_equation3 = ttk.Combobox(window, width=15, textvariable=f2)
 
 # creates values inside of the choice box
 q_equation3["values"] = ('Angle', 'Cosine')
@@ -89,7 +88,7 @@ d = tk.StringVar()
 N1text = ttk.Combobox(window, width=15, textvariable=d)
 
 # Entry
-text1 = ttk.Entry(window, font=("Times New Roman", 10))
+N1 = ttk.Entry(window, font=("Times New Roman", 10))
 c = tk.StringVar()
 N1box = ttk.Combobox(window, textvariable=c)
 
@@ -99,9 +98,9 @@ h = tk.StringVar()
 L1text = ttk.Combobox(window, width=15, textvariable=h)
 
 # Entry
-text2 = ttk.Entry(window, font=("Times New Roman", 10))
-i = tk.StringVar()
-L1box = ttk.Combobox(window, textvariable=i)
+L1 = ttk.Entry(window, font=("Times New Roman", 10))
+zz = tk.StringVar()
+L1box = ttk.Combobox(window, textvariable=zz)
 
 # Label
 ttk.Label(window, text="N\u2082:", font=("Times New Roman", 15)).place(x=310, y=98)
@@ -109,39 +108,39 @@ h = tk.StringVar()
 N2text = ttk.Combobox(window, width=15, textvariable=h)
 
 # Entry
-text3 = ttk.Entry(window, font=("Times New Roman", 10))
+N2 = ttk.Entry(window, font=("Times New Roman", 10))
 i = tk.StringVar()
 N2box = ttk.Combobox(window, textvariable=i)
 
 # Label
 ttk.Label(window, text="L\u2082:", font=("Times New Roman", 15)).place(x=465, y=98)
-h = tk.StringVar()
-L2text = ttk.Combobox(window, width=15, textvariable=h)
+h2 = tk.StringVar()
+L2text = ttk.Combobox(window, width=15, textvariable=h2)
 
 # Entry
-text4 = ttk.Entry(window, font=("Times New Roman", 10))
-i = tk.StringVar()
-L2box = ttk.Combobox(window, textvariable=i)
+L2 = ttk.Entry(window, font=("Times New Roman", 10))
+i2 = tk.StringVar()
+L2box = ttk.Combobox(window, textvariable=i2)
 
 # Label
 ttk.Label(window, text="N\u2083:", font=("Times New Roman", 15)).place(x=615, y=98)
-h = tk.StringVar()
-N3text = ttk.Combobox(window, width=15, textvariable=h)
+h3 = tk.StringVar()
+N3text = ttk.Combobox(window, width=15, textvariable=h3)
 
 # Entry
-text5 = ttk.Entry(window, font=("Times New Roman", 10))
-i = tk.StringVar()
-N3box = ttk.Combobox(window, textvariable=i)
+N3 = ttk.Entry(window, font=("Times New Roman", 10))
+i4 = tk.StringVar()
+N3box = ttk.Combobox(window, textvariable=i4)
 
 # Label
 ttk.Label(window, text="L\u2083:", font=("Times New Roman", 15)).place(x=770, y=98)
-h = tk.StringVar()
-L3text = ttk.Combobox(window, width=15, textvariable=h)
+h6 = tk.StringVar()
+L3text = ttk.Combobox(window, width=15, textvariable=h6)
 
 # Entry
-text6 = ttk.Entry(window, font=("Times New Roman", 10))
-i = tk.StringVar()
-L3box = ttk.Combobox(window, textvariable=i)
+L3 = ttk.Entry(window, font=("Times New Roman", 10))
+i5 = tk.StringVar()
+L3box = ttk.Combobox(window, textvariable=i5)
 
 # Label
 ttk.Label(window, text="Equilibrium Coordinates:", font=("Times New Roman", 10)).place(x=645, y=155)
@@ -211,65 +210,18 @@ def apioutput():
     print(q_equation1.get())
     print(q_equation2.get())
     print(q_equation3.get())
-    print(text1.get())
-    print(text2.get())
-    print(text3.get())
-    print(text4.get())
-    print(text5.get())
-    print(text6.get())
+    print(N1.get())
+    print(L1.get())
+    print(N2.get())
+    print(L2.get())
+    print(N3.get())
+    print(L3.get())
     print(t.get())
     print(g.get())
     print(v1.get())
     print(v2.get())
     print(v3.get())
     print(filename)
-
-
-def output():
-    API_Class.outputAPI.items.molecule = molecule.get()
-    API_Class.outputAPI.items.q_equation1 = q_equation1.get()
-    API_Class.outputAPI.items.q_equation2 = q_equation2.get()
-    API_Class.outputAPI.items.q_equation3 = q_equation3.get()
-    API_Class.outputAPI.items.text1 = text1.get()
-    API_Class.outputAPI.items.text2 = text2.get()
-    API_Class.outputAPI.items.text3 = text3.get()
-    API_Class.outputAPI.items.text4 = text4.get()
-    API_Class.outputAPI.items.text5 = text5.get()
-    API_Class.outputAPI.items.text6 = text6.get()
-    API_Class.outputAPI.items.t = t.get()
-    API_Class.outputAPI.items.g = g.get()
-    API_Class.outputAPI.items.v1 = v1.get()
-    API_Class.outputAPI.items.v2 = v2.get()
-    API_Class.outputAPI.items.v3 = v3.get()
-    #API_Class.outputAPI.items.file_name = filename
-    #print(filename)
-    # This is where error checking takes place.
-    if q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
-        messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
-
-    elif q_equation1.get() == 'OH\u2082 Bond Stretch' and q_equation2.get() == 'OH\u2082 Bond Stretch':
-        messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
-
-    else:
-        box: bool = tk.messagebox.askyesno("PyFGH", "Would you like to save the data to a text file?")
-        if box:
-            print('This yes button works')
-            # filename_api = filename
-            # apioutput()
-            window.destroy()
-        else:
-            print('The no button works')
-            #print(API_Class.outputAPI.items.molecule)
-            # print(outputAPI.molecule_api)
-            # filename_api = filename
-            # apioutput()
-            window.destroy()
-
-
-
-
-calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',
-                      command=output).place(x=420, y=250)
 
 
 # This definition works! This clears everything in the window!!!
@@ -284,13 +236,99 @@ def clear_data():
     v1.set('')
     v2.set('')
     v3.set('')
-    text1.delete(0, END)
-    text2.delete(0, END)
-    text3.delete(0, END)
-    text4.delete(0, END)
-    text5.delete(0, END)
-    text6.delete(0, END)
+    N1.delete(0, END)
+    L1.delete(0, END)
+    N2.delete(0, END)
+    L2.delete(0, END)
+    N3.delete(0, END)
+    L3.delete(0, END)
 
+
+def save_file_prompt():
+    box: bool = tk.messagebox.askyesno("PyFGH", "Would you like to save the data to a text file?")
+    if box:
+        print('This yes button works')
+        # filename_api = filename
+        # apioutput()
+        window.destroy()
+    else:
+        print('The no button works')
+        # filename_api = filename
+        # apioutput()
+        window.destroy()
+
+
+def output():
+    try:
+        """
+        Added validation rules to my interface. All N values must be positive, odd integers.
+        All L values must be positive floating point-values. 
+        Q1 and Q2 can not be the same.
+        Fix N so that the user can not enter floating point values.
+        """
+        API_Class.outputAPI.items.molecule = molecule.get()
+        API_Class.outputAPI.items.q_equation1 = q_equation1.get()
+        API_Class.outputAPI.items.q_equation2 = q_equation2.get()
+        API_Class.outputAPI.items.q_equation3 = q_equation3.get()
+        API_Class.outputAPI.items.text1 = N1.get()
+        API_Class.outputAPI.items.text2 = float(L1.get())
+        API_Class.outputAPI.items.text3 = N2.get()
+        API_Class.outputAPI.items.text4 = float(L2.get())
+        API_Class.outputAPI.items.text5 = N3.get()
+        API_Class.outputAPI.items.text6 = float(L3.get())
+        API_Class.outputAPI.items.t = t.get()
+        API_Class.outputAPI.items.g = g.get()
+        API_Class.outputAPI.items.v1 = v1.get()
+        API_Class.outputAPI.items.v2 = v2.get()
+        API_Class.outputAPI.items.v3 = v3.get()
+        # API_Class.outputAPI.items.file_name = filename
+    # This is where error checking takes place.
+
+        if q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
+            messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
+            clear_data()
+
+        elif q_equation1.get() == 'OH\u2082 Bond Stretch' and q_equation2.get() == 'OH\u2082 Bond Stretch':
+            messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
+            clear_data()
+        # this makes sure that the values are positive
+        elif (int(API_Class.outputAPI.items.text1)) % 2 == 0:
+            messagebox.showerror("PyFGH", "N must be odd!!!")
+            clear_data()
+        elif (int(API_Class.outputAPI.items.text3)) % 2 == 0:
+            messagebox.showerror("PyFGH", "N must be odd!!!")
+            clear_data()
+        elif (int(API_Class.outputAPI.items.text5)) % 2 == 0:
+            messagebox.showerror("PyFGH", "N must be odd!!!")
+            clear_data()
+
+        elif int(API_Class.outputAPI.items.text1) < 0:
+            messagebox.showerror("PyFGH", "N must be positive!!!")
+            clear_data()
+        elif int(API_Class.outputAPI.items.text2) < 0:
+            messagebox.showerror("PyFGH", "L must be positive!!!")
+            clear_data()
+        elif int(API_Class.outputAPI.items.text3) < 0:
+            messagebox.showerror("PyFGH", "N must be positive!!!")
+            clear_data()
+        elif int(API_Class.outputAPI.items.text4) < 0:
+            messagebox.showerror("PyFGH", "L must be positive!!!")
+            clear_data()
+        elif int(API_Class.outputAPI.items.text5) < 0:
+            messagebox.showerror("PyFGH", "N must be positive!!!")
+            clear_data()
+        elif int(API_Class.outputAPI.items.text6) < 0:
+            messagebox.showerror("PyFGH", "L must be positive!!!")
+            clear_data()
+
+        else:
+            save_file_prompt()
+    except ValueError:
+        messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")
+
+
+calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',
+                      command=output).place(x=420, y=250)
 
 clear = tk.Button(window, text='Clear', bd='10', bg='blue', fg='white',
                   command=clear_data).place(x=525, y=260)
@@ -361,10 +399,10 @@ v2.place(x=380, y=207)
 v2.current()
 v3.place(x=690, y=207)
 v3.current()
-text1.place(x=40, y=100, width=100)
-text2.place(x=185, y=100, width=100)
-text3.place(x=340, y=100, width=100)
-text4.place(x=495, y=100, width=100)
-text5.place(x=645, y=100, width=100)
-text6.place(x=800, y=100, width=100)
+N1.place(x=40, y=100, width=100)
+L1.place(x=185, y=100, width=100)
+N2.place(x=340, y=100, width=100)
+L2.place(x=495, y=100, width=100)
+N3.place(x=645, y=100, width=100)
+L3.place(x=800, y=100, width=100)
 window.mainloop()

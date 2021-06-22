@@ -258,6 +258,85 @@ def save_file_prompt():
         window.destroy()
 
 
+
+
+
+def model_prompt1():
+    window1 = tk.Tk()
+    style = Style()
+    window1.title('PyFGH')
+    window1.geometry('300x300')
+
+    # Water molecule icon in the top left conner
+    window1.iconbitmap(default='icon.ico')
+    " This is for the harmonic "
+    ttk.Label(window1, text="\u03BC for Q\u2081:", font=("Times New Roman", 15)).place(x=50, y=5)
+    a = tk.StringVar()
+    Mutext = ttk.Combobox(window1, width=15, textvariable=a)
+    # Entry
+    Mu = ttk.Entry(window1, font=("Times New Roman", 10))
+    i = tk.StringVar()
+    Mubox = ttk.Combobox(window1, textvariable=i)
+
+    ttk.Label(window1, text="k for Q\u2081:", font=("Times New Roman", 15)).place(x=50, y=40)
+    b = tk.StringVar()
+    c = ttk.Combobox(window1, width=15, textvariable=b)
+
+    # Entry
+    K = ttk.Entry(window1, font=("Times New Roman", 10))
+    i1 = tk.StringVar()
+    Kbox = ttk.Combobox(window1, textvariable=i1)
+
+    ttk.Label(window1, text="\u03BC for Q\u2082:", font=("Times New Roman", 15)).place(x=50, y=75)
+    a2 = tk.StringVar()
+    Mutext2 = ttk.Combobox(window1, width=15, textvariable=a2)
+    # Entry
+    Mu2 = ttk.Entry(window1, font=("Times New Roman", 10))
+    i = tk.StringVar()
+    Mubox2 = ttk.Combobox(window1, textvariable=i)
+
+    ttk.Label(window1, text="k for Q\u2082:", font=("Times New Roman", 15)).place(x=50, y=110)
+    b = tk.StringVar()
+    c2 = ttk.Combobox(window1, width=15, textvariable=b)
+
+    # Entry
+    K2 = ttk.Entry(window1, font=("Times New Roman", 10))
+    i2 = tk.StringVar()
+    Kbox2 = ttk.Combobox(window1, textvariable=i2)
+
+    ttk.Label(window1, text="\u03BC for Q\u2083:", font=("Times New Roman", 15)).place(x=50, y=145)
+    a3 = tk.StringVar()
+    Mutext3 = ttk.Combobox(window1, width=15, textvariable=a3)
+    # Entry
+    Mu3 = ttk.Entry(window1, font=("Times New Roman", 10))
+    i3 = tk.StringVar()
+    Mubox3 = ttk.Combobox(window1, textvariable=i3)
+
+    ttk.Label(window1, text="k for Q\u2083:", font=("Times New Roman", 15)).place(x=50, y=180)
+    b = tk.StringVar()
+    c3 = ttk.Combobox(window1, width=15, textvariable=b)
+
+    # Entry
+    K3 = ttk.Entry(window1, font=("Times New Roman", 10))
+    i2 = tk.StringVar()
+    Kbox3 = ttk.Combobox(window1, textvariable=i2)
+
+    def enter_button():
+        window1.destroy()
+        save_file_prompt()
+
+    enter = tk.Button(window1, text='Enter', bd='20', bg='green', fg='white',
+                      command=enter_button).place(x=110, y=215)
+
+    Mu.place(x=130, y=10, width=100)
+    K.place(x=130, y=40, width=100)
+    Mu2.place(x=130, y=75, width=100)
+    K2.place(x=130, y=110, width=100)
+    Mu3.place(x=130, y=145, width=100)
+    K3.place(x=130, y=180, width=100)
+    window1.mainloop()
+
+
 def output():
     try:
         """
@@ -282,9 +361,11 @@ def output():
         API_Class.outputAPI.items.v2 = v2.get()
         API_Class.outputAPI.items.v3 = v3.get()
         # API_Class.outputAPI.items.file_name = filename
-    # This is where error checking takes place.
+        # This is where error checking takes place.
 
-        if q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
+        if API_Class.outputAPI.items.v1 == 'Model-Harmonic Oscillator' and API_Class.outputAPI.items.v2 == 'Model-Harmonic Oscillator' and API_Class.outputAPI.items.v3 == 'Model-Harmonic Oscillator':
+            model_prompt1()
+        elif q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
             messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
             clear_data()
 

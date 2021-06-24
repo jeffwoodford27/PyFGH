@@ -1,4 +1,4 @@
-class outputAPI:
+class output:
 
     class items:
 

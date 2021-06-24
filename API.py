@@ -1,6 +1,6 @@
 import multiprocessing
 import GUI
-from util import API_Class
+from util import InputData
 """
 This is the API file.
 Author: Josiah Randleman
@@ -10,19 +10,19 @@ Author: Josiah Randleman
 # TODO: possibly make a restart button
 
 
-print(API_Class.outputAPI.items.molecule, 'This works from API file')
-print(API_Class.outputAPI.items.q_equation1, 'This works from API file')
-print(API_Class.outputAPI.items.q_equation2, 'This works from API file')
-print(API_Class.outputAPI.items.q_equation3, 'This works from API file')
-print(API_Class.outputAPI.items.text1, 'This works from API file')
-print(API_Class.outputAPI.items.text2, 'This works from API file')
-print(API_Class.outputAPI.items.text3, 'This works from API file')
-print(API_Class.outputAPI.items.text4, 'This works from API file')
-print(API_Class.outputAPI.items.text5, 'This works from API file')
-print(API_Class.outputAPI.items.text6, 'This works from API file')
-print(API_Class.outputAPI.items.t, 'This works from API file')
-print(API_Class.outputAPI.items.g, 'This works from API file')
-print(API_Class.outputAPI.items.v1, 'This works from API file')
-print(API_Class.outputAPI.items.v2, 'This works from API file')
-print(API_Class.outputAPI.items.v3, 'This works from API file')
+print(InputData.output.items.molecule, 'This works from API file')
+print(InputData.output.items.q_equation1, 'This works from API file')
+print(InputData.output.items.q_equation2, 'This works from API file')
+print(InputData.output.items.q_equation3, 'This works from API file')
+print(InputData.output.items.text1, 'This works from API file')
+print(InputData.output.items.text2, 'This works from API file')
+print(InputData.output.items.text3, 'This works from API file')
+print(InputData.output.items.text4, 'This works from API file')
+print(InputData.output.items.text5, 'This works from API file')
+print(InputData.output.items.text6, 'This works from API file')
+print(InputData.output.items.t, 'This works from API file')
+print(InputData.output.items.g, 'This works from API file')
+print(InputData.output.items.v1, 'This works from API file')
+print(InputData.output.items.v2, 'This works from API file')
+print(InputData.output.items.v3, 'This works from API file')
 

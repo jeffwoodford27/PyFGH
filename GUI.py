@@ -346,12 +346,12 @@ def output():
         InputData.output.items.q_equation1 = q_equation1.get()
         InputData.output.items.q_equation2 = q_equation2.get()
         InputData.output.items.q_equation3 = q_equation3.get()
-        InputData.output.items.text1 = N1.get()
-        InputData.output.items.text2 = float(L1.get())
-        InputData.output.items.text3 = N2.get()
-        InputData.output.items.text4 = float(L2.get())
-        InputData.output.items.text5 = N3.get()
-        InputData.output.items.text6 = float(L3.get())
+        InputData.output.items.N1 = N1.get()
+        InputData.output.items.L1 = float(L1.get())
+        InputData.output.items.N2 = N2.get()
+        InputData.output.items.L2 = float(L2.get())
+        InputData.output.items.N3 = N3.get()
+        InputData.output.items.L3 = float(L3.get())
         InputData.output.items.t = t.get()
         InputData.output.items.g = g.get()
         InputData.output.items.v1 = v1.get()
@@ -370,32 +370,32 @@ def output():
             messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
             clear_data()
         # this makes sure that the values are positive
-        elif (int(InputData.output.items.text1)) % 2 == 0:
+        elif (int(InputData.output.items.N1)) % 2 == 0:
             messagebox.showerror("PyFGH", "N must be odd!!!")
             clear_data()
-        elif (int(InputData.output.items.text3)) % 2 == 0:
+        elif (int(InputData.output.items.N2)) % 2 == 0:
             messagebox.showerror("PyFGH", "N must be odd!!!")
             clear_data()
-        elif (int(InputData.output.items.text5)) % 2 == 0:
+        elif (int(InputData.output.items.N3)) % 2 == 0:
             messagebox.showerror("PyFGH", "N must be odd!!!")
             clear_data()
 
-        elif int(InputData.output.items.text1) < 0:
+        elif int(InputData.output.items.N1) < 0:
             messagebox.showerror("PyFGH", "N must be positive!!!")
             clear_data()
-        elif int(InputData.output.items.text2) < 0:
+        elif int(InputData.output.items.L1) < 0:
             messagebox.showerror("PyFGH", "L must be positive!!!")
             clear_data()
-        elif int(InputData.output.items.text3) < 0:
+        elif int(InputData.output.items.N2) < 0:
             messagebox.showerror("PyFGH", "N must be positive!!!")
             clear_data()
-        elif int(InputData.output.items.text4) < 0:
+        elif int(InputData.output.items.L2) < 0:
             messagebox.showerror("PyFGH", "L must be positive!!!")
             clear_data()
-        elif int(InputData.output.items.text5) < 0:
+        elif int(InputData.output.items.N3) < 0:
             messagebox.showerror("PyFGH", "N must be positive!!!")
             clear_data()
-        elif int(InputData.output.items.text6) < 0:
+        elif int(InputData.output.items.L3) < 0:
             messagebox.showerror("PyFGH", "L must be positive!!!")
             clear_data()
 

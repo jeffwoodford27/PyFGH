@@ -1,31 +1,41 @@
 import time
-from multiprocessing import Process, Lock,  Queue
+from multiprocessing import Process, Lock, Queue
 import os
+from util import InputData
 
 
-def parent(title, x, y):
+
+def info(title,):
     print(title)
 
     print('process id:', os.getpid())
 
 
 
-def child(lock, total, x, y, sleepTime):
+def parent():
+    print('The interface is started')
+    import GUI
+
+
+def child(lock, sleepTime):
     lock.acquire()
-    parent('child process 1', 10, 10)
-    total.put(x+y)
-    print('x and y are added')
+    info('child process 1',)
+    #total.put(x + y)
+    print('variables are retrieved')
     lock.release()
     time.sleep(sleepTime)
-
 
 
 if __name__ == '__main__':
     lock = Lock()
     total = Queue()
-    parent('Parent process', 10, 10)
-    print('created x and y in the parent')
-    p = Process(target=child, args=(lock, total, 10, 10, 3))
+    info('Parent process',)
+    parent()
+    p = Process(target=child, args=(lock, 3))
     p.start()
     p.join()
-    print(total.get())
+    print(InputData.output.items.molecule)
+    print(InputData.output.items.N1)
+    print('done')
+
+    #print(total.get())

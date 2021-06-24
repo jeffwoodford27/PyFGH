@@ -4,12 +4,10 @@ import os
 from util import InputData
 
 
-
-def info(title,):
+def info(title, ):
     print(title)
 
     print('process id:', os.getpid())
-
 
 
 def parent():
@@ -17,25 +15,29 @@ def parent():
     import GUI
 
 
-def child(lock, sleepTime):
+def child1(lock, sleepTime):
     lock.acquire()
-    info('child process 1',)
-    #total.put(x + y)
+    info('child process 1', )
+    # total.put(x + y)
     print('variables are retrieved')
     lock.release()
     time.sleep(sleepTime)
 
 
+def child2():
+    info('child process 2', )
+    print(int(InputData.output.items.N1) + int(InputData.output.items.N2))
+
+
 if __name__ == '__main__':
     lock = Lock()
     total = Queue()
-    info('Parent process',)
+    info('Parent process', )
     parent()
-    p = Process(target=child, args=(lock, 3))
+    p = Process(target=child1, args=(lock, 3))
     p.start()
     p.join()
-    print(InputData.output.items.molecule)
-    print(InputData.output.items.N1)
+    child2()
     print('done')
 
-    #print(total.get())
+    # print(total.get())

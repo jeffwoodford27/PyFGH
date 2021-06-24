@@ -1,11 +1,11 @@
 import multiprocessing
-import sys
+
 import tkinter
 import tkinter as tk
-from tkinter import ttk, messagebox, NW, END, DISABLED
+from tkinter import ttk, messagebox, NW, END
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
-from util import API_Class
+from util import InputData
 
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
@@ -258,9 +258,6 @@ def save_file_prompt():
         window.destroy()
 
 
-
-
-
 def model_prompt1():
     window1 = tk.Tk()
     style = Style()
@@ -345,25 +342,25 @@ def output():
         Q1 and Q2 can not be the same.
         Fix N so that the user can not enter floating point values.
         """
-        API_Class.outputAPI.items.molecule = molecule.get()
-        API_Class.outputAPI.items.q_equation1 = q_equation1.get()
-        API_Class.outputAPI.items.q_equation2 = q_equation2.get()
-        API_Class.outputAPI.items.q_equation3 = q_equation3.get()
-        API_Class.outputAPI.items.text1 = N1.get()
-        API_Class.outputAPI.items.text2 = float(L1.get())
-        API_Class.outputAPI.items.text3 = N2.get()
-        API_Class.outputAPI.items.text4 = float(L2.get())
-        API_Class.outputAPI.items.text5 = N3.get()
-        API_Class.outputAPI.items.text6 = float(L3.get())
-        API_Class.outputAPI.items.t = t.get()
-        API_Class.outputAPI.items.g = g.get()
-        API_Class.outputAPI.items.v1 = v1.get()
-        API_Class.outputAPI.items.v2 = v2.get()
-        API_Class.outputAPI.items.v3 = v3.get()
+        InputData.output.items.molecule = molecule.get()
+        InputData.output.items.q_equation1 = q_equation1.get()
+        InputData.output.items.q_equation2 = q_equation2.get()
+        InputData.output.items.q_equation3 = q_equation3.get()
+        InputData.output.items.text1 = N1.get()
+        InputData.output.items.text2 = float(L1.get())
+        InputData.output.items.text3 = N2.get()
+        InputData.output.items.text4 = float(L2.get())
+        InputData.output.items.text5 = N3.get()
+        InputData.output.items.text6 = float(L3.get())
+        InputData.output.items.t = t.get()
+        InputData.output.items.g = g.get()
+        InputData.output.items.v1 = v1.get()
+        InputData.output.items.v2 = v2.get()
+        InputData.output.items.v3 = v3.get()
         # API_Class.outputAPI.items.file_name = filename
         # This is where error checking takes place.
 
-        if API_Class.outputAPI.items.v1 == 'Model-Harmonic Oscillator' and API_Class.outputAPI.items.v2 == 'Model-Harmonic Oscillator' and API_Class.outputAPI.items.v3 == 'Model-Harmonic Oscillator':
+        if InputData.output.items.v1 == 'Model-Harmonic Oscillator' and InputData.output.items.v2 == 'Model-Harmonic Oscillator' and InputData.output.items.v3 == 'Model-Harmonic Oscillator':
             model_prompt1()
         elif q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
             messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
@@ -373,32 +370,32 @@ def output():
             messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
             clear_data()
         # this makes sure that the values are positive
-        elif (int(API_Class.outputAPI.items.text1)) % 2 == 0:
+        elif (int(InputData.output.items.text1)) % 2 == 0:
             messagebox.showerror("PyFGH", "N must be odd!!!")
             clear_data()
-        elif (int(API_Class.outputAPI.items.text3)) % 2 == 0:
+        elif (int(InputData.output.items.text3)) % 2 == 0:
             messagebox.showerror("PyFGH", "N must be odd!!!")
             clear_data()
-        elif (int(API_Class.outputAPI.items.text5)) % 2 == 0:
+        elif (int(InputData.output.items.text5)) % 2 == 0:
             messagebox.showerror("PyFGH", "N must be odd!!!")
             clear_data()
 
-        elif int(API_Class.outputAPI.items.text1) < 0:
+        elif int(InputData.output.items.text1) < 0:
             messagebox.showerror("PyFGH", "N must be positive!!!")
             clear_data()
-        elif int(API_Class.outputAPI.items.text2) < 0:
+        elif int(InputData.output.items.text2) < 0:
             messagebox.showerror("PyFGH", "L must be positive!!!")
             clear_data()
-        elif int(API_Class.outputAPI.items.text3) < 0:
+        elif int(InputData.output.items.text3) < 0:
             messagebox.showerror("PyFGH", "N must be positive!!!")
             clear_data()
-        elif int(API_Class.outputAPI.items.text4) < 0:
+        elif int(InputData.output.items.text4) < 0:
             messagebox.showerror("PyFGH", "L must be positive!!!")
             clear_data()
-        elif int(API_Class.outputAPI.items.text5) < 0:
+        elif int(InputData.output.items.text5) < 0:
             messagebox.showerror("PyFGH", "N must be positive!!!")
             clear_data()
-        elif int(API_Class.outputAPI.items.text6) < 0:
+        elif int(InputData.output.items.text6) < 0:
             messagebox.showerror("PyFGH", "L must be positive!!!")
             clear_data()
 

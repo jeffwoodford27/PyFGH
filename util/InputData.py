@@ -19,3 +19,17 @@ class output:
         v3 = 0
         file_name = 0
 
+        Mu = 0
+        K = 0
+        Mu2 = 0
+        K2 = 0
+        Mu3 = 0
+        K3 = 0
+        D = 0
+        D2 = 0
+        D3 = 0
+        a = 0
+        a2 = 0
+        a3 = 0
+
+

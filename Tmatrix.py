@@ -4,14 +4,14 @@ import scipy as scipy
 import scipy.linalg
 import pyfghutil
 import math
-import time
+
 
 #A function to calculate the BMatrix
 def bmatrixgen(NValue, LValue):
     #Generate the BMatrix
-    b_matrix_local = scipy.zeros((NValue, NValue), float)
+    b_matrix = np.zeros((NValue, NValue), float)
     #Generate the difference matrix for the value calculations
-    difb_matrix = scipy.zeros((NValue, 1), float)   
+    difb_matrix = np.zeros((NValue, 1), float)
     scroll = 0
     for a in difb_matrix:
         for b in range(int((NValue-1)/2)):

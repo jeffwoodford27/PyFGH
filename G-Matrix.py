@@ -14,6 +14,8 @@ T1 = [1, 2, 3]
 T2 = [4, 5, 6]
 T3 = [7, 8, 9]
 
+print("Hello")
+
 
 def dot_product(first_array, second_array):
     dot_sum = 0

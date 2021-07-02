@@ -31,5 +31,6 @@ class output:
         a = 0
         a2 = 0
         a3 = 0
+        model_data = []
 
 

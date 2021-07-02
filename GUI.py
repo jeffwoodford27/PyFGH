@@ -259,11 +259,6 @@ def save_file_prompt():
         window.destroy()
 
 
-
-
-entries = []
-
-
 def model_prompt(section_1, section_2, section_3):
     global modelParam, modelParam2, modelParam3, modelLabel, modelLabel2, modelLabel3
     if section_1 == 0:  # Harmonic Oscillator
@@ -303,44 +298,64 @@ def model_prompt(section_1, section_2, section_3):
 
     window1 = tk.Tk()
     style = Style()
-    window1.title('PyFGH')
+    window1.title('Testing')
     box_length = 103
     box_length = box_length + 33 * (modelParam + modelParam2 + modelParam3)
     box_len_str = '300x' + str(box_length)
     window1.geometry(box_len_str)
-    # Water molecule icon in the top left conner
-    window1.iconbitmap(default='icon.ico')
 
     j = 0
     y = 5
 
+    entries = []
+    # create 3 variable lists, for Q1, Q2 and Q3
+    q1var = []
+    q2var = []
+    q3var = []
+
     for j in range(modelParam):
+        # append a string variable to the q1var list
+        q1var.append(tk.StringVar())
         ttk.Label(window1, text=modelLabel[j] + " for Q1:",
                   font=("Times New Roman", 15)).place(x=50, y=y)
-        a1 = ttk.Entry(window1, font=("Times New Roman", 10)).place(x=140, y=y)
-        entries.append(a1)
+        # set text variable as q1var[j] , each entry will have separate index in the list
+        a1 = ttk.Entry(window1, textvariable=q1var[j], font=("Times New Roman", 10)).place(x=140, y=y)
+
         j += 1
         y += 35
 
     for j in range(modelParam2):
+        # append a string variable to the q2var list
+        q2var.append(tk.StringVar())
         ttk.Label(window1, text=modelLabel2[j] + " for Q2:",
                   font=("Times New Roman", 15)).place(x=50, y=y)
-        a2 = ttk.Entry(window1, font=("Times New Roman", 10)).place(x=140, y=y)
-        entries.append(a2)
+        # set text variable as q3var[j] , each entry will have separate index in the list
+        a2 = ttk.Entry(window1, textvariable=q2var[j], font=("Times New Roman", 10)).place(x=140, y=y)
         j += 1
         y += 35
 
     for j in range(modelParam3):
+        # append a string variable to the q3var list
+        q3var.append(tk.StringVar())
         ttk.Label(window1, text=modelLabel3[j] + " for Q3:",
                   font=("Times New Roman", 15)).place(x=50, y=y)
-        a3 =ttk.Entry(window1, font=("Times New Roman", 10)).place(x=140, y=y)
-        entries.append(a3)
+        # set text variable as q3var[j] , each entry will have separate index in the list
+        a3 = ttk.Entry(window1, textvariable=q3var[j], font=("Times New Roman", 10)).place(x=140, y=y)
         j += 1
         y += 35
 
     def enter_button():
-        window1.destroy()
+        # add values from entry to the list using text variable
+        for k in range(modelParam):
+            entries.append('Q1 ' + modelLabel[k] + ' is ' + q1var[k].get())
+        for k in range(modelParam2):
+            entries.append('Q2 ' + modelLabel2[k] + ' is ' + q2var[k].get())
+        for k in range(modelParam3):
+            entries.append('Q3 ' + modelLabel3[k] + ' is ' + q3var[k].get())
+
+        InputData.output.items.entries_list = entries
         save_file_prompt()
+        window1.destroy()
 
     enter = tk.Button(window1, text='Enter', bd='20', bg='green', fg='white',
                       command=enter_button).place(x=110, y=y)

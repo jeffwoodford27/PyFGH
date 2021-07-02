@@ -1,10 +1,28 @@
 #Import the needed modules
 import numpy as np
-import scipy as scipy
-import scipy.linalg
-import pyfghutil
+from util import pyfghutil
 import math
-import time
+
+
+class HarmonicOscillatorModel:
+    def __init__(self,k):
+        self.k = k
+
+class MorseOscillatorModel:
+    def __init__(self,De,a):
+        self.De = De
+        self.a = a
+
+class Molecule:
+    def __init__(self, D, N, L, mu, Vtype, Vmodel):
+        self.N = N
+        self.L = L
+        self.mu = mu
+        self.Vtype = Vtype
+        self.Vmodel = Vmodel
+
+
+
 
 #A function to calculate the invidivdual values for the VMatrix
 def Vab(d, NValue, LValue, VModel, VType, deltax, dimensionCounterArray):
@@ -34,37 +52,8 @@ def Vab(d, NValue, LValue, VModel, VType, deltax, dimensionCounterArray):
                 #This should never happen
     return(total)        
 
-#A function to calculate the individual values for the TMatrix
-def Tab(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray):
-    #Deltacounter is used to makes sure that the value being calculated is in the diagonal of the matrix
-    Deltacounter = 0
-    #Total is return value
-    total = 0.0
-    for T in range(d):
-        #Check if the T counter is not equal to the index of the C value being tested, and if so it checks for if the dimension's corrosponding x and y values equal each other.
-        Deltacounter = 0
-        for Ccounter in range(d):
-            if(Ccounter != T):
-                if(dimensionCounterArray[Ccounter*2] == dimensionCounterArray[(Ccounter*2)+1]):
-                    Deltacounter += 1
-            else:
-                pass
-        #If deltacounter equals the dimensions - 1, add the formula to the total for that C value
-        if (Deltacounter == (d-1)):
-                #print(dimensionCounterArray)
-                try:
-                    total += (c_matrix_insert[T][dimensionCounterArray[(T*2)+1], dimensionCounterArray[T*2]])*((-1.0*1.0**2)/(2.0*mu[(d-1)-T])) 
-                except:
-                    print("Trying to access: "+str(dimensionCounterArray[(T*2)+1])+", "+str(dimensionCounterArray[T*2]))
-                    print(c_matrix_insert[T])
-                    print("TAB error")
-                    
-
-    return(total)        
-    #return(total*((-1.0*1.0**2)/(2.0*mu)))        
-
 #The function to calculate a VMatrix using the mol class from input
-def VMatrixCalc(mol, D, VType):
+def VMatrixCalc(mol, D):
     #Establish variables needed
     dimensions = D
     NValue = mol.N
@@ -75,21 +64,32 @@ def VMatrixCalc(mol, D, VType):
     mu = mol.mu
     #deltax = (float(LValue)/float(NValue))
     #Create the array for the x dimensional counters
-    dimensionCounterArray = scipy.zeros((dimensions*2,1), int)
+    dimensionCounterArray = np.zeros((dimensions*2,1), int)
 
     #Create the VMatrix
     #The alpha and beta values are used to create the VMatrix in the correct position
-    vmatrix = scipy.zeros((np.prod(NValue), np.prod(NValue)), float)
-    alpha = 0
-    beta = 0
+    vmatrix = np.zeros((np.prod(NValue), np.prod(NValue)), float)
 
     #Calculate the VMatrix
     for i in range((np.prod(NValue))*(np.prod(NValue))):
         alpha = pyfghutil.AlphaCalc(dimensions, dimensionCounterArray, NValue)
         beta = pyfghutil.BetaCalc(dimensions, dimensionCounterArray, NValue)  
 
-        vmatrix[alpha, beta] =  (Vab(dimensions, NValue, LValue, VModel, VType, 0, dimensionCounterArray))
+        vmatrix[alpha, beta] = (Vab(dimensions, NValue, LValue, VModel, VType, 0, dimensionCounterArray))
 
         #Adds +1 to the last dimension's X/Y value and checks to see if values need to add 1 to the next dimension counter / sets the current value to 0
         dimensionCounterArray = pyfghutil.DCAAdvance(dimensions, dimensionCounterArray, NValue)
     return vmatrix
+
+
+
+
+D = 1
+N = [5]
+L = [3]
+mu = [919]
+Vtype = [0]
+Vmodel = [HarmonicOscillatorModel(0.37)]
+
+mol = Molecule(D, N, L, mu, Vtype, Vmodel)
+print(VMatrixCalc(mol,D))

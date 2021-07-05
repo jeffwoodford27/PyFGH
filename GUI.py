@@ -349,12 +349,11 @@ def model_prompt(section_1, section_2, section_3):
     def enter_button():
         # add values from entry to the list using text variable
         for values in range(modelParam):
-            entries.append('Q1 ' + modelLabel[values] + ' is ' + q1var[values].get())
-            print(q1var[values].get(), 'test for q1')
+            entries.append(modelName + ': Q1 ' + modelLabel[values] + ' is ' + q1var[values].get())
         for values in range(modelParam2):
-            entries.append('Q2 ' + modelLabel2[values] + ' is ' + q2var[values].get())
+            entries.append(modelName2 + ': Q2 ' + modelLabel2[values] + ' is ' + q2var[values].get())
         for values in range(modelParam3):
-            entries.append('Q3 ' + modelLabel3[values] + ' is ' + q3var[values].get())
+            entries.append(modelName3 + ': Q3 ' + modelLabel3[values] + ' is ' + q3var[values].get())
 
         InputData.output.items.model_data = entries
         print(InputData.output.items.model_data, 'this is from InputData')

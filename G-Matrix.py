@@ -1,18 +1,8 @@
 from scipy import linalg
 import numpy as np
-import math
 
-intarrayA = [15.99491, 1.00782, 1.00782]
-intarrayD = [0, -1.4249788189, 1.4249788189]
-intarrayF = [-0.121268999, 0.9623132614, 0.9623132614]
 a_matrix = [[2, 1, 0, 0, 0], [1, 4, 1, 0, 0], [0, 1, 4, 1, 0], [0, 0, 1, 4, 1], [0, 0, 0, 1, 2]]
 inv_a_matrix = linalg.inv(a_matrix)
-# print("The original matrix is: " + str(a_matrix))
-# print("The inverted matrix is: " + str(linalg.inv(a_matrix)))
-
-T1 = [1, 2, 3]
-T2 = [4, 5, 6]
-T3 = [7, 8, 9]
 
 """ The first three indices of the arrays are xyz of oxygen, 4-6 are xyz of H1, 7-9 are xyz of H2 the first
 line is the equilibrium, the other seven arrays are the displacements that correspond to the q1-q6 with equilibrium
@@ -52,7 +42,6 @@ atom_mass_vector = [16, 16, 16, 1.008, 1.008, 1.008, 1.008, 1.008, 1.008]
 
 
 def dot_product(first_array, second_array):
-    dot_sum = 0
     if len(first_array) == len(second_array):
         dot_array = (first_array[0]*second_array[0]) + (first_array[1]*second_array[1]) + (first_array[2]*second_array[2])
         dot_p = dot_array/sum(first_array)
@@ -144,10 +133,17 @@ def eckart_rotation(n_atoms, eq_matrix, dis_matrix, mass_vector):
     return updated_dis_matrix
 
 
-def calc_g(first_x, second_x, mass_vector, q_vec1, q_vec2, num_atoms, num_points_1, num_points_2, len_grid_1, len_grid_2):
+def calc_g(first_x, second_x, mass_vector, num_atoms, num_points_1, num_points_2, len_grid_1, len_grid_2):
     # calc_g finds the 7x7 matrix that will be each index in the larger G matrix
     # the derivative matrix will contain all the partial derivatives of every coordinate from the position matrix
     # delta_q = len_grid/num_points, delta_q_1 = .062046, delta_q_2 = .0618668, delta_q_3 = .1049709
+    # the grid length for delta q 1 is: .434322, grid length for delta q 2 .4330676,
+    # grid length for delta q 3 = .7347963, num points 1 and 2 determine the length of the inner matrices of the g
+    # matrix, mass vector is a vector with nine components however they are three values in triplicate. first and
+    # second x are arrays from their respective matrices that will be used to compute derivatives which will then
+    # be used to calculate the g values for the inner g matrix. num atoms is the number of atoms the function is meant
+    # to consider so for our test purposes this value will always be three, however when this program is meant to
+    # deal with bigger molecules this number could scale accordingly to meet the number of atoms for the bigger molecule
     delta_q_1 = len_grid_1/num_points_1
     delta_q_2 = len_grid_2/num_points_2
     print("delta q 1 is: ", delta_q_1)
@@ -160,29 +156,11 @@ def calc_g(first_x, second_x, mass_vector, q_vec1, q_vec2, num_atoms, num_points
         for i in range(len(first_x)):
             set_up_vector.append(first_x[i][j])
         d_x_1.append(arbitrary_k_vector(set_up_vector)/delta_q_1)
-        # d_x_1.append(arbitrary_k_vector(set_up_vector)/delta_q_1)
-        # d_x_2.append(arbitrary_k_vector(set_up_vector)/delta_q_2)
     for j in range(3*num_atoms):
         set_up_vector = []
         for i in range(len(second_x)):
             set_up_vector.append(second_x[i][j])
         d_x_2.append(arbitrary_k_vector(set_up_vector)/delta_q_2)
-        # d_x_1.append(arbitrary_k_vector(set_up_vector)/delta_q_1)
-        # d_x_2.append(arbitrary_k_vector(set_up_vector)/delta_q_2)
-    print("\n \n \n")
-    """print("d_x without q is: ", d_x_1)
-    for i in range(len(d_x_1)):
-        for j in range(len(d_x_1[i])):
-            d_x_1[i][j] = d_x_1[i][j]/delta_q_1
-    """
-    print("\n \n \n")
-    print("d_x with q1: ", d_x_1)
-    """for i in range(len(d_x_2)):
-        for j in range(len(d_x_2[i])):
-            d_x_2[i][j] = d_x_2[i][j]/delta_q_2
-    """
-    print("\n \n \n")
-    print("dx with q2 is : ", d_x_2)
     for a in range(num_points_1):
         for b in range(num_points_2):
             g_sum = 0
@@ -193,29 +171,39 @@ def calc_g(first_x, second_x, mass_vector, q_vec1, q_vec2, num_atoms, num_points
     return inner_g_matrix
 
 
-def complete_g(x_array, mass_vector, q_1_vec, q_2_vec, q_3_vec, num_atoms, num_points_1, num_points_2, grid_len):
-    q_matrix = [q_1_vec, q_2_vec, q_3_vec]
+def complete_g(x_array, mass_vector, num_atoms, num_points_1, num_points_2, grid_len):
+    # x_array is actually an array of the position matrices of the three atoms that we are considering, grid_len
+    # is actually an array of the different grid lengths that the calc g function will need to find the different
+    # delta q values. complete g calls calc g passing its arguments to the calc g function. The complete g function is
+    # basically a helper function that takes each of the values from the calc g function and puts them into a 3x3
+    # matrix, called total_matrix in the function, and once the function has iterated through every point in the 3x3
+    # matrix it returns the complete g matrix, called total_matrix in the function.
     total_matrix = np.zeros((3, 3), dtype=np.core.multiarray)
     for r in range(num_atoms):
         for s in range(r, num_atoms):
-            total_matrix[r][s] = calc_g(x_array[r], x_array[s], mass_vector, q_matrix[r], q_matrix[s], num_atoms,
+            total_matrix[r][s] = calc_g(x_array[r], x_array[s], mass_vector, num_atoms,
                                         num_points_1, num_points_2, grid_len[r], grid_len[s])
             total_matrix[s][r] = total_matrix[r][s]
     return total_matrix
 
 
-def inverse_g(x_array, mass_vector, q_1_vec, q_2_vec, q_3_vec, num_atoms, num_points_1, num_points_2, grid_len):
-    blank_inner_matrix = np.zeros((num_points_1, num_points_2), dtype=np.core.multiarray)
-    blank_outer_matrix = np.zeros((num_atoms, num_atoms))
+def inverse_g(x_array, mass_vector, num_atoms, num_points_1, num_points_2, grid_len):
+    # the inverted g function takes arguments that it passes to the complete g function which allows it to
+    # get the original not inverted G matrix. We make a blank 3x3 matrix called inverted g, then we put a
+    # blank 7x7 matrix at every index in the 3x3 matrix. So we essentially have a blank G matrix. The nested for loops
+    # iterate through the original g matrix and pull out the i, j position from all nine outer matrices. It adds that
+    # to a blank 3x3 matrix, called blank_outer_matrix, then it inverts the blank_outer_matrix and we then put those
+    # inverted values into the i, j position of the inverted g matrix at the same point in the outer matrix that we got
+    # them from in the original g matrix, allowing us to construct the inverted g piece by piece. We then return the
+    # complete inverted g matrix.
+    blank_outer_matrix = np.zeros((3*num_atoms-6, 3*num_atoms-6))
     inverted_g = np.zeros((num_atoms, num_atoms), dtype=np.core.multiarray)
-    inverted_outer_matrix = np.zeros((num_atoms, num_atoms), dtype=np.core.multiarray)
-    original_g = complete_g(x_array, mass_vector, q_1_vec, q_2_vec, q_3_vec, num_atoms, num_points_1, num_points_2,
+    original_g = complete_g(x_array, mass_vector, num_atoms, num_points_1, num_points_2,
                             grid_len)
-
     # This loop is to make a blank 3x3 matrix with blank 7x7 matrices at every index
     for i in range(len(inverted_g)):
         for j in range(len(inverted_g)):
-            inverted_g[i][j] = blank_inner_matrix
+            inverted_g[i][j] = np.zeros((num_points_1, num_points_2), dtype=np.core.multiarray)
     # This loop goes through every point in the inner matrices
     for i in range(num_points_1):
         for j in range(num_points_2):
@@ -226,60 +214,12 @@ def inverse_g(x_array, mass_vector, q_1_vec, q_2_vec, q_3_vec, num_atoms, num_po
             inverted_outer_matrix = linalg.inv(blank_outer_matrix)
             for m in range(len(original_g)):
                 for n in range(len(original_g)):
-                    blank_inner_matrix = inverted_g[m][n]
-                    blank_inner_matrix[i][j] = inverted_outer_matrix[m][n]
+                    inverted_g[m][n][i][j] = inverted_outer_matrix[m][n]
 
     return "inverted g is: ", inverted_g
 
 
-"""
-print("g matrix is: ", calc_g(total_position_matrix, atom_mass_vector, q_vector, q_vector, 3, 7, 7, 3, 3))
-print("\n \n \n")
-print("total matrix with only q1 is: ", complete_g(total_position_matrix, atom_mass_vector, q_vector, q_vector,
-                                                   q_vector, 3, 7, 7, .434322, .434322))
-print("\n \n \n")
-"""
-print("test run: ", complete_g(x_matrix_array, atom_mass_vector, q_vector_2, q_vector_2, q_vector_2, 3, 7, 7,
+print("test run: ", complete_g(x_matrix_array, atom_mass_vector, 3, 7, 7,
                                grid_length_array))
 
-print("test run for inverse g: ", inverse_g(x_matrix_array, atom_mass_vector, q_vector_1, q_vector_2, q_vector_3,
-                                            3, 7, 7, grid_length_array))
-"""
-print("the dot product of array A and array D is: " + str(dot_product(intarrayA, intarrayD)))
-# The result should be 0
-
-print("the dot product of array A and array F is: " + str(dot_product(intarrayA, intarrayF)))
-# The result should be -5e-7
-
-print("the cross product of A, D, and F is: " + str(cross_product(intarrayA, intarrayD, intarrayF)))
-
-print("The cross product of T1,T2,and T3 is: " + str(cross_product(T1, T2, T3)))
-# The result should be -24
-
-# print("The K vector of the y array [1, 2, 3] (Linear) is: " + str(k_vector([1, 2, 3])))
-# The result should be [1, 1, 1]
-
-print("The K vector of the y array [1, 4, 9, 16, 25] (Quadratic) is: " + str(k_vector([1, 4, 9, 16, 25])))
-# I'm honestly not sure what the result of this should be, but it outputs [2.5, 4, 5.5]
-
-# print(("The slope, first derivative, and second derivative of the array [1, 2, 3, 4, 5] is: ",
-#      derivative([1, 2, 3, 4, 5])))
-# The output should be 'Linear', first derivative of 1, second derivative of 0
-
-# print("The slope, first derivative, and second derivative of the array [1, 4, 9, 16, 25] is: ",
-#      derivative([1, 4, 9, 16, 25]))
-# The output should be 'Quadratic, first derivative of [2, 4, 6, 8, 10], second derivative of 2
-print("First derivative using arbitrary length (Linear): ", arbitrary_k_vector([1, 2, 3, 4, 5]))
-print("First derivative using arbitrary length (Linear): ", arbitrary_k_vector([1, 2, 3, 4, 5, 6, 7]))
-print("First derivative using arbitrary length (Quad): ", arbitrary_k_vector([1, 4, 9, 16, 25]))
-print("First derivative using arbitrary length (Quad): ", arbitrary_k_vector([1, 4, 9, 16, 25, 36, 49]))
-print("Second derivative using arbitrary length (Quad): ",
-      arbitrary_k_vector(arbitrary_k_vector([1, 4, 9, 16, 25, 36, 49])))
-
-print("The center of mass is: ", eckart_translation([[0, 0, 0], [1, 0, 1], [1, 0, -1]], [16, 1.008, 1.008], 3))
-print("Eckart rotation: \n", eckart_rotation(3, [[0, -.1216899, 0], [-1.4249788189, .9623132614, 0],
-                                               [1.4249788189, .9623132614, 0]], [[-.0172834238, -.1211710472, 0],
-                                                                                 [-1.2884569406, .8571139503, 0],
-                                                                                 [1.5627573484, 1.0659580057, 0]],
-                                           [16, 1.00782, 1.00782]))
-"""
+print("test run for inverse g: ", inverse_g(x_matrix_array, atom_mass_vector, 3, 7, 7, grid_length_array))

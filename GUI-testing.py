@@ -5,37 +5,37 @@ from tkinter.ttk import Style
 
 def model_prompt(section_1, section_2, section_3):
     global modelParam, modelParam2, modelParam3, modelLabel, modelLabel2, modelLabel3
-    if section_1 == 0:  # Harmonic Oscillator
+    if section_1 == "Harmonic Oscillator":  # Harmonic Oscillator
         modelName = "Harmonic Oscillator"
         modelParam = 2
         modelLabel = ["\u03BC", "k"]
 
-    if section_1 == 1:  # Morse Oscillator
+    if section_1 == "Morse Oscillator":  # Morse Oscillator
         modelName = "Morse Oscillator"
         modelParam = 3
         modelLabel = ["\u03BC", "De", "a"]
 
-    if section_1 == 2:  # Test for models with 4 parameters
+    if section_1 == "Test Oscillator":  # Test for models with 4 parameters
         modelName = "Test Oscillator"
-        modelParam = 4
-        modelLabel = ["a", "b", "c", "d"]
+        modelParam = 7
+        modelLabel = ["a", "b", "c", "d", "e", "f", "g"]
 
-    if section_2 == 0:  # Harmonic Oscillator
+    if section_2 == "Harmonic Oscillator":  # Harmonic Oscillator
         modelName2 = "Harmonic Oscillator"
         modelParam2 = 2
         modelLabel2 = ["\u03BC", "k"]
 
-    if section_2 == 1:  # Morse Oscillator
+    if section_2 == "Morse Oscillator":  # Morse Oscillator
         modelName2 = "Morse Oscillator"
         modelParam2 = 3
         modelLabel2 = ["\u03BC", "De", "a"]
 
-    if section_3 == 0:  # Harmonic Oscillator
+    if section_3 == "Harmonic Oscillator":  # Harmonic Oscillator
         modelName3 = "Harmonic Oscillator"
         modelParam3 = 2
         modelLabel3 = ["\u03BC", "k"]
 
-    if section_3 == 1:  # Morse Oscillator
+    if section_3 == "Morse Oscillator":  # Morse Oscillator
         modelName3 = "Morse Oscillator"
         modelParam3 = 3
         modelLabel3 = ["\u03BC", "De", "a"]
@@ -91,14 +91,14 @@ def model_prompt(section_1, section_2, section_3):
     def enter_button():
         # add values from entry to the list using text variable
         for k in range(modelParam):
-            entries.append('Q1 ' + modelLabel[k] + ' is ' + q1var[k].get())
+            entries.append('Q1 is ' + modelLabel[k] + ' is ' + q1var[k].get())
         for k in range(modelParam2):
             entries.append('Q2 ' + modelLabel2[k] + ' is ' + q2var[k].get())
         for k in range(modelParam3):
             entries.append('Q3 ' + modelLabel3[k] + ' is ' + q3var[k].get())
 
         print(entries)
-        #save_file_prompt()
+        # save_file_prompt()
         window1.destroy()
 
     enter = tk.Button(window1, text='Enter', bd='20', bg='green', fg='white',
@@ -107,4 +107,4 @@ def model_prompt(section_1, section_2, section_3):
     window1.mainloop()
 
 
-model_prompt(1, 1, 1)
+model_prompt("Test Oscillator", "Harmonic Oscillator", "Harmonic Oscillator")

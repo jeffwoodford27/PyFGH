@@ -259,46 +259,48 @@ def save_file_prompt():
         window.destroy()
 
 
+# This is not working properly. q1var list is not working.
+
 def model_prompt(section_1, section_2, section_3):
     global modelParam, modelParam2, modelParam3, modelLabel, modelLabel2, modelLabel3
-    if section_1 == 0:  # Harmonic Oscillator
+    if section_1 == "Harmonic Oscillator":  # Harmonic Oscillator
         modelName = "Harmonic Oscillator"
         modelParam = 2
         modelLabel = ["\u03BC", "k"]
 
-    if section_1 == 1:  # Morse Oscillator
+    if section_1 == "Morse Oscillator":  # Morse Oscillator
         modelName = "Morse Oscillator"
         modelParam = 3
         modelLabel = ["\u03BC", "De", "a"]
 
-    if section_1 == 2:  # Test for models with 4 parameters
+    if section_1 == "Test Oscillator":  # Test for models with 4 parameters
         modelName = "Test Oscillator"
         modelParam = 4
         modelLabel = ["a", "b", "c", "d"]
 
-    if section_2 == 0:  # Harmonic Oscillator
+    if section_2 == "Harmonic Oscillator":  # Harmonic Oscillator
         modelName2 = "Harmonic Oscillator"
         modelParam2 = 2
         modelLabel2 = ["\u03BC", "k"]
 
-    if section_2 == 1:  # Morse Oscillator
+    if section_2 == "Morse Oscillator":  # Morse Oscillator
         modelName2 = "Morse Oscillator"
         modelParam2 = 3
         modelLabel2 = ["\u03BC", "De", "a"]
 
-    if section_3 == 0:  # Harmonic Oscillator
+    if section_3 == "Harmonic Oscillator":  # Harmonic Oscillator
         modelName3 = "Harmonic Oscillator"
         modelParam3 = 2
         modelLabel3 = ["\u03BC", "k"]
 
-    if section_3 == 1:  # Morse Oscillator
+    if section_3 == "Morse Oscillator":  # Morse Oscillator
         modelName3 = "Morse Oscillator"
         modelParam3 = 3
         modelLabel3 = ["\u03BC", "De", "a"]
 
     window1 = tk.Tk()
     style = Style()
-    window1.title('Testing')
+    window1.title('PyFGH')
     box_length = 103
     box_length = box_length + 33 * (modelParam + modelParam2 + modelParam3)
     box_len_str = '300x' + str(box_length)
@@ -346,14 +348,15 @@ def model_prompt(section_1, section_2, section_3):
 
     def enter_button():
         # add values from entry to the list using text variable
-        for k in range(modelParam):
-            entries.append('Q1 ' + modelLabel[k] + ' is ' + q1var[k].get())
-        for k in range(modelParam2):
-            entries.append('Q2 ' + modelLabel2[k] + ' is ' + q2var[k].get())
-        for k in range(modelParam3):
-            entries.append('Q3 ' + modelLabel3[k] + ' is ' + q3var[k].get())
+        for values in range(modelParam):
+            entries.append(modelName + ': Q1 ' + modelLabel[values] + ' is ' + q1var[values].get())
+        for values in range(modelParam2):
+            entries.append(modelName2 + ': Q2 ' + modelLabel2[values] + ' is ' + q2var[values].get())
+        for values in range(modelParam3):
+            entries.append(modelName3 + ': Q3 ' + modelLabel3[values] + ' is ' + q3var[values].get())
 
-        InputData.output.items.entries_list = entries
+        InputData.output.items.model_data = entries
+        print(InputData.output.items.model_data, 'this is from InputData')
         save_file_prompt()
         window1.destroy()
 
@@ -390,21 +393,21 @@ def output():
         # This is where error checking takes place.
 
         if InputData.output.items.v1 == 'Model-Harmonic Oscillator' and InputData.output.items.v2 == 'Model-Harmonic Oscillator' and InputData.output.items.v3 == 'Model-Harmonic Oscillator':
-            model_prompt(0, 0, 0)
+            model_prompt("Harmonic Oscillator", "Harmonic Oscillator", "Harmonic Oscillator")
         elif InputData.output.items.v1 == 'Model-Harmonic Oscillator' and InputData.output.items.v2 == 'Model-Harmonic Oscillator' and InputData.output.items.v3 == 'Model-Morse Oscillator':
-            model_prompt(0, 0, 1)
+            model_prompt("Harmonic Oscillator", "Harmonic Oscillator", "Morse Oscillator")
         elif InputData.output.items.v1 == 'Model-Harmonic Oscillator' and InputData.output.items.v2 == 'Model-Morse Oscillator' and InputData.output.items.v3 == 'Model-Harmonic Oscillator':
-            model_prompt(0, 1, 1)
+            model_prompt("Harmonic Oscillator", "Morse Oscillator", "Morse Oscillator")
         elif InputData.output.items.v1 == 'Model-Harmonic Oscillator' and InputData.output.items.v2 == 'Model-Morse Oscillator' and InputData.output.items.v3 == 'Model-Morse Oscillator':
-            model_prompt(0, 1, 1)
+            model_prompt("Harmonic Oscillator", "Morse Oscillator", "Morse Oscillator")
         elif InputData.output.items.v1 == 'Model-Morse Oscillator' and InputData.output.items.v2 == 'Model-Harmonic Oscillator' and InputData.output.items.v3 == 'Model-Harmonic Oscillator':
-            model_prompt(1, 0, 0)
+            model_prompt("Morse Oscillator", "Harmonic Oscillator", "Harmonic Oscillator")
         elif InputData.output.items.v1 == 'Model-Morse Oscillator' and InputData.output.items.v2 == 'Model-Harmonic Oscillator' and InputData.output.items.v3 == 'Model-Morse Oscillator':
-            model_prompt(1, 0, 1)
+            model_prompt("Morse Oscillator", "Harmonic Oscillator", "Morse Oscillator")
         elif InputData.output.items.v1 == 'Model-Morse Oscillator' and InputData.output.items.v2 == 'Model-Morse Oscillator' and InputData.output.items.v3 == 'Model-Harmonic Oscillator':
-            model_prompt(1, 1, 0)
+            model_prompt("Morse Oscillator", "Morse Oscillator", "Harmonic Oscillator")
         elif InputData.output.items.v1 == 'Model-Morse Oscillator' and InputData.output.items.v2 == 'Model-Morse Oscillator' and InputData.output.items.v3 == 'Model-Morse Oscillator':
-            model_prompt(1, 1, 1)
+            model_prompt("Morse Oscillator", "Morse Oscillator", "Morse Oscillator")
         elif q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
             messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
             clear_data()

@@ -14,9 +14,7 @@ class output:
         L3 = 0
         t = 0
         g = 0
-        v1 = 0
-        v2 = 0
-        v3 = 0
+        v = []
         file_name = 0
 
         Mu = 0
@@ -31,6 +29,6 @@ class output:
         a = 0
         a2 = 0
         a3 = 0
-        model_data = []
+        model_data = 0
 
 

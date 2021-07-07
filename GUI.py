@@ -6,6 +6,9 @@ from tkinter import ttk, messagebox, NW, END
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
 from util import InputData
+from util import model_objects
+import numpy as np
+
 
 
 """
@@ -179,27 +182,14 @@ g["values"] = 'q(x) = x', 'q(x) = x^2', 'q(x) = sinx', 'q(x) = cosx', 'Let us ch
 
 # TODO: if the user selects read from a file or compute on the fly disable the q, n, and l buttons!!!
 # Label
-ttk.Label(window, text="V for Q\u2081:", font=("Times New Roman", 15)).place(x=1, y=205)
-d = tk.StringVar()
-v1 = ttk.Combobox(window, width=32, textvariable=d)
-
-v1[
-    "values"] = 'Model-Harmonic Oscillator', 'Model-Morse Oscillator'
-
-# Label
-ttk.Label(window, text="V for Q\u2082:", font=("Times New Roman", 15)).place(x=305, y=205)
-d = tk.StringVar()
-v2 = ttk.Combobox(window, width=32, textvariable=d)
-
-v2[
-    "values"] = 'Model-Harmonic Oscillator', 'Model-Morse Oscillator'
-
-ttk.Label(window, text="V for Q\u2083:", font=("Times New Roman", 15)).place(x=615, y=205)
-d = tk.StringVar()
-v3 = ttk.Combobox(window, width=32, textvariable=d)
-
-v3[
-    "values"] = 'Model-Harmonic Oscillator', 'Model-Morse Oscillator'
+v = []
+value = 1
+for i in range(3):
+    ttk.Label(window, text="V for Q" + str(i + 1) + ":", font=("Times New Roman", 15)).place(x=value, y=205)
+    d = tk.StringVar()
+    v.append(ttk.Combobox(window, width=32, textvariable=d))
+    v[i]["values"] = 'Model-Harmonic Oscillator', 'Model-Morse Oscillator'
+    value += 310
 
 # Button
 exit = tk.Button(window, text='Exit', bd='10', bg='red', fg='white',
@@ -219,9 +209,8 @@ def apioutput():
     print(L3.get())
     print(t.get())
     print(g.get())
-    print(v1.get())
-    print(v2.get())
-    print(v3.get())
+    for i in range(3):
+        print(v[i].get())
     print(filename)
 
 
@@ -234,9 +223,8 @@ def clear_data():
     q_equation3.set('')
     t.set('')
     g.set('')
-    v1.set('')
-    v2.set('')
-    v3.set('')
+    for i in range(3):
+        v[i].set('')
     N1.delete(0, END)
     L1.delete(0, END)
     N2.delete(0, END)
@@ -261,109 +249,6 @@ def save_file_prompt():
 
 # This is not working properly. q1var list is not working.
 
-def model_prompt(section_1, section_2, section_3):
-    global modelParam, modelParam2, modelParam3, modelLabel, modelLabel2, modelLabel3
-    if section_1 == "Harmonic Oscillator":  # Harmonic Oscillator
-        modelName = "Harmonic Oscillator"
-        modelParam = 2
-        modelLabel = ["\u03BC", "k"]
-
-    if section_1 == "Morse Oscillator":  # Morse Oscillator
-        modelName = "Morse Oscillator"
-        modelParam = 3
-        modelLabel = ["\u03BC", "De", "a"]
-
-    if section_1 == "Test Oscillator":  # Test for models with 4 parameters
-        modelName = "Test Oscillator"
-        modelParam = 4
-        modelLabel = ["a", "b", "c", "d"]
-
-    if section_2 == "Harmonic Oscillator":  # Harmonic Oscillator
-        modelName2 = "Harmonic Oscillator"
-        modelParam2 = 2
-        modelLabel2 = ["\u03BC", "k"]
-
-    if section_2 == "Morse Oscillator":  # Morse Oscillator
-        modelName2 = "Morse Oscillator"
-        modelParam2 = 3
-        modelLabel2 = ["\u03BC", "De", "a"]
-
-    if section_3 == "Harmonic Oscillator":  # Harmonic Oscillator
-        modelName3 = "Harmonic Oscillator"
-        modelParam3 = 2
-        modelLabel3 = ["\u03BC", "k"]
-
-    if section_3 == "Morse Oscillator":  # Morse Oscillator
-        modelName3 = "Morse Oscillator"
-        modelParam3 = 3
-        modelLabel3 = ["\u03BC", "De", "a"]
-
-    window1 = tk.Tk()
-    style = Style()
-    window1.title('PyFGH')
-    box_length = 103
-    box_length = box_length + 33 * (modelParam + modelParam2 + modelParam3)
-    box_len_str = '300x' + str(box_length)
-    window1.geometry(box_len_str)
-
-    j = 0
-    y = 5
-
-    entries = []
-    # create 3 variable lists, for Q1, Q2 and Q3
-    q1var = []
-    q2var = []
-    q3var = []
-
-    for j in range(modelParam):
-        # append a string variable to the q1var list
-        q1var.append(tk.StringVar())
-        ttk.Label(window1, text=modelLabel[j] + " for Q1:",
-                  font=("Times New Roman", 15)).place(x=50, y=y)
-        # set text variable as q1var[j] , each entry will have separate index in the list
-        a1 = ttk.Entry(window1, textvariable=q1var[j], font=("Times New Roman", 10)).place(x=140, y=y)
-
-        j += 1
-        y += 35
-
-    for j in range(modelParam2):
-        # append a string variable to the q2var list
-        q2var.append(tk.StringVar())
-        ttk.Label(window1, text=modelLabel2[j] + " for Q2:",
-                  font=("Times New Roman", 15)).place(x=50, y=y)
-        # set text variable as q3var[j] , each entry will have separate index in the list
-        a2 = ttk.Entry(window1, textvariable=q2var[j], font=("Times New Roman", 10)).place(x=140, y=y)
-        j += 1
-        y += 35
-
-    for j in range(modelParam3):
-        # append a string variable to the q3var list
-        q3var.append(tk.StringVar())
-        ttk.Label(window1, text=modelLabel3[j] + " for Q3:",
-                  font=("Times New Roman", 15)).place(x=50, y=y)
-        # set text variable as q3var[j] , each entry will have separate index in the list
-        a3 = ttk.Entry(window1, textvariable=q3var[j], font=("Times New Roman", 10)).place(x=140, y=y)
-        j += 1
-        y += 35
-
-    def enter_button():
-        # add values from entry to the list using text variable
-        for values in range(modelParam):
-            entries.append(modelName + ': Q1 ' + modelLabel[values] + ' is ' + q1var[values].get())
-        for values in range(modelParam2):
-            entries.append(modelName2 + ': Q2 ' + modelLabel2[values] + ' is ' + q2var[values].get())
-        for values in range(modelParam3):
-            entries.append(modelName3 + ': Q3 ' + modelLabel3[values] + ' is ' + q3var[values].get())
-
-        InputData.output.items.model_data = entries
-        print(InputData.output.items.model_data, 'this is from InputData')
-        save_file_prompt()
-        window1.destroy()
-
-    enter = tk.Button(window1, text='Enter', bd='20', bg='green', fg='white',
-                      command=enter_button).place(x=110, y=y)
-
-    window1.mainloop()
 
 
 def output():
@@ -386,29 +271,45 @@ def output():
         InputData.output.items.L3 = float(L3.get())
         InputData.output.items.t = t.get()
         InputData.output.items.g = g.get()
-        InputData.output.items.v1 = v1.get()
-        InputData.output.items.v2 = v2.get()
-        InputData.output.items.v3 = v3.get()
+        for i in range(3):
+            InputData.output.items.v.append(v[i].get())
         # API_Class.outputAPI.items.file_name = filename
         # This is where error checking takes place.
+        for i in range(3):
+            if InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
+                holder = [model_objects.Harmonic_Oscillator(), model_objects.Harmonic_Oscillator(), model_objects.Harmonic_Oscillator()]
+                model_objects.model_prompt(holder)
+            elif InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
+                holder = [model_objects.Harmonic_Oscillator(), model_objects.Harmonic_Oscillator(),
+                          model_objects.Morse_Oscillator()]
+                model_objects.model_prompt(holder)
+            elif InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
+                holder = [model_objects.Harmonic_Oscillator(), model_objects.Morse_Oscillator(),
+                          model_objects.Harmonic_Oscillator()]
+                model_objects.model_prompt(holder)
+            elif InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
+                holder = [model_objects.Harmonic_Oscillator(), model_objects.Morse_Oscillator(),
+                          model_objects.Morse_Oscillator()]
+                model_objects.model_prompt(holder)
+            elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
+                holder = [model_objects.Morse_Oscillator(), model_objects.Harmonic_Oscillator(),
+                          model_objects.Harmonic_Oscillator()]
+                model_objects.model_prompt(holder)
+            elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
+                holder = [model_objects.Morse_Oscillator(), model_objects.Harmonic_Oscillator(),
+                          model_objects.Morse_Oscillator()]
+                model_objects.model_prompt(holder)
+            elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
+                holder = [model_objects.Morse_Oscillator(), model_objects.Morse_Oscillator(),
+                          model_objects.Harmonic_Oscillator()]
+                model_objects.model_prompt(holder)
+            elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
+                holder = [model_objects.Morse_Oscillator(), model_objects.Morse_Oscillator(),
+                          model_objects.Morse_Oscillator()]
+                model_objects.model_prompt(holder)
 
-        if InputData.output.items.v1 == 'Model-Harmonic Oscillator' and InputData.output.items.v2 == 'Model-Harmonic Oscillator' and InputData.output.items.v3 == 'Model-Harmonic Oscillator':
-            model_prompt("Harmonic Oscillator", "Harmonic Oscillator", "Harmonic Oscillator")
-        elif InputData.output.items.v1 == 'Model-Harmonic Oscillator' and InputData.output.items.v2 == 'Model-Harmonic Oscillator' and InputData.output.items.v3 == 'Model-Morse Oscillator':
-            model_prompt("Harmonic Oscillator", "Harmonic Oscillator", "Morse Oscillator")
-        elif InputData.output.items.v1 == 'Model-Harmonic Oscillator' and InputData.output.items.v2 == 'Model-Morse Oscillator' and InputData.output.items.v3 == 'Model-Harmonic Oscillator':
-            model_prompt("Harmonic Oscillator", "Morse Oscillator", "Morse Oscillator")
-        elif InputData.output.items.v1 == 'Model-Harmonic Oscillator' and InputData.output.items.v2 == 'Model-Morse Oscillator' and InputData.output.items.v3 == 'Model-Morse Oscillator':
-            model_prompt("Harmonic Oscillator", "Morse Oscillator", "Morse Oscillator")
-        elif InputData.output.items.v1 == 'Model-Morse Oscillator' and InputData.output.items.v2 == 'Model-Harmonic Oscillator' and InputData.output.items.v3 == 'Model-Harmonic Oscillator':
-            model_prompt("Morse Oscillator", "Harmonic Oscillator", "Harmonic Oscillator")
-        elif InputData.output.items.v1 == 'Model-Morse Oscillator' and InputData.output.items.v2 == 'Model-Harmonic Oscillator' and InputData.output.items.v3 == 'Model-Morse Oscillator':
-            model_prompt("Morse Oscillator", "Harmonic Oscillator", "Morse Oscillator")
-        elif InputData.output.items.v1 == 'Model-Morse Oscillator' and InputData.output.items.v2 == 'Model-Morse Oscillator' and InputData.output.items.v3 == 'Model-Harmonic Oscillator':
-            model_prompt("Morse Oscillator", "Morse Oscillator", "Harmonic Oscillator")
-        elif InputData.output.items.v1 == 'Model-Morse Oscillator' and InputData.output.items.v2 == 'Model-Morse Oscillator' and InputData.output.items.v3 == 'Model-Morse Oscillator':
-            model_prompt("Morse Oscillator", "Morse Oscillator", "Morse Oscillator")
-        elif q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
+
+        if q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
             messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
             clear_data()
 
@@ -474,18 +375,17 @@ tbutton = tk.Button(window, text='Display T equation', bd='10', bg='orange', fg=
 
 
 def open_file2():
-    if v1.get() == 'Model-Harmonic Oscillator':
+    def is_list_empty(list):
+        # checking the length
+        if len(list) == 0:
+            # returning true as length is 0
+            return True
+        # returning false as length is greater than 0
+        return False
+
+    if not is_list_empty(v):
         messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
-    elif v1.get() == 'Model-Morse Oscillator':
-        messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
-    elif v2.get() == 'Model-Harmonic Oscillator':
-        messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
-    elif v2.get() == 'Model-Morse Oscillator':
-        messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
-    elif v3.get() == 'Model-Harmonic Oscillator':
-        messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
-    elif v3.get() == 'Model-Morse Oscillator':
-        messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
+
     else:
         global filename2
         tkinter.Tk().withdraw()
@@ -517,12 +417,13 @@ t.place(x=80, y=157)
 t.current()
 g.place(x=440, y=157)
 g.current()
-v1.place(x=77, y=207)
-v1.current()
-v2.place(x=380, y=207)
-v2.current()
-v3.place(x=690, y=207)
-v3.current()
+vales2 = 80
+
+for i in range(3):
+    v[i].place(x=vales2, y=207, width=175)
+    v[i].current()
+    vales2 += 310
+
 N1.place(x=40, y=100, width=100)
 L1.place(x=185, y=100, width=100)
 N2.place(x=340, y=100, width=100)

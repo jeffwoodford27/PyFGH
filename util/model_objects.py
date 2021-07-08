@@ -49,7 +49,6 @@ class Test_Oscillator:
             self.param[i] = param_list[i]
         return
 
-
 def model_prompt(potential_model):
     window1 = tk.Tk()
     style = Style()
@@ -60,7 +59,6 @@ def model_prompt(potential_model):
     box_len_str = '300x' + str(box_length)
     window1.geometry(box_len_str)
 
-    entries = []
     qvar = np.empty(3, dtype=list)
     for i in range(3):
         qvar[i] = []
@@ -68,26 +66,28 @@ def model_prompt(potential_model):
     y = 5
 
     for q in range(3):
-        for qparam in range(potential_model[q].nparam):
-            qvar[q].append(tk.StringVar())
+        qvar[q] = [0] * potential_model[q].nparam
 
+        for qparam in range(potential_model[q].nparam):
             ttk.Label(window1, text=potential_model[q].label[qparam] + " for Q:" + str(q + 1) + ":",
                       font=("Times New Roman", 15)).place(x=50, y=y)
-            # set text variable as q1var[j] , each entry will have separate index in the list
-            a1 = ttk.Entry(window1, textvariable=qvar[q][qparam], font=("Times New Roman", 10)).place(x=140, y=y)
-
+            qvar[q][qparam] = ttk.Entry(window1, font=("Times New Roman", 10))
+            qvar[q][qparam].place(x=140, y=y)
             j += 1
             y += 35
+
 
     def enter_button():
         for q in range(3):
             param_list = []
             for qparam in range(potential_model[q].nparam):
                 param_list.append(qvar[q][qparam].get())
-            potential_model[q].set_param(param_list)
+            potential_model[q].set_param(param_list)  # This is giving me error. Not working properly!!!
+
         for q in range(3):
             for qparam in range(potential_model[q].nparam):
                 print(potential_model[q].param[qparam])
+
         InputData.output.items.model_data = potential_model
         print(InputData.output.items.model_data)
         window1.destroy()
@@ -98,7 +98,7 @@ def model_prompt(potential_model):
     window1.mainloop()
 
 
-def output():
+def output2():
     sections = []
     for i in range(3):
         if InputData.output.items.v[i] == "Model-Harmonic Oscillator":
@@ -112,7 +112,58 @@ def output():
 #test = [Harmonic_Oscillator(), Morse_Oscillator(), Test_Oscillator()]
 #model_prompt(test)
 
+
+
+
+
+
+
+
+
 """
+global holder
+
+if InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[
+    1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
+    holder = [Harmonic_Oscillator(), Harmonic_Oscillator(), Harmonic_Oscillator()]
+    model_prompt(holder)
+elif InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[
+    1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
+    holder = [Harmonic_Oscillator(), Harmonic_Oscillator(),
+              Morse_Oscillator()]
+    model_prompt(holder)
+elif InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[
+    1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
+    holder = [Harmonic_Oscillator(), Morse_Oscillator(),
+              Harmonic_Oscillator()]
+    model_prompt(holder)
+elif InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[
+    1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
+    holder = [Harmonic_Oscillator(), Morse_Oscillator(),
+              Morse_Oscillator()]
+    model_prompt(holder)
+elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[
+    1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
+    holder = [Morse_Oscillator(), Harmonic_Oscillator(),
+              Harmonic_Oscillator()]
+    model_prompt(holder)
+elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[
+    1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
+    holder = [Morse_Oscillator(), Harmonic_Oscillator(),
+              Morse_Oscillator()]
+    model_prompt(holder)
+elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[
+    1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
+    holder = [Morse_Oscillator(), Morse_Oscillator(),
+              Harmonic_Oscillator()]
+    model_prompt(holder)
+elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[
+    1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
+    holder = [Morse_Oscillator(), Morse_Oscillator(),
+              Morse_Oscillator()]
+    model_prompt(holder)
+
+
 
 def model_prompt(section_1, section_2, section_3):
 

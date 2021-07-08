@@ -6,7 +6,6 @@ from tkinter import ttk, messagebox, NW, END
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
 from util import InputData
-from util import model_objects
 import numpy as np
 
 
@@ -247,8 +246,108 @@ def save_file_prompt():
         window.destroy()
 
 
-# This is not working properly. q1var list is not working.
+class Harmonic_Oscillator:
+    def __init__(self):
+        self.type = 0
+        self.name = "Harmonic Oscillator"
+        self.nparam = 2
+        self.label = ["\u03BC", "k"]
+        self.param = np.zeros(self.nparam, float)
 
+    def set_param(self, param_list):
+        for i in range(self.nparam):
+            self.param[i] = param_list[i]
+        return
+
+
+class Morse_Oscillator:
+    def __init__(self):
+        self.type = 1
+        self.name = "Morse Oscillator"
+        self.nparam = 3
+        self.label = ["\u03BC", "De", "a"]
+        self.param = np.zeros(self.nparam, float)
+
+    def set_param(self, param_list):
+        for i in range(self.nparam):
+            self.param[i] = param_list[i]
+        return
+
+
+class Test_Oscillator:
+    def __init__(self):
+        self.type = 2
+        self.name = "Test Oscillator"
+        self.nparam = 4
+        self.mu = 0
+        self.label = ["a", "b", "c", "d"]
+        self.param = np.zeros(self.nparam, float)
+
+    def set_param(self, param_list):
+        for i in range(self.nparam):
+            self.param[i] = param_list[i]
+        return
+
+def model_prompt(potential_model):
+    window1 = tk.Tk()
+    style = Style()
+    window1.title('PyFGH Parameters')
+    box_length = 103
+    for q in range(3):
+        box_length = box_length + 33 * potential_model[q].nparam
+    box_len_str = '300x' + str(box_length)
+    window1.geometry(box_len_str)
+
+    qvar = np.empty(3, dtype=list)
+    for i in range(3):
+        qvar[i] = []
+    j = 0
+    y = 5
+
+    for q in range(3):
+        qvar[q] = [0] * potential_model[q].nparam
+
+        for qparam in range(potential_model[q].nparam):
+            ttk.Label(window1, text=potential_model[q].label[qparam] + " for Q:" + str(q + 1) + ":",
+                      font=("Times New Roman", 15)).place(x=50, y=y)
+            qvar[q][qparam] = ttk.Entry(window1, font=("Times New Roman", 10))
+            qvar[q][qparam].place(x=140, y=y)
+            j += 1
+            y += 35
+
+
+    def enter_button():
+        for q in range(3):
+            param_list = []
+            for qparam in range(potential_model[q].nparam):
+                param_list.append(qvar[q][qparam].get())
+            potential_model[q].set_param(param_list)
+
+        for q in range(3):
+            for qparam in range(potential_model[q].nparam):
+                print(potential_model[q].param[qparam])
+
+        InputData.output.items.model_data = potential_model
+        print(InputData.output.items.model_data)
+        window1.destroy()
+        save_file_prompt()
+
+
+    enter = tk.Button(window1, text='Enter', bd='20', bg='green', fg='white',
+                      command=enter_button).place(x=110, y=y)
+
+    window1.mainloop()
+
+
+def output2():
+    sections = []
+    for i in range(3):
+        if InputData.output.items.v[i] == "Model-Harmonic Oscillator":
+            sections.append(Harmonic_Oscillator())
+        elif InputData.output.items.v[i] == "Model-Morse Oscillator":
+            sections.append(Harmonic_Oscillator())
+        elif InputData.output.items.v[i] == "Model-Test Oscillator":
+            sections.append(Harmonic_Oscillator())
 
 
 def output():
@@ -275,40 +374,6 @@ def output():
             InputData.output.items.v.append(v[i].get())
         # API_Class.outputAPI.items.file_name = filename
         # This is where error checking takes place.
-        for i in range(3):
-            if InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
-                holder = [model_objects.Harmonic_Oscillator(), model_objects.Harmonic_Oscillator(), model_objects.Harmonic_Oscillator()]
-                model_objects.model_prompt(holder)
-            elif InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
-                holder = [model_objects.Harmonic_Oscillator(), model_objects.Harmonic_Oscillator(),
-                          model_objects.Morse_Oscillator()]
-                model_objects.model_prompt(holder)
-            elif InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
-                holder = [model_objects.Harmonic_Oscillator(), model_objects.Morse_Oscillator(),
-                          model_objects.Harmonic_Oscillator()]
-                model_objects.model_prompt(holder)
-            elif InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
-                holder = [model_objects.Harmonic_Oscillator(), model_objects.Morse_Oscillator(),
-                          model_objects.Morse_Oscillator()]
-                model_objects.model_prompt(holder)
-            elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
-                holder = [model_objects.Morse_Oscillator(), model_objects.Harmonic_Oscillator(),
-                          model_objects.Harmonic_Oscillator()]
-                model_objects.model_prompt(holder)
-            elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
-                holder = [model_objects.Morse_Oscillator(), model_objects.Harmonic_Oscillator(),
-                          model_objects.Morse_Oscillator()]
-                model_objects.model_prompt(holder)
-            elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
-                holder = [model_objects.Morse_Oscillator(), model_objects.Morse_Oscillator(),
-                          model_objects.Harmonic_Oscillator()]
-                model_objects.model_prompt(holder)
-            elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
-                holder = [model_objects.Morse_Oscillator(), model_objects.Morse_Oscillator(),
-                          model_objects.Morse_Oscillator()]
-                model_objects.model_prompt(holder)
-
-
         if q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
             messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
             clear_data()
@@ -345,9 +410,49 @@ def output():
         elif int(InputData.output.items.L3) < 0:
             messagebox.showerror("PyFGH", "L must be positive!!!")
             clear_data()
-
+        elif InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[
+            1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
+            holder = [Harmonic_Oscillator(), Harmonic_Oscillator(), Harmonic_Oscillator()]
+            model_prompt(holder)
+        elif InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[
+            1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
+            holder = [Harmonic_Oscillator(), Harmonic_Oscillator(),
+                      Morse_Oscillator()]
+            model_prompt(holder)
+        elif InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[
+            1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
+            holder = [Harmonic_Oscillator(), Morse_Oscillator(),
+                      Harmonic_Oscillator()]
+            model_prompt(holder)
+        elif InputData.output.items.v[0] == 'Model-Harmonic Oscillator' and InputData.output.items.v[
+            1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
+            holder = [Harmonic_Oscillator(), Morse_Oscillator(),
+                      Morse_Oscillator()]
+            model_prompt(holder)
+        elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[
+            1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
+            holder = [Morse_Oscillator(), Harmonic_Oscillator(),
+                      Harmonic_Oscillator()]
+            model_prompt(holder)
+        elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[
+            1] == 'Model-Harmonic Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
+            holder = [Morse_Oscillator(), Harmonic_Oscillator(),
+                      Morse_Oscillator()]
+            model_prompt(holder)
+        elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[
+            1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Harmonic Oscillator':
+            holder = [Morse_Oscillator(), Morse_Oscillator(),
+                      Harmonic_Oscillator()]
+            model_prompt(holder)
+        elif InputData.output.items.v[0] == 'Model-Morse Oscillator' and InputData.output.items.v[
+            1] == 'Model-Morse Oscillator' and InputData.output.items.v[2] == 'Model-Morse Oscillator':
+            holder = [Morse_Oscillator(), Morse_Oscillator(),
+                      Morse_Oscillator()]
+            model_prompt(holder)
         else:
             save_file_prompt()
+
+
     except ValueError:
         messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")
 

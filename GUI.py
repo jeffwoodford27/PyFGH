@@ -42,8 +42,14 @@ cores = ttk.Combobox(window, width=10, textvariable=n)
 # definition for calculating core counts.
 # TODO: make a better for loop. Include numbers that go up to the core count!!! For instance 12 cores, include 1-12 in choice box!!!
 def cpu_count():
+    """
     for x in range(multiprocessing.cpu_count()):
         cores["values"] = (x + 1)
+    """
+    x = 0
+    for i in range(multiprocessing.cpu_count()):
+        cores["values"] = (i + 1)
+        x += 1
 
 
 # Label

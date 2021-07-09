@@ -63,10 +63,6 @@ q_equation1 = ttk.Combobox(window, width=15, textvariable=n)
 q_equation1["values"] = (
     'OH\u2081 Bond Stretch', 'OH\u2082 Bond Stretch', 'Symmetric Stretch', 'Asymmetric Stretch')
 
-"""
-btn = ttk.Button(window, text="Get Value", command=return_value)
-btn.place(relx="0.5", rely="0.1")
-"""
 
 # Label
 ttk.Label(window, text="Q\u2082:", font=("Times New Roman", 15)).place(x=590, y=47)

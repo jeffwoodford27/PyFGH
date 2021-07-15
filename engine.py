@@ -1,4 +1,4 @@
-from util import InputData
+from util import DataObject
 import numpy as np
 import math
 import time

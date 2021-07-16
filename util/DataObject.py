@@ -13,7 +13,7 @@ class holdData:
     g = 0
     v = []
     file_name = 0
-    model_data = 0
+    model_data = []
 
 
 
@@ -35,7 +35,7 @@ class InputData:
         self.g = 0
         self.v = []
         self.file_name = 0
-        self.model_data = 0
+        self.model_data = []
 
     def setMolecule(self, molecule):
         self.molecule = molecule

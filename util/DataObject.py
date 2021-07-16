@@ -18,7 +18,7 @@ class holdData:
 
 
 class InputData:
-    v = []
+
 
     def __init__(self):
         self.molecule = 0

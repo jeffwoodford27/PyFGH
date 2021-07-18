@@ -8,12 +8,13 @@ from tkinter.ttk import Style
 from util import DataObject
 import numpy as np
 
-
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
 Author: Josiah Randleman
 © Copyright 2021, Josiah Randleman, All rights reserved. jrandl516@gmail.com
 """
+
+
 def main_window():
     # Creating tkinter window
     window = tk.Tk()
@@ -29,26 +30,19 @@ def main_window():
               background='green', foreground="white",
               font=("Times New Roman", 15)).place(x=200, y=0)
 
-    # label
+    cores = []
+    for i in range(1, multiprocessing.cpu_count() + 1):
+        cores.append(i)
+
+        # label
     ttk.Label(window, text="Computer Cores:",
               font=("Times New Roman", 10)).place(x=10, y=50)
 
     # Combobox creation
     n = tk.StringVar()
-    cores = ttk.Combobox(window, width=10, textvariable=n)
+    cores = ttk.Combobox(window, values=cores, width=10, textvariable=n)
 
     # definition for calculating core counts.
-    # TODO: make a better for loop. Include numbers that go up to the core count!!! For instance 12 cores, include 1-12 in choice box!!!
-    def cpu_count():
-        """
-        for x in range(multiprocessing.cpu_count()):
-            cores["values"] = (x + 1)
-        """
-        x = 0
-        for i in range(multiprocessing.cpu_count()):
-            cores["values"] = (i + 1)
-            x += 1
-
     # Label
     ttk.Label(window, text="Molecule Specification:", font=("Times New Roman", 10)).place(x=200, y=50)
     m = tk.StringVar()
@@ -149,9 +143,8 @@ def main_window():
     # Allows the user to chose a file in their file explorer
     # TODO: Error somewhere in this. When you select to open a file, then run the code in API.py the variables do not transfer. Fix this!!!
     def open_file():
-        global filename
         tkinter.Tk().withdraw()
-        filename = askopenfilename()
+        DataObject.holdData.file_name = askopenfilename()
 
     # This Button works!!!
     open = tk.Button(window, text='Open', bd='5', bg='black', fg='white',
@@ -205,7 +198,6 @@ def main_window():
         print(g.get())
         for i in range(3):
             print(v[i].get())
-        print(filename)
 
     # This definition works! This clears everything in the window!!!
     def clear_data():
@@ -489,7 +481,7 @@ def main_window():
 
     # Adding combobox drop down list
     # cores['values'] = (multiprocessing.cpu_count())
-    cpu_count()
+
     cores.place(x=105, y=50)
     cores.current()
     molecule.place(x=330, y=50)

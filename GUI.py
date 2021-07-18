@@ -8,9 +8,6 @@ from tkinter.ttk import Style
 from util import DataObject
 import numpy as np
 
-# Redo InputData
-# Don't have this all in one function
-#
 
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
@@ -320,6 +317,7 @@ def main_window():
                     print(potential_model[q].param[qparam])
 
             DataObject.holdData.model_data = potential_model
+            print(type(potential_model))
             print(DataObject.holdData.model_data)
             window1.destroy()
             save_file_prompt()

@@ -8,7 +8,7 @@ from tkinter.ttk import Style
 from util import DataObject
 import numpy as np
 
-#from PIL import ImageTk, Image
+##from PIL import ImageTk, Image
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
 Author: Josiah Randleman
@@ -441,6 +441,27 @@ def main_window():
 
     clear = tk.Button(window, text='Clear', bd='10', bg='blue', fg='white',
                       command=clear_data).place(x=525, y=260)
+
+    def about_window():
+        window = tk.Toplevel()
+        window.title("About")
+        window.geometry("500x235")
+        canvas = tkinter.Canvas(window, width=500, height=235)
+        canvas.pack()
+
+        text = "  A Python implementation of the Fourier Grid Hamiltonian \n method. Current repo information: main.py is currently " \
+               "the \n main program that runs the input and calculation modules \n inputparam.py checks for correctness of " \
+               "the user input data.\n Tmatrix.py calculates the T matrix, along with B and C \n matrices.Vmatrix.py calculates " \
+               "the V matrixpyfghutil.py \n contains useful utility functions. \n \n This program was developed by: Dr. Jeff Woodford, \n " \
+               "Nelson Maxley, Tyler Law and Josiah Randleman."
+
+
+        x = ttk.Label(window, text= text, font=("Times New Roman", 15))
+        x.pack()
+        x.place(x=0, y=0)
+
+    about = tk.Button(window, text='About', bd='10', bg='purple', fg='white',
+                      command=about_window).place(x=590, y=260)
 
     def t0():
         window = tk.Toplevel()

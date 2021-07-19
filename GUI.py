@@ -5,10 +5,10 @@ import tkinter as tk
 from tkinter import ttk, messagebox, NW, END
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
-from PIL import ImageTk, Image
 from util import DataObject
 import numpy as np
 
+#from PIL import ImageTk, Image
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
 Author: Josiah Randleman
@@ -445,18 +445,50 @@ def main_window():
     def t0():
         window = tk.Toplevel()
         window.title("T Equations")
-        window.geometry("500x400")
-
-
-        canvas = tkinter.Canvas(window, width=500, height=300)
+        window.geometry("500x650")
+        canvas = tkinter.Canvas(window, width=500, height=650)
         canvas.pack()
-        img = tkinter.PhotoImage(file="t0.png")
-        canvas.create_image(20, 20, anchor=NW, image=img)
 
-        canvas1 = tkinter.Canvas(window, width=500, height=300)
-        canvas1.pack()
+        x = ttk.Label(window, text="Approximation 1: ", font=("Times New Roman", 15), background='green',
+                      foreground="white")
+        x.pack()
+        x.place(x=175, y=0)
+
+        img = tkinter.PhotoImage(file="t0.png")
+        canvas.create_image(30, 30, anchor=NW, image=img)
+
+        x2 = ttk.Label(window, text="Approximation 2: ", font=("Times New Roman", 15), background='green',
+                       foreground="white")
+        x2.pack()
+        x2.place(x=175, y=135)
+
         img1 = tkinter.PhotoImage(file="t1.png")
-        canvas1.create_image(20, 20, anchor=NW, image=img1)
+        canvas.create_image(100, 165, anchor=NW, image=img1)
+
+        x3 = ttk.Label(window, text="Approximation 3: ", font=("Times New Roman", 15), background='green',
+                       foreground="white")
+        x3.pack()
+        x3.place(x=175, y=255)
+
+        img2 = tkinter.PhotoImage(file="t2.png")
+        canvas.create_image(250, 330, image=img2)
+
+        x4 = ttk.Label(window, text="Approximation 4: ", font=("Times New Roman", 15), background='green',
+                       foreground="white")
+        x4.pack()
+        x4.place(x=175, y=380)
+
+        img3 = tkinter.PhotoImage(file="t3.png")
+        canvas.create_image(250, 460, image=img3)
+
+        x5 = ttk.Label(window, text="Approximation 5: ", font=("Times New Roman", 15), background='green',
+                       foreground="white")
+        x5.pack()
+        x5.place(x=175, y=512)
+
+        img4 = tkinter.PhotoImage(file="t4.png")
+        canvas.create_image(250, 585, image=img4)
+
 
         window.mainloop()
 
@@ -519,5 +551,6 @@ def main_window():
     N3.place(x=645, y=100, width=100)
     L3.place(x=800, y=100, width=100)
     window.mainloop()
+
 
 main_window()

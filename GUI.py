@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, NW, END
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
+from PIL import ImageTk, Image
 from util import DataObject
 import numpy as np
 
@@ -442,14 +443,22 @@ def main_window():
                       command=clear_data).place(x=525, y=260)
 
     def t0():
-        box = tkinter.Tk()
-        box.title('PyFGH')
-        box.geometry('500x500')
-        canvas = tkinter.Canvas(box, width=300, height=300)
+        window = tk.Toplevel()
+        window.title("T Equations")
+        window.geometry("500x400")
+
+
+        canvas = tkinter.Canvas(window, width=500, height=300)
         canvas.pack()
         img = tkinter.PhotoImage(file="t0.png")
-        canvas.create_image(50, 15, anchor=NW, image=img)
-        box.mainloop()
+        canvas.create_image(20, 20, anchor=NW, image=img)
+
+        canvas1 = tkinter.Canvas(window, width=500, height=300)
+        canvas1.pack()
+        img1 = tkinter.PhotoImage(file="t1.png")
+        canvas1.create_image(20, 20, anchor=NW, image=img1)
+
+        window.mainloop()
 
     tbutton = tk.Button(window, text='Display T equation', bd='10', bg='orange', fg='white',
                         command=t0).place(x=232, y=260)
@@ -510,3 +519,5 @@ def main_window():
     N3.place(x=645, y=100, width=100)
     L3.place(x=800, y=100, width=100)
     window.mainloop()
+
+main_window()

@@ -152,7 +152,6 @@ def main_window():
                      command=open_file).place(x=795, y=150)
 
     # Label
-    # TODO: look back at the slides in the chemistry google drive. When user selects an approximation, display an image of the selected equation!!! Cosmetic!
     ttk.Label(window, text="T:", font=("Times New Roman", 20)).place(x=50, y=150)
     b = tk.StringVar()
     t = ttk.Combobox(window, width=15, textvariable=b)

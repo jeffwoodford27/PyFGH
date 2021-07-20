@@ -3,15 +3,24 @@ import time
 
 import GUI
 from util import DataObject
-from multiprocessing import Process, Lock, Queue
+from multiprocessing import Process, Queue
 
 """
 This one uses Queues
 """
 
 
+class Bob:
+    def __init__(self):
+        self.sum = 0
+
+    def setSum(self, sum):
+        self.sum = sum
+        return
+
+
 # This is the parent process
-def parent(q):
+def datamuncher(q):
     print('This is the parent process: ', os.getpid())
     holder1 = q.get()
     print(holder1.message)
@@ -27,23 +36,26 @@ def parent(q):
     print("L3: ", holder1.L3)
     print("T : ", holder1.t)
     print("G : ", holder1.g)
+    print("Filename: ", holder1.file_name)
     print("V : ", holder1.v)
     print("Values from the sum of N and L: ", holder1.sum)
+    Charles = Bob()
+    Charles.setSum(holder1.sum)
+    q.put(Charles)
     # print("File Name : ", holder1.file_name, " This is from the child process")
     # print("Model Data : ", holder1.model_data, " This is from the child process")
 
     return
 
 
-def child1():
+def datagrabber():
     q = Queue()
-    p1 = Process(target=parent, args=(q,))
+    p1 = Process(target=datamuncher, args=(q,))
     p1.start()
     time.sleep(1)
     GUI.main_window()
     print('The interface is started Process: ', os.getpid())
     holder = DataObject.InputData()
-
     holder.setMolecule(DataObject.holdData.molecule)
     holder.setQ1(DataObject.holdData.q_equation1)
     holder.setQ2(DataObject.holdData.q_equation2)
@@ -58,14 +70,18 @@ def child1():
     holder.setG(DataObject.holdData.g)
     holder.setV(DataObject.holdData.v)
     holder.setFileName(DataObject.holdData.file_name)
-    v = int(DataObject.holdData.N1) + int(DataObject.holdData.N2) + int(DataObject.holdData.N3) + int(DataObject.holdData.L1) + \
+    v = int(DataObject.holdData.N1) + int(DataObject.holdData.N2) + int(DataObject.holdData.N3) + int(
+        DataObject.holdData.L1) + \
         int(DataObject.holdData.L2) + int(DataObject.holdData.L3)
     holder.setMessage("This is from the child")
     holder.set_sum(v)
     # holder.setModelData(DataObject.holdData.model_data)  # look into pickling possibly un-pickling
     q.put(holder)
+    Charles = q.get()
+    print(Charles.sum)
+    return
 
 
 if __name__ == '__main__':
-    child1()
+    datagrabber()
     print('done')

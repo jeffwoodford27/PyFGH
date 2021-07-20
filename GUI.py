@@ -572,5 +572,3 @@ def main_window():
     L3.place(x=800, y=100, width=100)
     window.mainloop()
 
-
-main_window()

@@ -1,3 +1,5 @@
+import numpy as np
+
 class holdData:
     molecule = 0
     q_equation1 = 0

@@ -230,46 +230,6 @@ def main_window():
             # apioutput()
             window.destroy()
 
-    class Harmonic_Oscillator:
-        def __init__(self):
-            self.type = 0
-            self.name = "Harmonic Oscillator"
-            self.nparam = 2
-            self.label = ["\u03BC", "k"]
-            self.param = np.zeros(self.nparam, float)
-
-        def set_param(self, param_list):
-            for i in range(self.nparam):
-                self.param[i] = param_list[i]
-            return
-
-    class Morse_Oscillator:
-        def __init__(self):
-            self.type = 1
-            self.name = "Morse Oscillator"
-            self.nparam = 3
-            self.label = ["\u03BC", "De", "a"]
-            self.param = np.zeros(self.nparam, float)
-
-        def set_param(self, param_list):
-            for i in range(self.nparam):
-                self.param[i] = param_list[i]
-            return
-
-    class Test_Oscillator:
-        def __init__(self):
-            self.type = 2
-            self.name = "Test Oscillator"
-            self.nparam = 4
-            self.mu = 0
-            self.label = ["a", "b", "c", "d"]
-            self.param = np.zeros(self.nparam, float)
-
-        def set_param(self, param_list):
-            for i in range(self.nparam):
-                self.param[i] = param_list[i]
-            return
-
     def model_prompt(potential_model):
         window1 = tk.Tk()
         style = Style()
@@ -391,42 +351,42 @@ def main_window():
                 clear_data()
             elif DataObject.holdData.v[0] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[2] == 'Model-Harmonic Oscillator':
-                holder = [Harmonic_Oscillator(), Harmonic_Oscillator(), Harmonic_Oscillator()]
+                holder = [DataObject.Harmonic_Oscillator(), DataObject.Harmonic_Oscillator(), DataObject.Harmonic_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[2] == 'Model-Morse Oscillator':
-                holder = [Harmonic_Oscillator(), Harmonic_Oscillator(),
-                          Morse_Oscillator()]
+                holder = [DataObject.Harmonic_Oscillator(), DataObject.Harmonic_Oscillator(),
+                          DataObject.Morse_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Morse Oscillator' and DataObject.holdData.v[2] == 'Model-Harmonic Oscillator':
-                holder = [Harmonic_Oscillator(), Morse_Oscillator(),
-                          Harmonic_Oscillator()]
+                holder = [DataObject.Harmonic_Oscillator(), DataObject.Morse_Oscillator(),
+                          DataObject.Harmonic_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Morse Oscillator' and DataObject.holdData.v[2] == 'Model-Morse Oscillator':
-                holder = [Harmonic_Oscillator(), Morse_Oscillator(),
-                          Morse_Oscillator()]
+                holder = [DataObject.Harmonic_Oscillator(), DataObject.Morse_Oscillator(),
+                          DataObject.Morse_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Morse Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[2] == 'Model-Harmonic Oscillator':
-                holder = [Morse_Oscillator(), Harmonic_Oscillator(),
-                          Harmonic_Oscillator()]
+                holder = [DataObject.Morse_Oscillator(), DataObject.Harmonic_Oscillator(),
+                          DataObject.Harmonic_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Morse Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[2] == 'Model-Morse Oscillator':
-                holder = [Morse_Oscillator(), Harmonic_Oscillator(),
-                          Morse_Oscillator()]
+                holder = [DataObject.Morse_Oscillator(), DataObject.Harmonic_Oscillator(),
+                          DataObject.Morse_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Morse Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Morse Oscillator' and DataObject.holdData.v[2] == 'Model-Harmonic Oscillator':
-                holder = [Morse_Oscillator(), Morse_Oscillator(),
-                          Harmonic_Oscillator()]
+                holder = [DataObject.Morse_Oscillator(), DataObject.Morse_Oscillator(),
+                          DataObject.Harmonic_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Morse Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Morse Oscillator' and DataObject.holdData.v[2] == 'Model-Morse Oscillator':
-                holder = [Morse_Oscillator(), Morse_Oscillator(),
-                          Morse_Oscillator()]
+                holder = [DataObject.Morse_Oscillator(), DataObject.Morse_Oscillator(),
+                          DataObject.Morse_Oscillator()]
                 model_prompt(holder)
             else:
                 save_file_prompt()

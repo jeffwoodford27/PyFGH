@@ -15,6 +15,45 @@ class holdData:
     file_name = 0
     model_data = []
 
+class Harmonic_Oscillator:
+    def __init__(self):
+        self.type = 0
+        self.name = "Harmonic Oscillator"
+        self.nparam = 2
+        self.label = ["\u03BC", "k"]
+        self.param = np.zeros(self.nparam, float)
+
+    def set_param(self, param_list):
+        for i in range(self.nparam):
+            self.param[i] = param_list[i]
+        return
+
+class Morse_Oscillator:
+    def __init__(self):
+        self.type = 1
+        self.name = "Morse Oscillator"
+        self.nparam = 3
+        self.label = ["\u03BC", "De", "a"]
+        self.param = np.zeros(self.nparam, float)
+
+    def set_param(self, param_list):
+        for i in range(self.nparam):
+            self.param[i] = param_list[i]
+        return
+
+class Test_Oscillator:
+    def __init__(self):
+        self.type = 2
+        self.name = "Test Oscillator"
+        self.nparam = 4
+        self.mu = 0
+        self.label = ["a", "b", "c", "d"]
+        self.param = np.zeros(self.nparam, float)
+
+    def set_param(self, param_list):
+        for i in range(self.nparam):
+            self.param[i] = param_list[i]
+        return
 
 
 class InputData:
@@ -100,3 +139,14 @@ class InputData:
     def setModelData(self, model_data):
         self.model_data = model_data
         return
+
+
+class OutputData:
+    def __init__(self):
+        self.eigenvalues = []
+
+    def setEigenvalues(self, evalues):
+        for i in range(len(evalues)):
+            self.eigenvalues.append(evalues[i])
+        return
+

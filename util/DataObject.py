@@ -1,6 +1,11 @@
 import numpy as np
-
 class holdData:
+    """
+    If you want to use that variable even outside the class, you must declared that variable as a global.
+    Then the variable can be accessed using its name inside and outside the class and not using the instance of the
+    class. These values here are not global because they are  not accessed outside of the class with a global keyword.
+    """
+
     molecule = 0
     q_equation1 = 0
     q_equation2 = 0
@@ -15,51 +20,10 @@ class holdData:
     g = 0
     v = []
     file_name = 0
-    model_data = []
-
-class Harmonic_Oscillator:
-    def __init__(self):
-        self.type = 0
-        self.name = "Harmonic Oscillator"
-        self.nparam = 2
-        self.label = ["\u03BC", "k"]
-        self.param = np.zeros(self.nparam, float)
-
-    def set_param(self, param_list):
-        for i in range(self.nparam):
-            self.param[i] = param_list[i]
-        return
-
-class Morse_Oscillator:
-    def __init__(self):
-        self.type = 1
-        self.name = "Morse Oscillator"
-        self.nparam = 3
-        self.label = ["\u03BC", "De", "a"]
-        self.param = np.zeros(self.nparam, float)
-
-    def set_param(self, param_list):
-        for i in range(self.nparam):
-            self.param[i] = param_list[i]
-        return
-
-class Test_Oscillator:
-    def __init__(self):
-        self.type = 2
-        self.name = "Test Oscillator"
-        self.nparam = 4
-        self.mu = 0
-        self.label = ["a", "b", "c", "d"]
-        self.param = np.zeros(self.nparam, float)
-
-    def set_param(self, param_list):
-        for i in range(self.nparam):
-            self.param[i] = param_list[i]
-        return
+    model_data = []  # This doesn't work
 
 
 class InputData:
-
 
     def __init__(self):
         self.molecule = 0
@@ -76,7 +40,9 @@ class InputData:
         self.g = 0
         self.v = []
         self.file_name = 0
-        self.model_data = []
+        self.model_data = []  # This does not work
+        self.message = 0
+        self.sum = 0
 
     def setMolecule(self, molecule):
         self.molecule = molecule
@@ -142,6 +108,14 @@ class InputData:
         self.model_data = model_data
         return
 
+    def setMessage(self, message):
+        self.message = message
+        return
+
+    def set_sum(self, sum):
+        self.sum = sum
+        return
+
 
 class OutputData:
     def __init__(self):
@@ -151,4 +125,3 @@ class OutputData:
         for i in range(len(evalues)):
             self.eigenvalues.append(evalues[i])
         return
-

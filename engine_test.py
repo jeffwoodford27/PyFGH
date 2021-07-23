@@ -1,14 +1,21 @@
-from util import DataObject
+import os
+import time
+
 import numpy as np
 import math
-import time
 import sys
 import scipy.linalg
+
+import GUI
+from util import DataObject
+from multiprocessing import Process, Queue
 
 #Remove the numpy print limits
 np.set_printoptions(threshold=sys.maxsize)
 
-# comment goes here
+"""
+This one uses Queues
+"""
 
 
 def calc_idx(D, N, idx):
@@ -125,6 +132,7 @@ def CalcPotentialEnergy(x, VModel):
         print("Invalid Potential Energy Model")
         return(0)
 
+
 # The function to calculate a VMatrix using the mol class from input
 def VMatrixCalc(D, N, L, VModel):
     Npt = np.prod(N)
@@ -150,25 +158,99 @@ def VMatrixCalc(D, N, L, VModel):
     return vmatrix
 
 
-D = 3
 
-VModel = []
-N = np.zeros(D, int)
-L = np.zeros(D, float)
-mu = np.zeros(D, float)
-for j in range(0, D):
-    N[j] = 15
-    L[j] = 2
-    mu[j] = 919
-    param_list = [919, 0.37]
-    VModelObj = DataObject.Harmonic_Oscillator()
-    VModelObj.set_param(param_list)
-    VModel.append(VModelObj)
-TMatrix = TMatrixCalc(D, N, L, mu)
-VMatrix = VMatrixCalc(D, N, L, VModel)
-HMatrix = TMatrix + VMatrix
+# This is the parent process
+def datamuncher(q):
+    print('This is the parent process: ', os.getpid())
+    holder1 = q.get()
+#    print(holder1.message)
+    print("Molecule: ", holder1.molecule)
+    print("Q1 equation: ", holder1.q_equation1)
+    print("Q2 equation: ", holder1.q_equation2)
+    print("Q3 equation: ", holder1.q_equation3)
+    print("N1: ", holder1.N1)
+    print("L1: ", holder1.L1)
+    print("N2: ", holder1.N2)
+    print("L2: ", holder1.L2)
+    print("N3: ", holder1.N3)
+    print("L3: ", holder1.L3)
+    print("T : ", holder1.t)
+    print("G : ", holder1.g)
+    print("Filename: ", holder1.file_name)
+    print("V : ", holder1.v)
 
-EValues = np.sort(scipy.linalg.eigvals(HMatrix))
-opdata = DataObject.OutputData()
-opdata.setEigenvalues(EValues)
-print(opdata.eigenvalues)
+    D = 3
+    N = np.zeros(D,dtype=int)
+    N[0] = holder1.N1
+    N[1] = holder1.N2
+    N[2] = holder1.N3
+
+    print("Created N array")
+
+    L = np.zeros(D,dtype=float)
+    L[0] = holder1.L1
+    L[1] = holder1.L2
+    L[2] = holder1.L3
+
+    print("Created L array")
+
+    mu = np.zeros(D,dtype=float)
+    for i in range(D):
+        mu[i] = holder1.model_data[i].param[0]
+
+    print("Created mu array")
+
+    TMatrix = TMatrixCalc(D, N, L, mu)
+    print("Computed T matrix")
+    VMatrix = VMatrixCalc(D, N, L, holder1.model_data)
+    print("Computed V matrix")
+    HMatrix = TMatrix + VMatrix
+
+    EValues = np.sort(scipy.linalg.eigvals(HMatrix))
+    opdata = DataObject.OutputData()
+    opdata.setEigenvalues(EValues)
+    print("Eigenvalues on "+str(os.getpid())+" are "+str(opdata.eigenvalues))
+    q.put(opdata)
+
+    # print("File Name : ", holder1.file_name, " This is from the child process")
+    # print("Model Data : ", holder1.model_data, " This is from the child process")
+
+    return
+
+
+def datagrabber():
+    q = Queue()
+    p1 = Process(target=datamuncher, args=(q,))
+    p1.start()
+    time.sleep(1)
+    GUI.main_window()
+    print('The interface is started Process: ', os.getpid())
+    holder = DataObject.InputData()
+    holder.setMolecule(DataObject.holdData.molecule)
+    holder.setQ1(DataObject.holdData.q_equation1)
+    holder.setQ2(DataObject.holdData.q_equation2)
+    holder.setQ3(DataObject.holdData.q_equation3)
+    holder.setN1(DataObject.holdData.N1)
+    holder.setL1(DataObject.holdData.L1)
+    holder.setN2(DataObject.holdData.N2)
+    holder.setL2(DataObject.holdData.L2)
+    holder.setN3(DataObject.holdData.N3)
+    holder.setL3(DataObject.holdData.L3)
+    holder.setT(DataObject.holdData.t)
+    holder.setG(DataObject.holdData.g)
+    holder.setV(DataObject.holdData.v)
+    holder.setFileName(DataObject.holdData.file_name)
+    holder.setModelData(DataObject.holdData.model_data)
+
+#    holder.setMessage("This is from the child")
+
+    # holder.setModelData(DataObject.holdData.model_data)  # look into pickling possibly un-pickling
+    q.put(holder)
+    opdata = q.get()
+    print("Eigenvalues on "+str(os.getpid())+" are "+str(opdata.eigenvalues))
+    return
+
+
+if __name__ == '__main__':
+    datagrabber()
+    print('done')

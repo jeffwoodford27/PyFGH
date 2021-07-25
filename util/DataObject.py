@@ -1,4 +1,6 @@
 import numpy as np
+
+
 class holdData:
     """
     If you want to use that variable even outside the class, you must declared that variable as a global.
@@ -21,6 +23,9 @@ class holdData:
     v = []
     file_name = 0
     model_data = []  # This doesn't work
+    host = 0
+    user = 0
+    password = 0
 
 
 class InputData:
@@ -43,6 +48,9 @@ class InputData:
         self.model_data = []  # This does not work
         self.message = 0
         self.sum = 0
+        self.host = 0
+        self.user = 0
+        self.password = 0
 
     def setMolecule(self, molecule):
         self.molecule = molecule
@@ -114,6 +122,18 @@ class InputData:
 
     def set_sum(self, sum):
         self.sum = sum
+        return
+
+    def set_host(self, host):
+        self.host = host
+        return
+
+    def set_user(self, user):
+        self.user = user
+        return
+
+    def set_password(self, password):
+        self.password = password
         return
 
 

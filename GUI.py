@@ -1,4 +1,5 @@
 import multiprocessing
+import os
 
 import tkinter
 import tkinter as tk
@@ -13,6 +14,10 @@ import numpy as np
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
 Author: Josiah Randleman
 © Copyright 2021, Josiah Randleman, All rights reserved. jrandl516@gmail.com
+"""
+
+"""
+On line 392 fix this code. Make it more modular.
 """
 
 
@@ -183,6 +188,18 @@ def main_window():
     exit = tk.Button(window, text='Exit', bd='10', bg='red', fg='white',
                      command=window.destroy).place(x=365, y=260)
 
+    SSH = ttk.Label(window, text="Run remotely:", font=("Times New Roman", 15))
+    SSH.pack()
+    SSH.place(x=5, y=270)
+
+    b = tk.StringVar()
+    SSH_box = ttk.Combobox(window, width=10, textvariable=b)
+
+    # creates values inside of the choice box
+    SSH_box["values"] = ('Yes', 'No')
+    SSH_box.place(x=125, y=273)
+
+
     def apioutput():
         print(molecule.get())
         print(q_equation1.get())
@@ -230,6 +247,46 @@ def main_window():
             # apioutput()
             window.destroy()
 
+    class Harmonic_Oscillator:
+        def __init__(self):
+            self.type = 0
+            self.name = "Harmonic Oscillator"
+            self.nparam = 2
+            self.label = ["\u03BC", "k"]
+            self.param = np.zeros(self.nparam, float)
+
+        def set_param(self, param_list):
+            for i in range(self.nparam):
+                self.param[i] = param_list[i]
+            return
+
+    class Morse_Oscillator:
+        def __init__(self):
+            self.type = 1
+            self.name = "Morse Oscillator"
+            self.nparam = 3
+            self.label = ["\u03BC", "De", "a"]
+            self.param = np.zeros(self.nparam, float)
+
+        def set_param(self, param_list):
+            for i in range(self.nparam):
+                self.param[i] = param_list[i]
+            return
+
+    class Test_Oscillator:
+        def __init__(self):
+            self.type = 2
+            self.name = "Test Oscillator"
+            self.nparam = 4
+            self.mu = 0
+            self.label = ["a", "b", "c", "d"]
+            self.param = np.zeros(self.nparam, float)
+
+        def set_param(self, param_list):
+            for i in range(self.nparam):
+                self.param[i] = param_list[i]
+            return
+
     def model_prompt(potential_model):
         window1 = tk.Tk()
         style = Style()
@@ -250,7 +307,7 @@ def main_window():
             qvar[q] = [0] * potential_model[q].nparam
 
             for qparam in range(potential_model[q].nparam):
-                ttk.Label(window1, text=potential_model[q].label[qparam] + " for Q:" + str(q + 1) + ":",
+                ttk.Label(window1, text=potential_model[q].label[qparam] + " for Q" + str(q + 1) + ":",
                           font=("Times New Roman", 15)).place(x=50, y=y)
                 qvar[q][qparam] = ttk.Entry(window1, font=("Times New Roman", 10))
                 qvar[q][qparam].place(x=140, y=y)
@@ -289,6 +346,135 @@ def main_window():
             elif DataObject.holdData.v[i] == "Model-Test Oscillator":
                 sections.append(Harmonic_Oscillator())
 
+    def SSH_prompt():
+        window3 = tk.Tk()
+        style = Style()
+        window3.title('Remote Access')
+        window3.geometry('300x300')
+        text = "Remote Access Login"
+
+        Remote = ttk.Label(window3, text=text, font=("Times New Roman", 15), background='green',
+                           foreground="white")
+        Remote.pack()
+        Remote.place(x=65, y=0)
+
+        Host = ttk.Label(window3, text="Host:", font=("Times New Roman", 18))
+        Host.pack()
+        Host.place(x=30, y=30)
+
+        Host_entry = ttk.Entry(window3, font=("Times New Roman", 12))
+        zebra = tk.StringVar()
+        Host_box = ttk.Combobox(window3, textvariable=zebra)
+        Host_entry.place(x=115, y=32)
+
+        User = ttk.Label(window3, text="Username:", font=("Times New Roman", 18))
+        User.pack()
+        User.place(x=10, y=65)
+
+        Username_entry = ttk.Entry(window3, font=("Times New Roman", 12))
+        lion = tk.StringVar()
+        Echo = ttk.Combobox(window3, textvariable=lion)
+        Username_entry.place(x=115, y=68)
+
+        Password = ttk.Label(window3, text="Password:", font=("Times New Roman", 18))
+        Password.pack()
+        Password.place(x=10, y=100)
+
+        Password_entry = ttk.Entry(window3, font=("Times New Roman", 12))
+        tiger = tk.StringVar()
+        Hunter = ttk.Combobox(window3, textvariable=tiger)
+        Password_entry.place(x=115, y=103)
+
+        def Srun():
+            window1 = tk.Tk()
+            style = Style()
+            window1.title('Srun Configuration')
+            window1.geometry('300x300')
+            text = "Srun Configuration"
+            Remote = ttk.Label(window1, text=text, font=("Times New Roman", 15), background='green',
+                               foreground="white")
+            Remote.pack()
+            Remote.place(x=75, y=0)
+
+            Partition = ttk.Label(window1, text="Partition:", font=("Times New Roman", 18))
+            Partition.pack()
+            Partition.place(x=20, y=30)
+
+            Partition_entry = ttk.Entry(window1, font=("Times New Roman", 12))
+            zebra2 = tk.StringVar()
+            Partition_box = ttk.Combobox(window1, textvariable=zebra2)
+            Partition_entry.place(x=115, y=32)
+
+            QOS = ttk.Label(window1, text="QOS:", font=("Times New Roman", 18))
+            QOS.pack()
+            QOS.place(x=50, y=65)
+
+            QOS_entry = ttk.Entry(window1, font=("Times New Roman", 12))
+            lion2 = tk.StringVar()
+            Echo2 = ttk.Combobox(window1, textvariable=lion2)
+            QOS_entry.place(x=115, y=68)
+
+            Cores = ttk.Label(window1, text="Cores:", font=("Times New Roman", 18))
+            Cores.pack()
+            Cores.place(x=45, y=100)
+
+            Cores_entry = ttk.Entry(window1, font=("Times New Roman", 12))
+            tiger2 = tk.StringVar()
+            Hunter2 = ttk.Combobox(window1, textvariable=tiger2)
+            Cores_entry.place(x=115, y=103)
+
+            Memory = ttk.Label(window1, text="Memory:", font=("Times New Roman", 18))
+            Memory.pack()
+            Memory.place(x=20, y=130)
+
+            Memory_entry = ttk.Entry(window1, font=("Times New Roman", 12))
+            tiger3 = tk.StringVar()
+            Hunter3 = ttk.Combobox(window1, textvariable=tiger3)
+            Memory_entry.place(x=115, y=135)
+
+            Memory = ttk.Label(window1, text="Time:", font=("Times New Roman", 18))
+            Memory.pack()
+            Memory.place(x=50, y=165)
+
+            Memory_entry = ttk.Entry(window1, font=("Times New Roman", 12))
+            tiger3 = tk.StringVar()
+            Hunter3 = ttk.Combobox(window1, textvariable=tiger3)
+            Memory_entry.place(x=115, y=170)
+
+            PTY = ttk.Label(window1, text="PTY:", font=("Times New Roman", 18))
+            PTY.pack()
+            PTY.place(x=55, y=200)
+
+            PTY_entry = ttk.Entry(window1, font=("Times New Roman", 12))
+            leopard = tk.StringVar()
+            Omega = ttk.Combobox(window1, textvariable=leopard)
+            PTY_entry.place(x=115, y=203)
+
+            Enter2 = tk.Button(window1, text='Enter', bd='15', bg='green', fg='white',
+                                  command=window1.destroy).place(x=120, y=235)
+            window3.destroy()
+            window1.mainloop()
+
+
+        var1 = tk.IntVar()
+        c1 = tk.Checkbutton(window3, text='Configure with srun', font=("Times New Roman", 15), variable=var1, onvalue=1,
+                            offvalue=0, command=Srun)
+        c1.pack()
+        c1.place(x=60, y=130)
+
+        def Enter():
+            DataObject.holdData.host = Host_entry.get()
+            DataObject.holdData.user = Username_entry.get()
+            DataObject.holdData.password = Password_entry.get()
+            window3.destroy()
+            print(DataObject.holdData.host, DataObject.holdData.user, DataObject.holdData.password)
+            save_file_prompt()
+
+        Enter = tk.Button(window3, text='Enter', bd='15', bg='green', fg='white',
+                              command=Enter).place(x=110, y=170)
+
+        window3.mainloop()
+
     def output():
         try:
             """
@@ -309,6 +495,7 @@ def main_window():
             DataObject.holdData.L3 = float(L3.get())
             DataObject.holdData.t = t.get()
             DataObject.holdData.g = g.get()
+
             for i in range(3):
                 DataObject.holdData.v.append(v[i].get())
             # API_Class.outputAPI.items.file_name = filename
@@ -320,6 +507,8 @@ def main_window():
             elif q_equation1.get() == 'OH\u2082 Bond Stretch' and q_equation2.get() == 'OH\u2082 Bond Stretch':
                 messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
                 clear_data()
+            elif SSH_box.get() == 'Yes':
+                SSH_prompt()
             # this makes sure that the values are positive
             elif (int(DataObject.holdData.N1)) % 2 == 0:
                 messagebox.showerror("PyFGH", "N must be odd!!!")
@@ -349,44 +538,46 @@ def main_window():
             elif int(DataObject.holdData.L3) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
+            ### Make this code here more modular ###
+
             elif DataObject.holdData.v[0] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[2] == 'Model-Harmonic Oscillator':
-                holder = [DataObject.Harmonic_Oscillator(), DataObject.Harmonic_Oscillator(), DataObject.Harmonic_Oscillator()]
+                holder = [Harmonic_Oscillator(), Harmonic_Oscillator(), Harmonic_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[2] == 'Model-Morse Oscillator':
-                holder = [DataObject.Harmonic_Oscillator(), DataObject.Harmonic_Oscillator(),
-                          DataObject.Morse_Oscillator()]
+                holder = [Harmonic_Oscillator(), Harmonic_Oscillator(),
+                          Morse_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Morse Oscillator' and DataObject.holdData.v[2] == 'Model-Harmonic Oscillator':
-                holder = [DataObject.Harmonic_Oscillator(), DataObject.Morse_Oscillator(),
-                          DataObject.Harmonic_Oscillator()]
+                holder = [Harmonic_Oscillator(), Morse_Oscillator(),
+                          Harmonic_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Morse Oscillator' and DataObject.holdData.v[2] == 'Model-Morse Oscillator':
-                holder = [DataObject.Harmonic_Oscillator(), DataObject.Morse_Oscillator(),
-                          DataObject.Morse_Oscillator()]
+                holder = [Harmonic_Oscillator(), Morse_Oscillator(),
+                          Morse_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Morse Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[2] == 'Model-Harmonic Oscillator':
-                holder = [DataObject.Morse_Oscillator(), DataObject.Harmonic_Oscillator(),
-                          DataObject.Harmonic_Oscillator()]
+                holder = [Morse_Oscillator(), Harmonic_Oscillator(),
+                          Harmonic_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Morse Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Harmonic Oscillator' and DataObject.holdData.v[2] == 'Model-Morse Oscillator':
-                holder = [DataObject.Morse_Oscillator(), DataObject.Harmonic_Oscillator(),
-                          DataObject.Morse_Oscillator()]
+                holder = [Morse_Oscillator(), Harmonic_Oscillator(),
+                          Morse_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Morse Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Morse Oscillator' and DataObject.holdData.v[2] == 'Model-Harmonic Oscillator':
-                holder = [DataObject.Morse_Oscillator(), DataObject.Morse_Oscillator(),
-                          DataObject.Harmonic_Oscillator()]
+                holder = [Morse_Oscillator(), Morse_Oscillator(),
+                          Harmonic_Oscillator()]
                 model_prompt(holder)
             elif DataObject.holdData.v[0] == 'Model-Morse Oscillator' and DataObject.holdData.v[
                 1] == 'Model-Morse Oscillator' and DataObject.holdData.v[2] == 'Model-Morse Oscillator':
-                holder = [DataObject.Morse_Oscillator(), DataObject.Morse_Oscillator(),
-                          DataObject.Morse_Oscillator()]
+                holder = [Morse_Oscillator(), Morse_Oscillator(),
+                          Morse_Oscillator()]
                 model_prompt(holder)
             else:
                 save_file_prompt()
@@ -408,14 +599,10 @@ def main_window():
         canvas = tkinter.Canvas(window, width=500, height=235)
         canvas.pack()
 
-        text = "  A Python implementation of the Fourier Grid Hamiltonian \n method. Current repo information: main.py is currently " \
-               "the \n main program that runs the input and calculation modules \n inputparam.py checks for correctness of " \
-               "the user input data.\n Tmatrix.py calculates the T matrix, along with B and C \n matrices.Vmatrix.py calculates " \
-               "the V matrixpyfghutil.py \n contains useful utility functions. \n \n This program was developed by: Dr. Jeff Woodford, \n " \
-               "Nelson Maxley, Tyler Law and Josiah Randleman."
+        text = "  A Python implementation of the Fourier Grid Hamiltonian \n \n Credits: Dr. Jeffrey Woodford, " \
+               "Nelson Maxey, Tyler Law \n and Josiah Randleman. \n \n GitHub Repository: \n https://github.com/jeffwoodford27/PyFGH/tree/main "
 
-
-        x = ttk.Label(window, text= text, font=("Times New Roman", 15))
+        x = ttk.Label(window, text=text, font=("Times New Roman", 15))
         x.pack()
         x.place(x=0, y=0)
 
@@ -429,15 +616,15 @@ def main_window():
         canvas = tkinter.Canvas(window, width=500, height=650)
         canvas.pack()
 
-        x = ttk.Label(window, text="Approximation 1: ", font=("Times New Roman", 15), background='green',
+        x = ttk.Label(window, text="None: ", font=("Times New Roman", 15), background='green',
                       foreground="white")
         x.pack()
-        x.place(x=175, y=0)
+        x.place(x=215, y=0)
 
         img = tkinter.PhotoImage(file="t0.png")
         canvas.create_image(30, 30, anchor=NW, image=img)
 
-        x2 = ttk.Label(window, text="Approximation 2: ", font=("Times New Roman", 15), background='green',
+        x2 = ttk.Label(window, text="Approximation 1: ", font=("Times New Roman", 15), background='green',
                        foreground="white")
         x2.pack()
         x2.place(x=175, y=135)
@@ -445,7 +632,7 @@ def main_window():
         img1 = tkinter.PhotoImage(file="t1.png")
         canvas.create_image(100, 165, anchor=NW, image=img1)
 
-        x3 = ttk.Label(window, text="Approximation 3: ", font=("Times New Roman", 15), background='green',
+        x3 = ttk.Label(window, text="Approximation 2: ", font=("Times New Roman", 15), background='green',
                        foreground="white")
         x3.pack()
         x3.place(x=175, y=255)
@@ -453,7 +640,7 @@ def main_window():
         img2 = tkinter.PhotoImage(file="t2.png")
         canvas.create_image(250, 330, image=img2)
 
-        x4 = ttk.Label(window, text="Approximation 4: ", font=("Times New Roman", 15), background='green',
+        x4 = ttk.Label(window, text="Approximation 3: ", font=("Times New Roman", 15), background='green',
                        foreground="white")
         x4.pack()
         x4.place(x=175, y=380)
@@ -461,14 +648,13 @@ def main_window():
         img3 = tkinter.PhotoImage(file="t3.png")
         canvas.create_image(250, 460, image=img3)
 
-        x5 = ttk.Label(window, text="Approximation 5: ", font=("Times New Roman", 15), background='green',
+        x5 = ttk.Label(window, text="Approximation 4: ", font=("Times New Roman", 15), background='green',
                        foreground="white")
         x5.pack()
         x5.place(x=175, y=512)
 
         img4 = tkinter.PhotoImage(file="t4.png")
         canvas.create_image(250, 585, image=img4)
-
 
         window.mainloop()
 
@@ -531,4 +717,3 @@ def main_window():
     N3.place(x=645, y=100, width=100)
     L3.place(x=800, y=100, width=100)
     window.mainloop()
-

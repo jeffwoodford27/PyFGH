@@ -26,6 +26,7 @@ class holdData:
     host = 0
     user = 0
     password = 0
+    remote = 0
 
 
 class InputData:
@@ -51,7 +52,7 @@ class InputData:
         self.host = 0
         self.user = 0
         self.password = 0
-
+        self.remote = 0
     def setMolecule(self, molecule):
         self.molecule = molecule
         return
@@ -136,6 +137,9 @@ class InputData:
         self.password = password
         return
 
+    def set_remote(self, remote):
+        self.remote = remote
+        return
 
 class OutputData:
     def __init__(self):

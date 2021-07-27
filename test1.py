@@ -54,38 +54,41 @@ def datamuncher(q):
     file.close()
 
 
+    def SSH_connection():
+        host = holder1.host
+        port = 22
+        username = holder1.user
+        password = holder1.password
+        command = "python3 test3.py"
+        command2 = "rm DataList.txt"
+        command3 = "rm test3.py"
+        command4 = "rm Results.txt"
 
-    host = holder1.host
-    port = 22
-    username = holder1.user
-    password = holder1.password
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(host, port, username, password)
+        sftp = ssh.open_sftp()
+
+        path = "/home/jrandleman/DataList.txt"
+        localpath = "./resources/DataList.txt"
+        sftp.put(localpath, path)
+        path2 = "/home/jrandleman/test3.py"
+        localpath2 = "test3.py"
+        sftp.put(localpath2, path2)
+        stdin, stdout, stderr = ssh.exec_command(command)
+        stdin, stdout, stderr = ssh.exec_command(command2)
+        stdin, stdout, stderr = ssh.exec_command(command3)
+        path3 = "/home/" + username + "/Results.txt"
+        localpath3 = "./resources/Results.txt"
+        sftp.get(path3, localpath3)
+        stdin, stdout, stderr = ssh.exec_command(command4)
+        sftp.close()
+        ssh.close()
 
 
-    command = "python3 test3.py"
-    command2 = "rm DataList.txt"
-    command3 = "rm test3.py"
-    command4 = "rm Results.txt"
 
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(host, port, username, password)
-    sftp = ssh.open_sftp()
-
-    path = "/home/jrandleman/DataList.txt"
-    localpath = "./resources/DataList.txt"
-    sftp.put(localpath, path)
-    path2 = "/home/jrandleman/test3.py"
-    localpath2 = "test3.py"
-    sftp.put(localpath2, path2)
-    stdin, stdout, stderr = ssh.exec_command(command)
-    stdin, stdout, stderr = ssh.exec_command(command2)
-    stdin, stdout, stderr = ssh.exec_command(command3)
-    path3 = "/home/jrandleman/Results.txt"
-    localpath3 = "./resources/Results.txt"
-    sftp.get(path3, localpath3)
-    stdin, stdout, stderr = ssh.exec_command(command4)
-    sftp.close()
-    ssh.close()
+    if holder1.remote == 'Yes':
+        SSH_connection()
 
     Charles = Bob()
     Charles.setSum(holder1.sum)
@@ -125,7 +128,8 @@ def datagrabber():
     holder.set_host(DataObject.holdData.host)
     holder.set_user(DataObject.holdData.user)
     holder.set_password(DataObject.holdData.password)
-    #holder.setModelData(DataObject.holdData.model_data)  # look into pickling possibly un-pickling
+    holder.set_remote(DataObject.holdData.remote)
+    # holder.setModelData(DataObject.holdData.model_data)  # look into pickling possibly un-pickling
     q.put(holder)
     Charles = q.get()
     print(Charles.sum)

@@ -495,6 +495,7 @@ def main_window():
             DataObject.holdData.L3 = float(L3.get())
             DataObject.holdData.t = t.get()
             DataObject.holdData.g = g.get()
+            DataObject.holdData.remote = SSH_box.get()
 
             for i in range(3):
                 DataObject.holdData.v.append(v[i].get())

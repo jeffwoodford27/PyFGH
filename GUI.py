@@ -350,6 +350,7 @@ def main_window():
         style = Style()
         window3.title('Remote Access')
         window3.geometry('300x300')
+        window.iconbitmap(default='key.ico')
         text = "Remote Access Login"
 
         Remote = ttk.Label(window3, text=text, font=("Times New Roman", 15), background='green',
@@ -390,6 +391,7 @@ def main_window():
             style = Style()
             window1.title('Srun Configuration')
             window1.geometry('300x300')
+            window.iconbitmap(default='key.ico')
             text = "Srun Configuration"
             Remote = ttk.Label(window1, text=text, font=("Times New Roman", 15), background='green',
                                foreground="white")

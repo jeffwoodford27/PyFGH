@@ -53,6 +53,8 @@ def datamuncher(q):
         file.write('%s\n' % x)
     file.close()
 
+    DataObject.holdData.user2 = holder1.user
+
 
     def SSH_connection():
         host = holder1.host
@@ -69,10 +71,10 @@ def datamuncher(q):
         ssh.connect(host, port, username, password)
         sftp = ssh.open_sftp()
 
-        path = "/home/jrandleman/DataList.txt"
+        path = "/home/" + username + "/DataList.txt"
         localpath = "./resources/DataList.txt"
         sftp.put(localpath, path)
-        path2 = "/home/jrandleman/test3.py"
+        path2 = "/home/" + username + "/test3.py"
         localpath2 = "test3.py"
         sftp.put(localpath2, path2)
         stdin, stdout, stderr = ssh.exec_command(command)

@@ -199,7 +199,6 @@ def main_window():
     SSH_box["values"] = ('Yes', 'No')
     SSH_box.place(x=125, y=273)
 
-
     def apioutput():
         print(molecule.get())
         print(q_equation1.get())
@@ -381,6 +380,7 @@ def main_window():
         Password.place(x=10, y=100)
 
         Password_entry = ttk.Entry(window3, font=("Times New Roman", 12))
+        Password_entry.config(show="*")
         tiger = tk.StringVar()
         Hunter = ttk.Combobox(window3, textvariable=tiger)
         Password_entry.place(x=115, y=103)
@@ -451,10 +451,9 @@ def main_window():
             PTY_entry.place(x=115, y=203)
 
             Enter2 = tk.Button(window1, text='Enter', bd='15', bg='green', fg='white',
-                                  command=window1.destroy).place(x=120, y=235)
+                               command=window1.destroy).place(x=120, y=235)
             window3.destroy()
             window1.mainloop()
-
 
         var1 = tk.IntVar()
         c1 = tk.Checkbutton(window3, text='Configure with srun', font=("Times New Roman", 15), variable=var1, onvalue=1,
@@ -471,7 +470,7 @@ def main_window():
             save_file_prompt()
 
         Enter = tk.Button(window3, text='Enter', bd='15', bg='green', fg='white',
-                              command=Enter).place(x=110, y=170)
+                          command=Enter).place(x=110, y=170)
 
         window3.mainloop()
 

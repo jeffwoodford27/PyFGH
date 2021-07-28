@@ -1,7 +1,8 @@
-import os
+import getpass
 # Linux
 # Windows ./resources/DataList.txt
-with open("/home/jrandleman/DataList.txt",  encoding="utf-8") as open_file:
+username = getpass.getuser()
+with open("/home/" + username + "/DataList.txt",  encoding="utf-8") as open_file:
     lines = open_file.readlines()
     a = 0
     x1 = lines[4].strip('\n')

@@ -9,6 +9,8 @@ from multiprocessing import Process, Queue
 This one uses Queues
 This communicates by using SSH
 Also connected to test3.py
+Author: Josiah Randleman
+© Copyright 2021, Josiah Randleman, All rights reserved. jrandl516@gmail.com
 """
 
 

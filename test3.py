@@ -1,4 +1,10 @@
 import getpass
+
+"""
+Author: Josiah Randleman
+© Copyright 2021, Josiah Randleman, All rights reserved. jrandl516@gmail.com
+"""
+
 # Linux
 # Windows ./resources/DataList.txt
 username = getpass.getuser()

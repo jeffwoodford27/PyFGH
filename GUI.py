@@ -9,7 +9,7 @@ from tkinter.ttk import Style
 from util import DataObject
 import numpy as np
 
-##from PIL import ImageTk, Image
+
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
 Author: Josiah Randleman
@@ -17,10 +17,8 @@ Author: Josiah Randleman
 """
 
 """
-On line 392 fix this code. Make it more modular.
+This is the main method. 
 """
-
-
 def main_window():
     # Creating tkinter window
     window = tk.Tk()
@@ -36,6 +34,7 @@ def main_window():
               background='green', foreground="white",
               font=("Times New Roman", 15)).place(x=200, y=0)
 
+    # This is where it finds how many cpu processors the computer has. It then displays this information in the GUI.
     cores = []
     for i in range(1, multiprocessing.cpu_count() + 1):
         cores.append(i)
@@ -152,7 +151,7 @@ def main_window():
         tkinter.Tk().withdraw()
         DataObject.holdData.file_name = askopenfilename()
 
-    # This Button works!!!
+    # Open Button
     open = tk.Button(window, text='Open', bd='5', bg='black', fg='white',
                      command=open_file).place(x=795, y=150)
 
@@ -177,6 +176,7 @@ def main_window():
     # Label
     v = []
     value = 1
+    # This appends the models to the choice boxes for V
     for i in range(3):
         ttk.Label(window, text="V for Q" + str(i + 1) + ":", font=("Times New Roman", 15)).place(x=value, y=205)
         d = tk.StringVar()
@@ -188,6 +188,7 @@ def main_window():
     exit = tk.Button(window, text='Exit', bd='10', bg='red', fg='white',
                      command=window.destroy).place(x=365, y=260)
 
+    # Label for SSH
     SSH = ttk.Label(window, text="Run remotely:", font=("Times New Roman", 15))
     SSH.pack()
     SSH.place(x=5, y=270)
@@ -199,6 +200,7 @@ def main_window():
     SSH_box["values"] = ('Yes', 'No')
     SSH_box.place(x=125, y=273)
 
+    # This is just a method for testing the values
     def apioutput():
         print(molecule.get())
         print(q_equation1.get())
@@ -215,7 +217,7 @@ def main_window():
         for i in range(3):
             print(v[i].get())
 
-    # This definition works! This clears everything in the window!!!
+    # This method clears all of the data in the GUI
     def clear_data():
         cores.set('')
         molecule.set('')
@@ -233,6 +235,7 @@ def main_window():
         N3.delete(0, END)
         L3.delete(0, END)
 
+    # This method saves the output of the GUI to a text file
     def save_file_prompt():
         box: bool = tk.messagebox.askyesno("PyFGH", "Would you like to save the data to a text file?")
         if box:
@@ -245,6 +248,15 @@ def main_window():
             # filename_api = filename
             # apioutput()
             window.destroy()
+
+    """
+    This is where you define a model. 
+    To begin define the class and class name. Then define the type. The type is Harmonic Oscillator is zero. So the 
+    next model is one and so forth. The name is the name of the class. The nparam is the number of parameters that the
+    model contains. For example, the Harmonic Oscillator contains two elements for the nparam is 2. The label is the text
+    or elements that you wanted displayed in the GUI. In every class include the self.param = np.zeros(self.nparam, float).
+    Also in every class include the def set_param(self, param_list) definition.
+    """
 
     class Harmonic_Oscillator:
         def __init__(self):
@@ -285,6 +297,13 @@ def main_window():
             for i in range(self.nparam):
                 self.param[i] = param_list[i]
             return
+
+    """
+    This method is responsible for calling the GUI window for the models. When you select the different models, this 
+    method finds the class and then builds the window depending on the parameters and windows. This method is fully 
+    modular. To add a new model, you only need to create a new class up above. Look at the following classes up above
+    for an example on how to create a new class for the model prompt.
+    """
 
     def model_prompt(potential_model):
         window1 = tk.Tk()
@@ -335,6 +354,7 @@ def main_window():
 
         window1.mainloop()
 
+    # This is just for testing purposes.
     def output2():
         sections = []
         for i in range(3):
@@ -344,6 +364,14 @@ def main_window():
                 sections.append(Harmonic_Oscillator())
             elif DataObject.holdData.v[i] == "Model-Test Oscillator":
                 sections.append(Harmonic_Oscillator())
+
+    """
+    This method is for building the SSH window is the user selects yes for running remotely. This takes the data that
+    is entered and saves it to the DataObject folder. This runs the GUI locally and then saves the input data to a new
+    text folder called DataList.txt in the resources folder. Then it takes the DataList.txt and sends this file to the 
+    remote server. It then calculates the values and saves it to a new file called Results.txt. This file gets saved in 
+    resources folder.
+    """
 
     def SSH_prompt():
         window3 = tk.Tk()
@@ -386,6 +414,7 @@ def main_window():
         Hunter = ttk.Combobox(window3, textvariable=tiger)
         Password_entry.place(x=115, y=103)
 
+        # For running slum on a server
         def Srun():
             window1 = tk.Tk()
             style = Style()
@@ -476,8 +505,12 @@ def main_window():
 
         window3.mainloop()
 
+    """
+    This method gets called when the GUI is terminated. This saves the values from the input to the DataObject file.
+    This also checks for validation rules also for the values that were inputted.
+    """
+
     def output():
-        global charly1, charly2, charly3
         try:
             """
             Added validation rules to my interface. All N values must be positive, odd integers.
@@ -502,9 +535,10 @@ def main_window():
             for i in range(3):
                 DataObject.holdData.v.append(v[i].get())
 
-
             # API_Class.outputAPI.items.file_name = filename
             # This is where error checking takes place.
+
+            # These are validation rules for the input.
             if q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
                 messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
                 clear_data()
@@ -512,6 +546,7 @@ def main_window():
             elif q_equation1.get() == 'OH\u2082 Bond Stretch' and q_equation2.get() == 'OH\u2082 Bond Stretch':
                 messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
                 clear_data()
+            # This runs the SSH window if the user selects yes.
             elif SSH_box.get() == 'Yes':
                 SSH_prompt()
             # this makes sure that the values are positive
@@ -543,44 +578,33 @@ def main_window():
             elif int(DataObject.holdData.L3) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
-
+            # This runs the model window when the user hits calculate.
             else:
-                z1 = (DataObject.holdData.v[0])
-                z2 = (DataObject.holdData.v[1])
-                z3 = (DataObject.holdData.v[2])
-
-                if z1 == "Harmonic Oscillator":
-                    charly1 = Harmonic_Oscillator()
-                if z1 == "Morse Oscillator":
-                    charly1 = Morse_Oscillator()
-                if z2 == "Harmonic Oscillator":
-                    charly2 = Harmonic_Oscillator()
-                if z2 == "Morse Oscillator":
-                    charly2 = Morse_Oscillator()
-                if z3 == "Harmonic Oscillator":
-                    charly3 = Harmonic_Oscillator()
-                if z3 == "Morse Oscillator":
-                    charly3 = Morse_Oscillator()
-
-                auburn = charly1
-                chattanooga = charly2
-                gulf_shores = charly3
-
-                holder = [auburn, chattanooga, gulf_shores]
+                holder = []
+                for i in range(3):
+                    if DataObject.holdData.v[i] == 'Harmonic Oscillator':
+                        holder.append(Harmonic_Oscillator())
+                    elif DataObject.holdData.v[i] == 'Morse Oscillator':
+                        holder.append(Morse_Oscillator())
+                    else:
+                        print('ERROR SOMETHING IS WRONG WITH THE MODEL!!!')
 
                 print(holder)
                 model_prompt(holder)
-                #save_file_prompt()
+                # save_file_prompt()
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")
 
+    # This is the calculate button.
     calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',
                           command=output).place(x=420, y=250)
 
+    # This is the clear button.
     clear = tk.Button(window, text='Clear', bd='10', bg='blue', fg='white',
                       command=clear_data).place(x=525, y=260)
 
+    # This method displays the about window in the GUI interface.
     def about_window():
         window = tk.Toplevel()
         window.title("About")
@@ -595,9 +619,11 @@ def main_window():
         x.pack()
         x.place(x=0, y=0)
 
+    # This is the about button.
     about = tk.Button(window, text='About', bd='10', bg='purple', fg='white',
                       command=about_window).place(x=590, y=260)
 
+    # This method here displays the T equations.
     def t0():
         window = tk.Toplevel()
         window.title("T Equations")
@@ -649,7 +675,10 @@ def main_window():
 
     tbutton = tk.Button(window, text='Display T equation', bd='10', bg='orange', fg='white',
                         command=t0).place(x=232, y=260)
-
+    """
+    This is a validation checker for the Read Structures button. You can not read in values and also try to run the 
+    GUI interface at the same time.
+    """
     def open_file2():
         def is_list_empty(list):
             # checking the length
@@ -669,6 +698,7 @@ def main_window():
             print(filename2)
             window.destroy()
 
+    # This is a button called Read Structures
     readbutton = tk.Button(window, text='Read Structures and Energies from File', bd='10', bg='gray', fg='white',
                            command=open_file2).place(x=360, y=320)
     # Disabled the compute button for now
@@ -678,6 +708,7 @@ def main_window():
     # Adding combobox drop down list
     # cores['values'] = (multiprocessing.cpu_count())
 
+    # This places a lot of things in the GUI
     cores.place(x=105, y=50)
     cores.current()
     molecule.place(x=330, y=50)
@@ -706,4 +737,3 @@ def main_window():
     N3.place(x=645, y=100, width=100)
     L3.place(x=800, y=100, width=100)
     window.mainloop()
-

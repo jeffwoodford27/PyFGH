@@ -1,12 +1,12 @@
 import numpy as np
 
+"""
+DataObject is a place to hold data. All values in these classes are first assigned to zero. In GUI.py these values get 
+reassigned new values based on the input of the GUI. When the GUI is terminated, these values change from zero to the 
+values from the input. After the GUI is terminated, these new values can be called from any file in this project.
+"""
 
 class holdData:
-    """
-    If you want to use that variable even outside the class, you must declared that variable as a global.
-    Then the variable can be accessed using its name inside and outside the class and not using the instance of the
-    class. These values here are not global because they are  not accessed outside of the class with a global keyword.
-    """
 
     molecule = 0
     q_equation1 = 0
@@ -53,6 +53,11 @@ class InputData:
         self.user = 0
         self.password = 0
         self.remote = 0
+
+    """
+    The following methods are setters. These values get set in test1.py
+    """
+
     def setMolecule(self, molecule):
         self.molecule = molecule
         return
@@ -140,6 +145,7 @@ class InputData:
     def set_remote(self, remote):
         self.remote = remote
         return
+
 
 class OutputData:
     def __init__(self):

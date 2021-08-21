@@ -5,9 +5,11 @@ import tkinter
 import tkinter as tk
 from tkinter import ttk, messagebox, NW, END
 from tkinter.filedialog import askopenfilename
+from tkinter.messagebox import showinfo
 from tkinter.ttk import Style
 from util import DataObject
 import numpy as np
+from tkinter import filedialog as fd
 
 
 """
@@ -146,10 +148,24 @@ def main_window():
     ttk.Label(window, text="Equilibrium Coordinates:", font=("Times New Roman", 10)).place(x=645, y=155)
 
     # Allows the user to chose a file in their file explorer
-    # TODO: Error somewhere in this. When you select to open a file, then run the code in API.py the variables do not transfer. Fix this!!!
     def open_file():
-        tkinter.Tk().withdraw()
-        DataObject.holdData.file_name = askopenfilename()
+        filetypes = (
+            ('text files', '*.txt'),
+            ('All files', '*.*')
+        )
+        filename = fd.askopenfilename(
+            title='Open a file',
+            initialdir='/',
+            filetypes=filetypes)
+
+        showinfo(
+            title='Selected File',
+            message=filename
+        )
+     
+
+        #kinter.Tk().withdraw()
+        #DataObject.holdData.file_name = askopenfilename()
 
     # Open Button
     open = tk.Button(window, text='Open', bd='5', bg='black', fg='white',

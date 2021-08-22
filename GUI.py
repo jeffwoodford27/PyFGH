@@ -11,7 +11,6 @@ from util import DataObject
 import numpy as np
 from tkinter import filedialog as fd
 
-
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
 Author: Josiah Randleman
@@ -21,6 +20,8 @@ Author: Josiah Randleman
 """
 This is the main method. 
 """
+
+
 def main_window():
     # Creating tkinter window
     window = tk.Tk()
@@ -162,10 +163,9 @@ def main_window():
             title='Selected File',
             message=filename
         )
-     
 
-        #kinter.Tk().withdraw()
-        #DataObject.holdData.file_name = askopenfilename()
+        # kinter.Tk().withdraw()
+        # DataObject.holdData.file_name = askopenfilename()
 
     # Open Button
     open = tk.Button(window, text='Open', bd='5', bg='black', fg='white',
@@ -611,6 +611,9 @@ def main_window():
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")
+        except IndexError:  # TODO this is not working properly. After the error restart the interface!
+            messagebox.showerror("PyFGH", "Please select the appropriate models!!!")
+            main_window()
 
     # This is the calculate button.
     calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',
@@ -695,6 +698,7 @@ def main_window():
     This is a validation checker for the Read Structures button. You can not read in values and also try to run the 
     GUI interface at the same time.
     """
+
     def open_file2():
         def is_list_empty(list):
             # checking the length

@@ -363,7 +363,10 @@ def main_window():
             print(type(potential_model))
             print(DataObject.holdData.model_data)
             window1.destroy()
-            save_file_prompt()
+            if SSH_box.get() == 'Yes':
+                SSH_prompt()
+            if SSH_box.get() == 'No':
+                save_file_prompt()
 
         enter = tk.Button(window1, text='Enter', bd='20', bg='green', fg='white',
                           command=enter_button).place(x=110, y=y)
@@ -563,8 +566,8 @@ def main_window():
                 messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
                 clear_data()
             # This runs the SSH window if the user selects yes.
-            elif SSH_box.get() == 'Yes':
-                SSH_prompt()
+            #elif SSH_box.get() == 'Yes':
+            #    SSH_prompt()
             # this makes sure that the values are positive
             elif (int(DataObject.holdData.N1)) % 2 == 0:
                 messagebox.showerror("PyFGH", "N must be odd!!!")

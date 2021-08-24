@@ -365,7 +365,7 @@ def main_window():
             window1.destroy()
             if SSH_box.get() == 'Yes':
                 SSH_prompt()
-            if SSH_box.get() == 'No':
+            else:
                 save_file_prompt()
 
         enter = tk.Button(window1, text='Enter', bd='20', bg='green', fg='white',
@@ -565,9 +565,6 @@ def main_window():
             elif q_equation1.get() == 'OH\u2082 Bond Stretch' and q_equation2.get() == 'OH\u2082 Bond Stretch':
                 messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
                 clear_data()
-            # This runs the SSH window if the user selects yes.
-            #elif SSH_box.get() == 'Yes':
-            #    SSH_prompt()
             # this makes sure that the values are positive
             elif (int(DataObject.holdData.N1)) % 2 == 0:
                 messagebox.showerror("PyFGH", "N must be odd!!!")
@@ -610,7 +607,6 @@ def main_window():
 
                 print(holder)
                 model_prompt(holder)
-                # save_file_prompt()
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")

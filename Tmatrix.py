@@ -2,8 +2,10 @@
 import numpy as np
 import scipy as scipy
 import scipy.linalg
-import pyfghutil
+from util import pyfghutil
 import math
+import multiprocessing as mp
+import sys
 
 
 #A function to calculate the BMatrix
@@ -72,13 +74,41 @@ def Tab(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray):
     return(total)        
     #return(total*((-1.0*1.0**2)/(2.0*mu)))        
 
+def TBlockCalc(dimensions, NValue, LValue, mu, c_matrix, blockX, blockY):
+    #Blocks will be 0 index
+    blockHolder = scipy.zeros((NValue[0], NValue[0]), float)
+    #The 0Start variables will always be 0 at the beginning to act as loop variables that correspond to the blockHolder size
+    alpha0start = 0
+    beta0start = 0
+    for alpha in range(0+NValue[0]*blockX, NValue[0]+NValue[0]*blockX):
+        for beta in range(0+NValue[0]*blockY, NValue[0]+NValue[0]*blockY):
+            counter = pyfghutil.AlphaAndBetaToCounter(alpha, beta, dimensions, NValue)
+            blockHolder[alpha0start, beta0start] = (Tab(dimensions, NValue, LValue, mu, c_matrix, counter))
+            beta0start += 1
+        alpha0start += 1
+        beta0start = 0
+    return blockHolder
+
 #The function to calculate a TMatrix using the mol class from input
-def TMatrixCalc(mol, D, VType):
+def TMatrixCalc(dataObj):
     #Establish variables needed
-    dimensions = D
-    NValue = mol.N
-    LValue = mol.L
-    mu = mol.mu
+    NValue = []
+    LValue = []
+    #Create the NValue and LValue list from scratch:
+    if(int(dataObj.holdData.N1) > 0):
+        NValue.append(int(dataObj.holdData.N1))
+        LValue.append(int(dataObj.holdData.L1))
+    if(int(dataObj.holdData.N2) > 0):
+        NValue.append(int(dataObj.holdData.N2))
+        LValue.append(int(dataObj.holdData.L2))
+    if(int(dataObj.holdData.N3) > 0):
+        NValue.append(int(dataObj.holdData.N3))
+        LValue.append(int(dataObj.holdData.L3))
+    
+    mu = []
+    for VModelClass in dataObj.holdData.model_data:
+        mu.append(VModelClass.param[0])
+    dimensions = len(NValue)
     #Move deltax to functions that need it
     #deltax = (float(LValue)/float(NValue))
     #Create the array for the x dimensional counters
@@ -90,6 +120,8 @@ def TMatrixCalc(mol, D, VType):
     tflag = scipy.zeros((np.prod(NValue), np.prod(NValue)), int)
     alpha = 0
     beta = 0
+
+    #This will be configured to only work with 2D for now
     
     #Create the C_Matrix
     c_matrix = []
@@ -97,25 +129,46 @@ def TMatrixCalc(mol, D, VType):
         #c_matrix.append(cmatrixgen(NValue[(dimensions-1)-x], LValue[(dimensions-1)-x]))
         c_matrix.append(cmatrixgen(NValue[x], LValue[x]))
 
+    blockCoords = []
+    blocks = []
+    paramz = []
+    totalwidth = int(np.prod(NValue))
+    repeatamount = int(totalwidth // NValue[0])
+    #print(repeatamount)
+    #print(NValue)
+    #Don't optimize for now. Just calculate blocks as needed.
+    for x in range(repeatamount):
+        for y in range(repeatamount):
+            blockCoords.append((x,y))
+    for coords in blockCoords:
+        paramz.append((dimensions, NValue, LValue, mu, c_matrix, coords[0], coords[1]))
 
-    #Calculate the TMatrix
-    for i in range((np.prod(NValue))*(np.prod(NValue))):
-        #Counts X componenets of counterarray and multiplies it times N^(current dimension being used - 1) for alpha
-        alpha = pyfghutil.AlphaCalc(dimensions, dimensionCounterArray, NValue)
-        beta = pyfghutil.BetaCalc(dimensions, dimensionCounterArray, NValue) 
-
-        #print("Alpha: "+str(alpha)+" Beta:"+str(beta))
-        #print(dimensionCounterArray)
-        #Set the t matrix if the flag hasn't been set
-        if tflag[alpha, beta] == 0:
-            tmatrix[alpha, beta] = (Tab(dimensions, NValue, LValue, mu, c_matrix, dimensionCounterArray))
-            tflag[alpha,beta] = 1
-        if tflag[beta, alpha] == 0:
-            tmatrix[beta, alpha] = (Tab(dimensions, NValue, LValue, mu, c_matrix, dimensionCounterArray))
-            tflag[beta, alpha] = 1  
-
-        #Adds +1 to the last dimension's X/Y value and checks to see if values need to add 1 to the next dimension counter / sets the current value to 0
-        dimensionCounterArray = pyfghutil.DCAAdvance(dimensions, dimensionCounterArray, NValue)
-
+    p = mp.Pool(16)
+    print("Pool go T")
+    blocks = p.starmap(TBlockCalc, paramz)
+    print("Pool's done T")
+    p.close()
+    
+    precalc = 0
+    for i in range(len(blockCoords)):
+        block = blocks[i]
+        x = blockCoords[i][0]
+        y = blockCoords[i][1]
+        tmatrix[(0+NValue[precalc]*x):(NValue[precalc]+NValue[precalc]*x), (0+NValue[precalc]*y):(NValue[precalc]+NValue[precalc]*y)] = block
+    
+    
     return tmatrix
+    '''
+    #Calculate the TMatrix with just alpha beta loop for testing
+    for alpha in range(np.prod(NValue)):
+        for beta in range(np.prod(NValue)):
+            #dimensionCounterArray = pyfghutil.AlphaAndBetaToCounter(alpha, beta, D, NValue)
+            #print("Alpha: "+str(alpha)+" Beta: "+str(beta)+" and Counter: ")
+            #print(dimensionCounterArray)
+            if tflag[alpha, beta] == 0:
+                dimensionCounterArray = pyfghutil.AlphaAndBetaToCounter(alpha, beta, D, NValue)
+                tmatrix[alpha, beta] = (Tab(dimensions, NValue, LValue, mu, c_matrix, dimensionCounterArray))
+                tflag[alpha,beta] = 1
+    return tmatrix
+    '''
 

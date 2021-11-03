@@ -1,11 +1,12 @@
 import os
-import time
 import paramiko
 import GUI
 from util import DataObject
-from multiprocessing import Process, Queue
-
+from multiprocessing import Process, Queue, Pool
 import GUItoCalc as GTC
+from multiprocessing import Pool
+import time
+from tqdm import *
 
 """
 This one uses Queues
@@ -141,8 +142,12 @@ def datagrabber():
     print(Charles.sum)
 
     #At this point, insert the data into the handler
+
     GTC.passToCalc(DataObject)
     return
+
+
+
     
 
 if __name__ == '__main__':

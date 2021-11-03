@@ -6,8 +6,9 @@ reassigned new values based on the input of the GUI. When the GUI is terminated,
 values from the input. After the GUI is terminated, these new values can be called from any file in this project.
 """
 
-class holdData:
 
+class holdData:
+    Hmat = []
     molecule = 0
     q_equation1 = 0
     q_equation2 = 0
@@ -21,6 +22,7 @@ class holdData:
     t = 0
     g = 0
     v = []
+    name_of_file = 0
     file_name = 0
     model_data = []  # This doesn't work
     host = 0
@@ -53,10 +55,18 @@ class InputData:
         self.user = 0
         self.password = 0
         self.remote = 0
+        self.Hmat = []
+        name_of_file = 0
 
     """
     The following methods are setters. These values get set in test1.py
     """
+    def setname_of_file(self, name_of_file):
+        self.name_of_file = name_of_file
+        return
+    def setHmat(self, Hmat):
+        self.Hmat = Hmat
+        return
 
     def setMolecule(self, molecule):
         self.molecule = molecule

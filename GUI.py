@@ -253,12 +253,38 @@ def main_window():
 
     # This method saves the output of the GUI to a text file
     def save_file_prompt():
-        box: bool = tk.messagebox.askyesno("PyFGH", "Would you like to save the data to a text file?")
+        box: bool = tk.messagebox.askyesno("PyFGH", "Would you like to save the data to a CSV file?")
         if box:
-            print('This yes button works')
-            # filename_api = filename
-            # apioutput()
+            window5 = tk.Tk()
+            style = Style()
+            window5.title('File')
+            window5.geometry('300x150')
+            text = "Name for New File"
+
+            Remote2 = ttk.Label(window5, text=text, font=("Times New Roman", 15), background='green',
+                               foreground="white")
+            Remote2.pack()
+            Remote2.place(x=75, y=0)
+
+            Host2 = ttk.Label(window5, text="Enter Name:", font=("Times New Roman", 15))
+            Host2.pack()
+            Host2.place(x=10, y=30)
+
+            Host_entry3 = ttk.Entry(window5, font=("Times New Roman", 12))
+            zebras = tk.StringVar()
+            values = ttk.Combobox(window5, textvariable=zebras)
+            Host_entry3.place(x=115, y=32)
+
+            def enter6():
+                DataObject.holdData.name_of_file = Host_entry3.get()
+                window5.destroy()
+
+            calculate = tk.Button(window5, text='Enter', bd='15', bg='green', fg='white',
+                                  command=enter6).place(x=110, y=70)
+
             window.destroy()
+            window5.mainloop()
+
         else:
             print('The no button works')
             # filename_api = filename
@@ -320,8 +346,10 @@ def main_window():
     modular. To add a new model, you only need to create a new class up above. Look at the following classes up above
     for an example on how to create a new class for the model prompt.
     """
+    global model_prompt
 
     def model_prompt(potential_model):
+
         window1 = tk.Tk()
         style = Style()
         window1.title('PyFGH Parameters')
@@ -360,8 +388,8 @@ def main_window():
                     print(potential_model[q].param[qparam])
 
             DataObject.holdData.model_data = potential_model
-            print(type(potential_model))
-            print(DataObject.holdData.model_data)
+            # print(type(potential_model))
+            # print(DataObject.holdData.model_data)
             window1.destroy()
             if SSH_box.get() == 'Yes':
                 SSH_prompt()
@@ -596,17 +624,17 @@ def main_window():
                 clear_data()
             # This runs the model window when the user hits calculate.
             else:
-                holder = []
+                holder_model = []
                 for i in range(3):
                     if DataObject.holdData.v[i] == 'Harmonic Oscillator':
-                        holder.append(Harmonic_Oscillator())
+                        holder_model.append(Harmonic_Oscillator())
                     elif DataObject.holdData.v[i] == 'Morse Oscillator':
-                        holder.append(Morse_Oscillator())
+                        holder_model.append(Morse_Oscillator())
                     else:
                         print('ERROR SOMETHING IS WRONG WITH THE MODEL!!!')
 
-                print(holder)
-                model_prompt(holder)
+                print(holder_model)
+                model_prompt(holder_model)
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")

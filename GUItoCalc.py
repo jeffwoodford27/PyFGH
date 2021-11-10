@@ -10,22 +10,39 @@ import tkinter as tk
 from tkinter import ttk, messagebox, NW, END
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
-
+import csv
+from tkinter import *
 
 from util import DataObject
 
-def window():
-    window = tk.Tk()
-    style = Style()
-    window.title('Results')
-    window.geometry('800x500')
-    text = "Results"
-    Results = ttk.Label(window, text=DataObject.holdData.Hmat, font=("Times New Roman", 15), background='green',
-                        foreground="white")
-    Results.pack()
-    Results.place(x=350, y=0)
-    window.mainloop()
+def window(x):
+    File = open(x)
+    Reader = csv.reader(File)
+    Data = list(Reader)
+    del (Data[0])
 
+    list_of_entries = []
+    x = 0
+    for x in list(range(0, len(Data))):
+        list_of_entries.append(Data[x])
+        x += 1
+
+    root = Tk()
+    v = Scrollbar(root)
+    v2 = Scrollbar(root)
+    root.geometry('1550x800')
+    root.title('Results')
+    v.pack(side=RIGHT, fill=Y)
+    SHBar = tk.Scrollbar(root,
+                         orient=tk.HORIZONTAL)
+    SHBar.pack(side=tk.BOTTOM,
+               fill="x")
+    var = StringVar(value=list_of_entries)
+    listbox1 = Listbox(root, listvariable=var)
+    listbox1.pack(side=LEFT, fill=BOTH)
+    listbox1.config(width=1550, height=800, yscrollcommand=v.set)
+    SHBar.config(command=listbox1.xview)
+    root.mainloop()
 
 def main():
     pass
@@ -47,7 +64,8 @@ def passToCalc(dataObj):
     HMat = VMat + TMat
     pd.DataFrame(HMat).to_csv(DataObject.holdData.name_of_file+".csv")
     DataObject.holdData.Hmat = HMat
-    window()
+    z = DataObject.holdData.name_of_file+".csv"
+    window(z)
 
     print(HMat)
     

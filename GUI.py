@@ -286,9 +286,8 @@ def main_window():
             window5.mainloop()
 
         else:
-            print('The no button works')
-            # filename_api = filename
-            # apioutput()
+            a = "holder"
+            DataObject.holdData.name_of_file = a
             window.destroy()
 
     """

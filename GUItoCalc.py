@@ -1,6 +1,6 @@
 #Interface between GUI and Calculation Scripts
+import os
 from tqdm.contrib.concurrent import process_map
-
 import Vmatrix
 import Tmatrix
 import numpy as np
@@ -12,8 +12,8 @@ from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
 import csv
 from tkinter import *
-
 from util import DataObject
+
 
 def window(x):
     File = open(x)
@@ -48,9 +48,7 @@ def main():
     pass
 
 
-
 def passToCalc(dataObj):
-
     print("Got an object.")
     print(dataObj)
     for i in dataObj.holdData.v:
@@ -66,11 +64,12 @@ def passToCalc(dataObj):
     DataObject.holdData.Hmat = HMat
     z = DataObject.holdData.name_of_file+".csv"
     window(z)
-
     print(HMat)
-    
-    
-    
+    if os.path.exists("holder.csv"):
+        os.remove("holder.csv")
+
+
+
 
 if __name__ == '__main__':
     r = process_map(main, range(0, 30), max_workers=12)

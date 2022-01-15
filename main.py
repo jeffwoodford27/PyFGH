@@ -17,15 +17,6 @@ Author: Josiah Randleman
 """
 
 
-class Bob:
-    def __init__(self):
-        self.sum = 0
-
-    def setSum(self, sum):
-        self.sum = sum
-        return
-
-
 # This is the parent process
 def datamuncher(q):
     print('This is the parent process: ', os.getpid())
@@ -60,7 +51,6 @@ def datamuncher(q):
 
     DataObject.holdData.user2 = holder1.user
 
-
     def SSH_connection():
         host = holder1.host
         port = 22
@@ -92,14 +82,10 @@ def datamuncher(q):
         sftp.close()
         ssh.close()
 
-
-
     if holder1.remote == 'Yes':
         SSH_connection()
 
-    Charles = Bob()
-    Charles.setSum(holder1.sum)
-    q.put(Charles)
+
     # print("File Name : ", holder1.file_name, " This is from the child process")
     # print("Model Data : ", holder1.model_data, " This is from the child process")
     return
@@ -138,17 +124,12 @@ def datagrabber():
     holder.set_remote(DataObject.holdData.remote)
     # holder.setModelData(DataObject.holdData.model_data)  # look into pickling possibly un-pickling
     q.put(holder)
-    Charles = q.get()
-    print(Charles.sum)
 
-    #At this point, insert the data into the handler
+    # At this point, insert the data into the handler
 
     GTC.passToCalc(DataObject)
     return
 
-
-
-    
 
 if __name__ == '__main__':
     datagrabber()

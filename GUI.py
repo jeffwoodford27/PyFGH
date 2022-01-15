@@ -1,5 +1,6 @@
 import multiprocessing
 import os
+import sys
 
 import tkinter
 import tkinter as tk
@@ -24,8 +25,16 @@ This is the main method.
 
 
 def main_window():
+    def close_window():
+        global running
+        running = False
+        print("Window closed \nPython Terminated")
+        window.destroy()
+        os._exit(0)
     # Creating tkinter window
     window = tk.Tk()
+    window.protocol("WM_DELETE_WINDOW", close_window)
+    running = True
     style = Style()
     window.title('PyFGH')
     window.geometry('910x425')
@@ -291,7 +300,6 @@ def main_window():
             DataObject.holdData.name_of_file = a
             window.destroy()
 
-
     global model_prompt
 
     def model_prompt(potential_model):
@@ -367,6 +375,7 @@ def main_window():
     remote server. It then calculates the values and saves it to a new file called Results.txt. This file gets saved in 
     resources folder.
     """
+
 
     def SSH_prompt():
         window3 = tk.Tk()
@@ -738,4 +747,6 @@ def main_window():
     L2.place(x=495, y=100, width=100)
     N3.place(x=645, y=100, width=100)
     L3.place(x=800, y=100, width=100)
+
+
     window.mainloop()

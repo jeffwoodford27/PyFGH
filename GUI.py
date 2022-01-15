@@ -291,14 +291,6 @@ def main_window():
             DataObject.holdData.name_of_file = a
             window.destroy()
 
-    """
-    This is where you define a model. 
-    To begin define the class and class name. Then define the type. The type is Harmonic Oscillator is zero. So the 
-    next model is one and so forth. The name is the name of the class. The nparam is the number of parameters that the
-    model contains. For example, the Harmonic Oscillator contains two elements for the nparam is 2. The label is the text
-    or elements that you wanted displayed in the GUI. In every class include the self.param = np.zeros(self.nparam, float).
-    Also in every class include the def set_param(self, param_list) definition.
-    """
 
     global model_prompt
 

@@ -8,6 +8,7 @@ from tkinter.filedialog import askopenfilename
 from tkinter.messagebox import showinfo
 from tkinter.ttk import Style
 from util import DataObject
+from util import model_objects
 import numpy as np
 from tkinter import filedialog as fd
 
@@ -197,7 +198,7 @@ def main_window():
         ttk.Label(window, text="V for Q" + str(i + 1) + ":", font=("Times New Roman", 15)).place(x=value, y=205)
         d = tk.StringVar()
         v.append(ttk.Combobox(window, width=32, textvariable=d))
-        v[i]["values"] = 'Harmonic Oscillator', 'Morse Oscillator'
+        v[i]["values"] = model_objects.Oscillator_List
         value += 310
 
     # Button
@@ -262,7 +263,7 @@ def main_window():
             text = "Name for New File"
 
             Remote2 = ttk.Label(window5, text=text, font=("Times New Roman", 15), background='green',
-                               foreground="white")
+                                foreground="white")
             Remote2.pack()
             Remote2.place(x=75, y=0)
 
@@ -299,52 +300,6 @@ def main_window():
     Also in every class include the def set_param(self, param_list) definition.
     """
 
-    class Harmonic_Oscillator:
-        def __init__(self):
-            self.type = 0
-            self.name = "Harmonic Oscillator"
-            self.nparam = 2
-            self.label = ["\u03BC", "k"]
-            self.param = np.zeros(self.nparam, float)
-
-        def set_param(self, param_list):
-            for i in range(self.nparam):
-                self.param[i] = param_list[i]
-            return
-
-    class Morse_Oscillator:
-        def __init__(self):
-            self.type = 1
-            self.name = "Morse Oscillator"
-            self.nparam = 3
-            self.label = ["\u03BC", "De", "a"]
-            self.param = np.zeros(self.nparam, float)
-
-        def set_param(self, param_list):
-            for i in range(self.nparam):
-                self.param[i] = param_list[i]
-            return
-
-    class Test_Oscillator:
-        def __init__(self):
-            self.type = 2
-            self.name = "Test Oscillator"
-            self.nparam = 4
-            self.mu = 0
-            self.label = ["a", "b", "c", "d"]
-            self.param = np.zeros(self.nparam, float)
-
-        def set_param(self, param_list):
-            for i in range(self.nparam):
-                self.param[i] = param_list[i]
-            return
-
-    """
-    This method is responsible for calling the GUI window for the models. When you select the different models, this 
-    method finds the class and then builds the window depending on the parameters and windows. This method is fully 
-    modular. To add a new model, you only need to create a new class up above. Look at the following classes up above
-    for an example on how to create a new class for the model prompt.
-    """
     global model_prompt
 
     def model_prompt(potential_model):
@@ -401,6 +356,7 @@ def main_window():
         window1.mainloop()
 
     # This is just for testing purposes.
+    """
     def output2():
         sections = []
         for i in range(3):
@@ -410,6 +366,7 @@ def main_window():
                 sections.append(Harmonic_Oscillator())
             elif DataObject.holdData.v[i] == "Model-Test Oscillator":
                 sections.append(Harmonic_Oscillator())
+    """
 
     """
     This method is for building the SSH window is the user selects yes for running remotely. This takes the data that
@@ -623,14 +580,21 @@ def main_window():
                 clear_data()
             # This runs the model window when the user hits calculate.
             else:
+                """
+                This will loop through the model_objects file. When you select a model in the GUI this will find the 
+                models that you selected. It takes the selected models and it loops in the model_objects file to find the
+                given class that you selected. When it finds the matching class it will pull all of the information from 
+                that class and it will append it to the holder_model list. This list will be sent to the model_prompt 
+                function that will build the GUI parameter box depending on the dimensions and parameters of each 
+                unique model.
+                """
+                import inspect
                 holder_model = []
-                for i in range(3):
-                    if DataObject.holdData.v[i] == 'Harmonic Oscillator':
-                        holder_model.append(Harmonic_Oscillator())
-                    elif DataObject.holdData.v[i] == 'Morse Oscillator':
-                        holder_model.append(Morse_Oscillator())
-                    else:
-                        print('ERROR SOMETHING IS WRONG WITH THE MODEL!!!')
+
+                for key, className in inspect.getmembers(model_objects):
+                    for i in range(3):
+                        if DataObject.holdData.v[i] == key:
+                            holder_model.append(className())
 
                 print(holder_model)
                 model_prompt(holder_model)

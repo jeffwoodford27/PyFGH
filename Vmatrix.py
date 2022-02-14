@@ -4,6 +4,7 @@ from util import pyfghutil
 import math
 import multiprocessing as mp
 import sys
+import pandas
 
 
 class HarmonicOscillatorModel:
@@ -154,7 +155,6 @@ def Vab(d, NValue, LValue, VType, VModel, deltax, dimensionCounterArray):
         #Add 1 to deltacounter if the corrosponding x and y values for the dimension equals each other
         if(dimensionCounterArray[Vcounter*2] == dimensionCounterArray[(Vcounter*2)+1]):
             Deltacounter += 1
-        Vcounter += 1
     #If the deltacounter amount equals the amount of dimensions, perform a summation for the formula
     #Otherwise, the total will remain 0.0 
     if (Deltacounter == d):
@@ -170,6 +170,7 @@ def Vab(d, NValue, LValue, VType, VModel, deltax, dimensionCounterArray):
             else:
                 pass
                 #This should never happen
+        
     return(total)        
 
 def VBlockCalc(dimensions, NValue, LValue, VType, VModel, blockX, blockY):
@@ -195,13 +196,13 @@ def VMatrixCalc(dataObj):
     #Create the NValue and LValue list from scratch:
     if(int(dataObj.holdData.N1) > 0):
         NValue.append(int(dataObj.holdData.N1))
-        LValue.append(int(dataObj.holdData.L1))
+        LValue.append(float(dataObj.holdData.L1))
     if(int(dataObj.holdData.N2) > 0):
         NValue.append(int(dataObj.holdData.N2))
-        LValue.append(int(dataObj.holdData.L2))
+        LValue.append(float(dataObj.holdData.L2))
     if(int(dataObj.holdData.N3) > 0):
         NValue.append(int(dataObj.holdData.N3))
-        LValue.append(int(dataObj.holdData.L3))
+        LValue.append(float(dataObj.holdData.L3))
     
     dimensions = len(NValue)
     VType = []
@@ -246,43 +247,59 @@ def VMatrixCalc(dataObj):
     print("Try to access")
     print(NBlocks.accessPoint(37, 20))
     '''
-    
-    #Calculate by blocks:
-    #Don't optimize for now. Just calculate blocks as needed.
-    blockCoords = []
-    optBlockCoords = []
-    blocks = []
-    paramz = []
-    totalwidth = int(np.prod(NValue))
-    repeatamount = int(totalwidth // NValue[0])
-    #print(NValue)
-    for x in range(repeatamount):
-        for y in range(repeatamount):
-            blockCoords.append((x,y))
-    optBlockCoords = NBlocks.coordGen()
-    #print(optBlockCoords)
-    for coords in optBlockCoords:
-        paramz.append((dimensions, NValue, LValue, VType, VModel, coords[0], coords[1]))
-        
-    p = mp.Pool(16)
-    print("Pool go V")
-    blocks = p.starmap(VBlockCalc, paramz)
-    print("Pool's done V")
-    p.close()
 
-    precalc = 0
-    for i in range(len(optBlockCoords)):
-        block = blocks[i]
-        x = optBlockCoords[i][0]
-        y = optBlockCoords[i][1]
-        #vmatrix[(0+NValue[precalc]*x):(NValue[precalc]+NValue[precalc]*x), (0+NValue[precalc]*y):(NValue[precalc]+NValue[precalc]*y)] = block
-        #print("Block: "+str(x)+", "+str(y))
-        NBlocks.setBlock(x, y, block)
-    for i in range(len(blockCoords)):
-        x = blockCoords[i][0]
-        y = blockCoords[i][1]
-        vmatrix[(0+NValue[precalc]*x):(NValue[precalc]+NValue[precalc]*x), (0+NValue[precalc]*y):(NValue[precalc]+NValue[precalc]*y)] = NBlocks.readBlock(x,y)
+    #If using model or file
+    if(False):
+        #Calculate by blocks:
+        #Don't optimize for now. Just calculate blocks as needed.
+        blockCoords = []
+        optBlockCoords = []
+        blocks = []
+        paramz = []
+        totalwidth = int(np.prod(NValue))
+        repeatamount = int(totalwidth // NValue[0])
+        #print(NValue)
+        for x in range(repeatamount):
+            for y in range(repeatamount):
+                blockCoords.append((x,y))
+        optBlockCoords = NBlocks.coordGen()
+        #print(optBlockCoords)
+        for coords in optBlockCoords:
+            paramz.append((dimensions, NValue, LValue, VType, VModel, coords[0], coords[1]))
         
+        p = mp.Pool(16)
+        print("Pool go V")
+        blocks = p.starmap(VBlockCalc, paramz)
+        print("Pool's done V")
+        p.close()
+    
+        precalc = 0
+        for i in range(len(optBlockCoords)):
+            block = blocks[i]
+            x = optBlockCoords[i][0]
+            y = optBlockCoords[i][1]
+            NBlocks.setBlock(x, y, block)
+        for i in range(len(blockCoords)):
+            x = blockCoords[i][0]
+            y = blockCoords[i][1]
+            vmatrix[(0+NValue[precalc]*x):(NValue[precalc]+NValue[precalc]*x), (0+NValue[precalc]*y):(NValue[precalc]+NValue[precalc]*y)] = NBlocks.readBlock(x,y)
+    else:
+        #Using file
+        potentialfile = pandas.read_csv("waterpot-data.csv", names=['q1', 'q2', 'q3', 'x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'v'])
+        countamount = int(np.prod(NValue))
+        potentialfilepreview = np.zeros((countamount, countamount), float)
+        for alpha in range(countamount):
+            for beta in range(countamount):
+                counterArray = pyfghutil.AlphaAndBetaToCounter(alpha, beta, dimensions, NValue)
+                deltas = 0
+                for coordPair in range(dimensions):
+                    if(counterArray[coordPair*2] == counterArray[coordPair*2 + 1]):
+                        deltas += 1
+                if(deltas == dimensions):
+                    vmatrix[alpha][beta] = potentialfile['v'][alpha]
+                    potentialfilepreview[alpha][beta] = potentialfile['v'][alpha]
+                #print("\n\n"+str(counterArray)+" alpha value "+str(alpha)+" beta value "+str(beta)+ " and value "+ str(potentialfile['v'][alpha]))
+        pandas.DataFrame(potentialfilepreview).to_csv("alphabetapreview.csv")
     
     return vmatrix
 

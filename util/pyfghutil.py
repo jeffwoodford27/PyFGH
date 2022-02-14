@@ -1,5 +1,139 @@
 import numpy as np
-import scipy 
+
+# Object storing the parameters for the harmonic oscillator model.
+# V(q) = 1/2 k q**2
+# mu is needed for the kinetic energy calculation.
+
+class HarmonicOscillatorModel:
+    def __init__(self, mu, k):
+        self.mu = mu
+        self.k = k
+
+    def getMu(self):
+        return self.mu
+
+    def calcPotentialEnergy(self, x):
+        return (0.5 * self.k * x * x)
+
+# Object storing the parameters for the Morse Oscillator Model:
+# V(q) = De*(1-exp(-a*q))^2
+# mu is needed for the kinetic energy calculation.
+
+class MorseOscillatorModel:
+    def __init__(self, mu, De, a):
+        self.mu = mu
+        self.De = De
+        self.a = a
+
+    def getMu(self):
+        return self.mu
+
+    def calcPotentialEnergy(self, x):
+        return (self.De * (1 - math.exp(-self.a * x)) ** 2)
+
+# The atom class.  Defines a chemical atom.
+# Z = atomic number of the atom.
+# s = atomic symbol of the atom, from a lookup dictionary (below).
+# A = mass number of the atom.
+# m = physical mass of the atom, from a lookup dictionary (below), converted from amu to atomic units
+
+class Atom:
+    def __init__(self,Z,A):
+        self.Z = Z
+        self.s = AtomicSymbolLookup[Z]
+        self.A = A
+        self.m = MassLookup[self.s+"-"+str(A)] * 1822.89
+
+# A class to define a chemical structure.
+# Nat = number of atoms in the structure
+# at = a list of length Nat of Atom objects
+# x = a list of length Nat of x coordinates
+# y = a list of length Nat of y coordinates
+
+class Structure:
+    def __init__(self, Nat, at, x, y):
+        self.Nat = Nat
+        self.at = at
+        self.x = x
+        self.y = y
+
+# A class to define a point on the potential energy surface.
+# n = the number of the grid point (indexed from 0)
+# q = a list of length 3 to define the values of q for the grid point
+# struct = a member of class Structure to define the chemical structure at this point
+# en = the value of the potential energy at this point (in atomic units)
+
+class PESpoint:
+    def __init__(self, n, q, struct, en):
+        self.n = n
+        self.q = q
+        self.struct = struct
+        self.en = en
+
+    def getq1(self):
+        return self.q[0]
+
+    def getq2(self):
+        return self.q[1]
+
+    def getq3(self):
+        return self.q[2]
+
+    def getStruct(self):
+        return self.struct
+
+    def getEnergy(self):
+        return self.en
+
+# A class to define a potential energy surface.
+# atomlist = a list of length Nat containing members of the Atom class
+# N = a list of length 3 containing the number of grid points in each dimension
+# df = a Pandas object containing the CSV data read in from the file
+
+class PotentialEnergySurface:
+    def __init__(self, atomlist, N, df):
+        self.N = N
+        self.atomlist = atomlist
+        Nat = len(atomlist)
+        n = 0
+        self.pts = []
+        for i in range(N[0]):
+            self.pts.append([])
+            for j in range(N[1]):
+                self.pts[i].append([])
+                for k in range(N[2]):
+                    q = np.zeros(3)
+                    q[0] = df['q1'][n]
+                    q[1] = df['q2'][n]
+                    q[2] = df['q3'][n]
+                    x = np.zeros(3)
+                    x[0] = df['x1'][n]
+                    x[1] = df['x2'][n]
+                    x[2] = df['x3'][n]
+                    y = np.zeros(3)
+                    y[0] = df['y1'][n]
+                    y[1] = df['y2'][n]
+                    y[2] = df['y3'][n]
+                    struct = Structure(Nat, atomlist, x, y)
+                    self.pts[i][j].append(PESpoint(n,q,struct,df['en'][n]))
+                    n = n + 1
+
+    def getPointByN(self,t,u,v):
+        return self.pts[t][u][v]
+
+# A class to hold the calculation parameters.
+# This class will be superseded by Josiah's class.
+
+class Parameters:
+    def __init__(self, D, N, L, Tapprox, Vtype, Vmodel, PES, GMatrix):
+        self.N = N
+        self.L = L
+        self.Tapprox = Tapprox
+        self.Vtype = Vtype
+        self.Vmodel = Vmodel
+        self.PES = PES
+        self.GMatrix = GMatrix
+
 
 def AlphaCalc(D, counterarray, NValues):
     output = 0
@@ -11,7 +145,7 @@ def AlphaCalc(D, counterarray, NValues):
     return output
 
 def AlphaAndBetaToCounter(alpha, beta, D, NValues):
-    counter = scipy.zeros((D*2,1), int)
+    counter = np.zeros((D*2,1), int)
     #I am uncertain about the ability to modify the input parameters,
     #for now, I will create duplicate variables
     modalpha = alpha
@@ -61,6 +195,8 @@ def DCAAdvance(D, counterArray, NValues):
             jlcounter = 0
             NValueC +=1
     return counterArray
+
+# A lookup dictionary connecting each atomic number with its corresponding atomic symbol.
 
 AtomicSymbolLookup = {
     1: "H",
@@ -182,6 +318,8 @@ AtomicSymbolLookup = {
     117: "Ts",
     118: "Og"
 }
+
+# A lookup dictionary connecting each nuclide with its mass (in amu).
 
 MassLookup = {
     "H-1": 1.007825032,

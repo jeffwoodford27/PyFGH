@@ -196,11 +196,11 @@ for j in range(N[1]):
             dx3dq1[i][j][k] = x3p[i]
             dy3dq1[i][j][k] = y3p[i]
 
-m1 = 15.99491
-m2 = 1.007825
-m3 = 1.007825
+m1 = 15.99491* 1822.89
+m2 = 1.007825* 1822.89
+m3 = 1.007825* 1822.89
 
-Gmatrix = np.zeros[[N[0], N[1], N[2], 3, 3]]
+Gmatrix = np.zeros([N[0], N[1], N[2], 3, 3])
 
 for i in range(N[0]):
     for j in range(N[1]):
@@ -224,12 +224,13 @@ for i in range(N[0]):
             G[2][2] = m1 * (dx1dq3[i][j][k] * dx1dq3[i][j][k] + dy1dq3[i][j][k] * dy1dq3[i][j][k]) \
                       + m2 * (dx2dq3[i][j][k] * dx2dq3[i][j][k] + dy2dq3[i][j][k] * dy2dq3[i][j][k]) \
                       + m3 * (dx3dq3[i][j][k] * dx3dq3[i][j][k] + dy3dq3[i][j][k] * dy3dq3[i][j][k])
-            G[1][0] = G[0][1]
-            G[2][0] = G[0][2]
-            G[2][1] = G[1][2]
+            G[1][0] = G[0][1] 
+            G[2][0] = G[0][2] 
+            G[2][1] = G[1][2] 
             Ginv = scipy.linalg.inv(G)
             for r in range(3):
                 for s in range(3):
                     Gmatrix[i][j][k][r][s] = Ginv[r][s]
 
 
+print(Gmatrix)

@@ -165,3 +165,18 @@ class OutputData:
         for i in range(len(evalues)):
             self.eigenvalues.append(evalues[i])
         return
+
+
+class atom:
+    def __init__(self,m,x,y,z):
+        self.m = m
+        self.x = x
+        self.y = y
+        self.z = z
+
+class molecule:
+    def __init__(self,N,m,x,y,z):
+        self.N = N
+        self.at = []
+        for i in range(0,N):
+            self.at.append(atom(m[i],x[i],y[i],z[i]))

@@ -45,9 +45,9 @@ class MorseOscillatorModel:
 class Atom:
     def __init__(self):
         self.Z = []
-        # self.s = AtomicSymbolLookup[Z]
+        self.s = []
         self.A = []
-        # self.m = MassLookup[self.s + "-" + str(A)] * 1822.89
+        #self.m = MassLookup[self.s + "-" + str(self.A)] * 1822.89
 
     def setAtomicNumber(self, Z):
         self.Z = Z

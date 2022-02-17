@@ -59,13 +59,15 @@ class Atom:
 # at = a list of length Nat of Atom objects
 # x = a list of length Nat of x coordinates
 # y = a list of length Nat of y coordinates
+# z = a list of length Nat of z coordinates
 
 class Structure:
-    def __init__(self, Nat, at, x, y):
+    def __init__(self, Nat, at, x, y, z):
         self.Nat = Nat
         self.at = at
         self.x = x
         self.y = y
+        self.z = z
 
 
 # A class to define a point on the potential energy surface.

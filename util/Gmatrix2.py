@@ -15,7 +15,14 @@ def compute_derivative (x, y, N):
     yprime[N-1] = scipy.misc.derivative(spl,x[N-1]-dx,dx=dx)
     return yprime
 
-def calcGMatrix(atomlist, N, PES):
+def calcGMatrix(atomlist, N, PES, mu):
+    GMatrix = np.zeros([int(np.prod(N)),3,3],float)
+    if(PES == None):
+        for alpha in range(np.prod(N)):
+            GMatrix[alpha][0][0] = 1/mu[0]
+            GMatrix[alpha][1][1] = 1/mu[1]
+            GMatrix[alpha][2][2] = 1/mu[2]
+        return(GMatrix)
     dx1dq1 = np.zeros([N[0],N[1],N[2]])
     dy1dq1 = np.zeros([N[0],N[1],N[2]])
     dx2dq1 = np.zeros([N[0],N[1],N[2]])
@@ -132,7 +139,7 @@ def calcGMatrix(atomlist, N, PES):
     m2 = atomlist[1].m
     m3 = atomlist[2].m
 
-    GMatrix = np.zeros([int(np.prod(N)),3,3],float)
+    
 
     for i in range(N[0]):
         for j in range(N[1]):

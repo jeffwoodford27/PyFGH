@@ -43,16 +43,35 @@ class MorseOscillatorModel:
 # m = physical mass of the atom, from a lookup dictionary (below), converted from amu to atomic units
 
 class Atom:
-    def __init__(self):
-        self.Z = []
-        self.s = []
-        self.A = []
+    def __init__(self, Z, A, m, x, y):
+        self.x = x
+        self.y = y
+        self.A = A
+        self.Z = Z
+        self.m = m
         #self.m = MassLookup[self.s + "-" + str(self.A)] * 1822.89
 
     def setAtomicNumber(self, Z):
         self.Z = Z
         return
 
+    def getZ(self):
+        return self.z
+
+    def getS(self):
+        return self.s
+
+    def getA(self):
+        return self.A
+
+    def getM(self):
+        return self.m
+
+    def getX(self):
+        return self.x
+
+    def getY(self):
+        return self.y
 
 # A class to define a chemical structure.
 # Nat = number of atoms in the structure

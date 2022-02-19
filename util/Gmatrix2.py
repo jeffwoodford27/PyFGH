@@ -5,14 +5,9 @@ from scipy import misc
 from scipy import linalg
 import numpy as np
 
-def compute_derivative (x, y, N):
-    dx = 1e-5
-    spl = scipy.interpolate.interp1d(x,y)
-    yprime = np.zeros(N)
-    yprime[0] = scipy.misc.derivative(spl,x[0]+dx,dx=dx)
-    for i in range(1,N-1):
-        yprime[i] = scipy.misc.derivative(spl,x[i],dx=dx)
-    yprime[N-1] = scipy.misc.derivative(spl,x[N-1]-dx,dx=dx)
+def compute_derivative (x, y):
+    spl = scipy.interpolate.splrep(x,y,s=0)
+    yprime = scipy.interpolate.splev(x,spl,der=1)
     return yprime
 
 def calcGMatrix(atomlist, N, PES, mu):
@@ -59,12 +54,12 @@ def calcGMatrix(atomlist, N, PES, mu):
                 y2[k] = PES.getPointByN(i,j,k).struct.y[1]
                 x3[k] = PES.getPointByN(i,j,k).struct.x[2]
                 y3[k] = PES.getPointByN(i,j,k).struct.y[2]
-            x1p = compute_derivative(q3,x1,N[2])
-            y1p = compute_derivative(q3,y1,N[2])
-            x2p = compute_derivative(q3,x2,N[2])
-            y2p = compute_derivative(q3,y2,N[2])
-            x3p = compute_derivative(q3,x3,N[2])
-            y3p = compute_derivative(q3,y3,N[2])
+            x1p = compute_derivative(q3,x1)
+            y1p = compute_derivative(q3,y1)
+            x2p = compute_derivative(q3,x2)
+            y2p = compute_derivative(q3,y2)
+            x3p = compute_derivative(q3,x3)
+            y3p = compute_derivative(q3,y3)
             for k in range(N[2]):
                 dx1dq3[i][j][k] = x1p[k]
                 dy1dq3[i][j][k] = y1p[k]
@@ -90,12 +85,12 @@ def calcGMatrix(atomlist, N, PES, mu):
                 y2[j] = PES.getPointByN(i,j,k).struct.y[1]
                 x3[j] = PES.getPointByN(i,j,k).struct.x[2]
                 y3[j] = PES.getPointByN(i,j,k).struct.y[2]
-            x1p = compute_derivative(q2,x1,N[1])
-            y1p = compute_derivative(q2,y1,N[1])
-            x2p = compute_derivative(q2,x2,N[1])
-            y2p = compute_derivative(q2,y2,N[1])
-            x3p = compute_derivative(q2,x3,N[1])
-            y3p = compute_derivative(q2,y3,N[1])
+            x1p = compute_derivative(q2,x1)
+            y1p = compute_derivative(q2,y1)
+            x2p = compute_derivative(q2,x2)
+            y2p = compute_derivative(q2,y2)
+            x3p = compute_derivative(q2,x3)
+            y3p = compute_derivative(q2,y3)
             for j in range(N[1]):
                 dx1dq2[i][j][k] = x1p[j]
                 dy1dq2[i][j][k] = y1p[j]
@@ -121,12 +116,12 @@ def calcGMatrix(atomlist, N, PES, mu):
                 y2[i] = PES.getPointByN(i,j,k).struct.y[1]
                 x3[i] = PES.getPointByN(i,j,k).struct.x[2]
                 y3[i] = PES.getPointByN(i,j,k).struct.y[2]
-            x1p = compute_derivative(q1,x1,N[0])
-            y1p = compute_derivative(q1,y1,N[0])
-            x2p = compute_derivative(q1,x2,N[0])
-            y2p = compute_derivative(q1,y2,N[0])
-            x3p = compute_derivative(q1,x3,N[0])
-            y3p = compute_derivative(q1,y3,N[0])
+            x1p = compute_derivative(q1,x1)
+            y1p = compute_derivative(q1,y1)
+            x2p = compute_derivative(q1,x2)
+            y2p = compute_derivative(q1,y2)
+            x3p = compute_derivative(q1,x3)
+            y3p = compute_derivative(q1,y3)
             for i in range(N[0]):
                 dx1dq1[i][j][k] = x1p[i]
                 dy1dq1[i][j][k] = y1p[i]

@@ -11,15 +11,43 @@ y_coordinates: list[str] = []
 z_coordinates: list[str] = []
 mass: list[str] = []
 
+# TODO For atom molecule Atom(Z, A, m, x y). Implement this into this here.
+# TODO molecules Li 6,  Li 7, Ce 20. Fix this in the program.
+# TODO ask the user for two files. File 1 is the equilibrium file or the molecules.csv file
+# TODO File 2 is the potential energies file which is the waterpot-data.csv
+# TODO do distance test with potential energy file which is x1 and so forth
+# TODO waterpot.csv: Q1, Q2, Q3, x1, y1, x2, y2, x3, y3, energies
+
+from collections.abc import Iterable
+
+
+def flatten(lis):
+    for item in lis:
+        if isinstance(item, Iterable) and not isinstance(item, str):
+            for x in flatten(item):
+                yield x
+        else:
+            yield item
+
+
 with open("molecules.csv") as f:
     for row in f:
-        list2.append(row.split('-')[0])
-        list3.append(row.split(',')[0])
+        list2.append(row.split(',')[0])  # Li
+        # list3.append((row.split(' ')[0]) + (row[1])) # Li-6
+        new_row = ['-'.join([row.split(',')[0], row.split(',')[1]])]
+        x = ' '.join(new_row)
+        list3.append(x)
         x_coordinates.append(row.split(',')[2])
         y_coordinates.append(row.split(',')[3])
         z_coordinates.append((row.split(',')[4]).strip())
         mass.append(row.split(',')[1])
         masslist = ([float(x) for x in mass])
+        #print(list2)  # ['Li']
+        print(list3)  # ['Li-6']
+        print("\n")
+    for x in list2:
+        print(x)
+
 
     for x in list2:  # x is the atomic symbol
         if x in pyfghutil.AtomicSymbolLookup.values():

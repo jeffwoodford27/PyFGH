@@ -1,7 +1,6 @@
 import pyfghutil
 import scipy
 from scipy import interpolate
-from scipy import misc
 from scipy import linalg
 import numpy as np
 
@@ -133,8 +132,6 @@ def calcGMatrix(atomlist, N, PES, mu):
     m1 = atomlist[0].m
     m2 = atomlist[1].m
     m3 = atomlist[2].m
-
-    
 
     for i in range(N[0]):
         for j in range(N[1]):

@@ -215,4 +215,4 @@ print("Atomic Mass: ", A)  # Atomic Mass
 print("Symbol: ", s)  # Symbol
 calculations(x1, y1, z1, x2, y2, z2, xx2, yy2, zz2, xx3, yy3, zz3)
 test = pyfghutil.Atom(Z, A, m, xlist, ylist)
-print(getattr(test, 'A'))
+print(getattr(test, 'Z'))

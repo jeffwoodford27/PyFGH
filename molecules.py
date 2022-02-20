@@ -14,6 +14,12 @@ x_coordinates = []
 y_coordinates = []
 z_coordinates = []
 mass = []
+potx1 = []
+potx2 = []
+potx3 = []
+poty1 = []
+poty2 = []
+poty3 = []
 
 # TODO For atom molecule Atom(Z, A, m, x y). Implement this into this here.
 # TODO molecules Li 6,  Li 7, Ce 20. Fix this in the program.
@@ -76,7 +82,10 @@ with open("molecules.csv") as f:
         print("amu to atomic ", m)
 
 
-# Function to find distance
+"""
+This does validation checking. Calculates the distance and the cos theta
+"""
+
 def calculations(x1, y1, z1, x2, y2, z2, xx2, yy2, zz2, xx3, yy3, zz3):
     d = math.sqrt(math.pow(x2 - x1, 2) +
                   math.pow(y2 - y1, 2) +
@@ -126,6 +135,76 @@ xx3 = xlist[2]
 yy3 = ylist[2]
 zz3 = zlist[2]
 
+
+"""
+Splices the data in the waterpot-data.csv file
+"""
+with open("waterpot-data.csv", ) as f:
+    for x in f:
+        potx1.append(x.split(',')[3])
+        potx2.append(x.split(',')[5])
+        potx3.append(x.split(',')[7])
+
+        poty1.append(x.split(',')[4])
+        poty2.append(x.split(',')[6])
+        poty3.append(x.split(',')[8])
+
+potxlist1 = [float(x) for x in potx1]
+potxlist2 = [float(x) for x in potx2]
+potxlist3 = [float(x) for x in potx3]
+
+potylist1 = [float(x) for x in poty1]
+potylist2 = [float(x) for x in poty2]
+potylist3 = [float(x) for x in poty3]
+
+
+"""
+This does validation checking. Calculates the distance and the cos theta
+"""
+def calculations2(x1, y1, x2, y2, x3, y3):
+    d = math.sqrt(math.pow(x2 - x1, 2) +
+                  math.pow(y2 - y1, 2))
+
+    d2 = math.sqrt(math.pow(x3 - x1, 2) +
+                   math.pow(y3 - y1, 2))
+
+    d3 = math.sqrt(math.pow(x3 - x2, 2) +
+                   math.pow(y3 - y2, 2))
+
+    # cos theta equation
+    costheta = (((x2 - x1) * (x3 - x1) + (y2 - y1) * (y3 - y1)) / (d * d2))
+    print("Cos Theta is: ", costheta)
+
+    if -1 < costheta < 1:
+        print('molecule is non-linear')
+        print("Cos Theta is: ", costheta)
+    else:
+        print("Molecule is linear")
+        raise Exception("Molecule is linear")
+
+    if d >= 0.10 and d2 >= 0.10 and d3 >= 0.10:
+        print("Distance is", d + d2 + d3, " Atom is unique")
+    else:
+        print("Atom is not unique")
+        raise Exception("Atom is not unique")
+
+        # First atom is assumed to be the central atom
+
+"""
+This does validation checking for the waterpot-data.csv file
+"""
+for x in range(
+        len(potxlist1) and len(potxlist2) and len(potxlist3) and len(potylist1) and len(potylist2) and len(potylist3)):
+    calculations2(potxlist1[x], potylist1[x], potxlist2[x], potylist2[x], potxlist3[x], potylist3[x])
+    x += 1
+
+print("\n")
+print("WaterPot for x1: ", potxlist1)
+print("WaterPot for x2: ", potxlist2)
+print("WaterPot for x3: ", potxlist3)
+print("WaterPot for y1: ", potylist1)
+print("WaterPot for y2: ", potylist2)
+print("WaterPot for y3: ", potylist3)
 print("\n")
 print("X Coordinates of the elements: ", xlist)
 print("Y Coordinates of the elements: ", ylist)

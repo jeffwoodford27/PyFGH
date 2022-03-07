@@ -261,7 +261,7 @@ getNs()
 #validateQ()
 
 """
-This is for validating the water potentila energy file
+This is for validating the water potential energy file
 """
 
 N1_2 = 7

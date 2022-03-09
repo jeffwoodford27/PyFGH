@@ -1,6 +1,6 @@
 import csv
 
-import self
+#import self
 
 from util import pyfghutil, DataObject
 import math
@@ -38,9 +38,9 @@ totalN = 0
 #totalN = DataObject.holdData.N1 * DataObject.holdData.N2 * DataObject.holdData.N3
 
 
-N1 = 10
-N2 = 10
-N3 = 10
+N1 = 11
+N2 = 11
+N3 = 11
 
 
 def getNs():
@@ -275,26 +275,26 @@ deltaQ1 = L1_2 / float(N1_2)
 deltaQ2 = L2_2 / float(N2_2)
 deltaQ3 = L3_2 / float(N3_2)
 
-kenobi = 1
+
 with open("waterpot-data.csv", ) as f:
     for x in f:
-        Q1.append(x.split(',')[0])
-        Q2.append(x.split(',')[1])
-        Q3.append(x.split(',')[2])
+        Q1.append(float(x.split(',')[0]))
+        Q2.append(float(x.split(',')[1]))
+        Q3.append(float(x.split(',')[2]))
 
-
+n = 0
 for i in range(N1_2):
     for j in range(N2_2):
         for k in range(N3_2):
-            q1 = deltaQ1*float(i - float(N1_2 / 2))
-            q2 = deltaQ2*float(j - float(N2_2 / 2))
-            q3 = deltaQ3*float(k - float(N3_2 / 2))
+            q1 = deltaQ1*float(i - int(N1_2 / 2))
+            q2 = deltaQ2*float(j - int(N2_2 / 2))
+            q3 = deltaQ3*float(k - int(N3_2 / 2))
             print("Q1: ", q1)
             print("Q2: ", q2)
             print("Q3: ", q3)
-            print(Q1[k], Q2[k], Q3[k])
-            if (q1 == Q1[kenobi-1]) and (q2 == Q2[kenobi-1]) and (q3 == Q3[kenobi-1]):
+            print(Q1[n], Q2[n], Q3[n])
+            if (round(q1,3) == round(Q1[n],3)) and (round(q2,3) == round(Q2[n],3)) and (round(q3,3) == round(Q3[n],3)):
                 print("it passes!")
             else:
                 print("throw an error!")
-            kenobi += 1
+            n += 1

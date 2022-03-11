@@ -710,18 +710,6 @@ def main_window():
             messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
 
         else:
-            global molecules
-            tkinter.Tk().withdraw()
-            molecules = askopenfile()
-            """
-            if molecules is not None:
-                content = molecules.read()
-                print(content)
-                """
-            print(molecules)
-            potential_energies_file = askopenfilename()
-            print(potential_energies_file)
-
             Q1 = []
             Q2 = []
             Q3 = []
@@ -742,14 +730,6 @@ def main_window():
             poty2 = []
             poty3 = []
 
-            # TODO ask the user for two files. File 1 is the equilibrium file or the molecules.csv file
-            # TODO File 2 is the potential energies file which is the waterpot-data.csv
-            # TODO read in q and energies and verify in the water.csv that # of lines equals n1*n2*n3.
-            # TODO q must be equally spaced also q3 then q2 then q1. Calcalte the Detla Q. L1=n1*delta Q1;  L2=n2*delta Q2
-            # do distance test with potential energy file which is x1 and so forth
-            # waterpot.csv: Q1, Q2, Q3, x1, y1, x2, y2, x3, y3, energies
-            # TODO add to interface!!!!!!
-
             totalN = 0
             # totalN = DataObject.holdData.N1 * DataObject.holdData.N2 * DataObject.holdData.N3
 
@@ -757,35 +737,13 @@ def main_window():
             N2_1 = 11
             N3_1 = 11
 
-            def getNs():
-                file = open(potential_energies_file)
-                reader = csv.reader(file)
-                lines = len(list(reader))
-                totalN = N1_1 * N2_1 * N3_1
-                if lines == totalN:
-                    print("The lines of waterpot-data equals the toal of all N vales")
-                else:
-                    print("The lines of waterpot-data do not equal the toal of all N vales ", lines)
-                return totalN
+            molecules = askopenfilename()
+            potential_energy = askopenfilename()
 
-            """
-            def validateQ ():
-                #TODO calculate delta q
-                with open("waterpot-data.csv", ) as f:
-                    for x in f:
-                        Q1.append(x.split(',')[0])
-                        Q2.append(x.split(',')[1])
-                        Q3.append(x.split(',')[2])
-
-                    i = 0
-                    while i < len(Q3):
-                        if Q3[i] == Q3[0] and (Q2[i] - 1.00):
-                            print('true')
-                            break
-
-            """
-            with open(molecules.read()) as a:
-                for row in a:
+            print(molecules)
+            with open(molecules, encoding='UTF-8') as f:
+                for row in f:
+                    print(row)
                     list2.append(row.split(',')[0])  # Li
                     new_row = ['-'.join([row.split(',')[0], row.split(',')[1]])]
                     x = ' '.join(new_row)
@@ -837,9 +795,18 @@ def main_window():
                     m.append(atomic)
                     print("amu to atomic ", m)
 
-            """
-            This does validation checking. Calculates the distance and the cos theta
-            """
+            def getNs():
+                java = potential_energy
+                print(java)
+                file = open(java, encoding='UTF-8')
+                reader = csv.reader(file)
+                lines = len(list(reader))
+                totalN_2 = N1_1 * N2_1 * N3_1
+                if lines == totalN_2:
+                    print("The lines of waterpot-data equals the toal of all N vales")
+                else:
+                    print("The lines of waterpot-data do not equal the toal of all N vales ", lines)
+                return totalN_2
 
             def calculations(x1, y1, z1, x2, y2, z2, xx2, yy2, zz2, xx3, yy3, zz3):
                 d = math.sqrt(math.pow(x2 - x1, 2) +
@@ -892,16 +859,21 @@ def main_window():
             """
             Splices the data in the waterpot-data.csv file
             """
-            with open(potential_energies_file.read(),  encoding="utf-8") as a:
-                for x in a:
-                    potx1.append(x.split(',')[3])
-                    potx2.append(x.split(',')[5])
-                    potx3.append(x.split(',')[7])
 
-                    poty1.append(x.split(',')[4])
-                    poty2.append(x.split(',')[6])
-                    poty3.append(x.split(',')[8])
+            def hi():
+                r = potential_energy
+                print(r)
+                hola = open(r, encoding='UTF-8')
+                for hello in hola:
+                    potx1.append(hello.split(',')[3])
+                    potx2.append(hello.split(',')[5])
+                    potx3.append(hello.split(',')[7])
 
+                    poty1.append(hello.split(',')[4])
+                    poty2.append(hello.split(',')[6])
+                    poty3.append(hello.split(',')[8])
+
+            hi()
             potxlist1 = [float(x) for x in potx1]
             potxlist2 = [float(x) for x in potx2]
             potxlist3 = [float(x) for x in potx3]
@@ -971,6 +943,7 @@ def main_window():
                                   ylist)  # save only one molecule to the atom class. Save a collection of the atoms to the structure class.
             print(getattr(test, 'Z'))
             getNs()
+
             # validateQ()
 
             """
@@ -988,7 +961,8 @@ def main_window():
             deltaQ2 = L2_2 / float(N2_2)
             deltaQ3 = L3_2 / float(N3_2)
 
-            with open(potential_energies_file.read(),  encoding="utf-8") as a:
+            r = potential_energy
+            with open(r, encoding="utf-8") as a:
                 for x in a:
                     Q1.append(float(x.split(',')[0]))
                     Q2.append(float(x.split(',')[1]))

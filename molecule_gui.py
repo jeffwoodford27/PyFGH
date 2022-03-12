@@ -1,8 +1,7 @@
 import csv
 import math
 from tkinter.filedialog import askopenfile, askopenfilenames, askopenfilename
-
-from util import pyfghutil
+from util import pyfghutil, DataObject
 
 Q1 = []
 Q2 = []
@@ -29,18 +28,19 @@ totalN = 0
 
 
 def getData():
-    global molecules, potential_energy
-    molecules = askopenfilename()
-    potential_energy = askopenfilename()
+    holder = DataObject.InputData()
+    holder.setMolecule(askopenfilename())
+    holder.setpotential_energy(askopenfilename())
 
 
 def molecule_testing(N1, L1, N2, L2, N3, L3):
+    holder = DataObject.InputData()
     N1_1 = N1
     N2_1 = N2
     N3_1 = N3
     print(N1_1)
-    print(molecules)
-    with open(molecules, encoding='UTF-8') as f:
+    print(holder.molecule)
+    with open(holder.molecule, encoding='UTF-8') as f:
         for row in f:
             print(row)
             list2.append(row.split(',')[0])  # Li
@@ -95,7 +95,8 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
             print("amu to atomic ", m)
 
     def getNs():
-        java = potential_energy
+        holder1 = DataObject.InputData()
+        java = holder1.potential_energy
         print(java)
         file = open(java, encoding='UTF-8')
         reader = csv.reader(file)
@@ -160,7 +161,8 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     """
 
     def hi():
-        r = potential_energy
+        holder = DataObject.InputData()
+        r = holder.potential_energy
         print(r)
         hola = open(r, encoding='UTF-8')
         for hello in hola:
@@ -259,8 +261,8 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     deltaQ1 = L1_2 / float(N1_2)
     deltaQ2 = L2_2 / float(N2_2)
     deltaQ3 = L3_2 / float(N3_2)
-
-    r = potential_energy
+    holder = DataObject.InputData()
+    r = holder.potential_energy
     with open(r, encoding="utf-8") as a:
         for x in a:
             Q1.append(float(x.split(',')[0]))

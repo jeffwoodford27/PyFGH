@@ -194,13 +194,13 @@ def VMatrixCalc(dataObj):
     NValue = []
     LValue = []
     #Create the NValue and LValue list from scratch:
-    if(int(dataObj.holdData.N1) > 0):
+    if int(dataObj.holdData.N1) > 0:
         NValue.append(int(dataObj.holdData.N1))
         LValue.append(float(dataObj.holdData.L1))
-    if(int(dataObj.holdData.N2) > 0):
+    if int(dataObj.holdData.N2) > 0:
         NValue.append(int(dataObj.holdData.N2))
         LValue.append(float(dataObj.holdData.L2))
-    if(int(dataObj.holdData.N3) > 0):
+    if int(dataObj.holdData.N3) > 0:
         NValue.append(int(dataObj.holdData.N3))
         LValue.append(float(dataObj.holdData.L3))
     

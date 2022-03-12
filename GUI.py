@@ -523,6 +523,8 @@ def main_window():
     This also checks for validation rules also for the values that were inputted.
     """
 
+    value_holder=False
+
     def output():
         try:
             """
@@ -545,8 +547,12 @@ def main_window():
             DataObject.holdData.g = g.get()
             DataObject.holdData.remote = SSH_box.get()
 
-            molecule_gui.molecule_testing(int(DataObject.holdData.N1), int(DataObject.holdData.L1), int(DataObject.holdData.N2),
-                                          int(DataObject.holdData.L2), int(DataObject.holdData.N3), int(DataObject.holdData.L3))
+            if value_holder:
+                molecule_gui.molecule_testing(int(DataObject.holdData.N1), int(DataObject.holdData.L1),
+                                              int(DataObject.holdData.N2),
+                                              int(DataObject.holdData.L2), int(DataObject.holdData.N3),
+                                              int(DataObject.holdData.L3))
+
 
             for i in range(3):
                 DataObject.holdData.v.append(v[i].get())
@@ -722,7 +728,8 @@ def main_window():
             time just only use a CSV file format!!!!!!!!!! Excel has the ability to save it to CSV format. To find out 
             how to save it to that format, just google it. This is the end of my rant. Happy Coding!
             """
-
+            global value_holder
+            value_holder = True
             molecule_gui.getData()
 
 

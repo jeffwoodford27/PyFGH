@@ -7,33 +7,10 @@ values from the input. After the GUI is terminated, these new values can be call
 """
 
 
-class holdData:
-    Hmat = []
-    molecule = 0
-    q_equation1 = 0
-    q_equation2 = 0
-    q_equation3 = 0
-    N1 = 0
-    L1 = 0
-    N2 = 0
-    L2 = 0
-    N3 = 0
-    L3 = 0
-    t = 0
-    g = 0
-    v = []
-    name_of_file = 0
-    file_name = 0
-    model_data = []  # This doesn't work
-    host = 0
-    user = 0
-    password = 0
-    remote = 0
-
-
 class InputData:
 
     def __init__(self):
+        self.name_of_file = 0
         self.molecule = 0
         self.q_equation1 = 0
         self.q_equation2 = 0
@@ -56,14 +33,33 @@ class InputData:
         self.password = 0
         self.remote = 0
         self.Hmat = []
+        self.molecule = 0
+        self.potential_energy = 0
         name_of_file = 0
 
     """
     The following methods are setters. These values get set in test1.py
     """
+
+    def getQ1(self):
+        return self.q_equation1
+
+    def setMolecule(self, molecule):
+        self.molecule = molecule
+        return
+
+    def setpotential_energy(self, potential_energy):
+        self.potential_energy = potential_energy
+        return
+
+    def setHmat(self, Hmat):
+        self.Hmat = Hmat
+        return
+
     def setname_of_file(self, name_of_file):
         self.name_of_file = name_of_file
         return
+
     def setHmat(self, Hmat):
         self.Hmat = Hmat
         return
@@ -156,6 +152,10 @@ class InputData:
         self.remote = remote
         return
 
+    def set_name_of_file(self, name_of_file):
+        self.name_of_file = name_of_file
+        return
+
 
 class OutputData:
     def __init__(self):
@@ -168,15 +168,16 @@ class OutputData:
 
 
 class atom:
-    def __init__(self,m,x,y,z):
+    def __init__(self, m, x, y, z):
         self.m = m
         self.x = x
         self.y = y
         self.z = z
 
+
 class molecule:
-    def __init__(self,N,m,x,y,z):
+    def __init__(self, N, m, x, y, z):
         self.N = N
         self.at = []
-        for i in range(0,N):
-            self.at.append(atom(m[i],x[i],y[i],z[i]))
+        for i in range(0, N):
+            self.at.append(atom(m[i], x[i], y[i], z[i]))

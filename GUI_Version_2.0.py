@@ -15,6 +15,7 @@ from util import model_objects
 import numpy as np
 from tkinter import filedialog as fd
 
+
 import csv
 
 # import self
@@ -34,6 +35,7 @@ This is the main method.
 
 
 def main_window():
+    holder = DataObject.InputData()
     def close_window():
         global running
         running = False
@@ -296,7 +298,7 @@ def main_window():
             Host_entry3.place(x=115, y=32)
 
             def enter6():
-                DataObject.holdData.name_of_file = Host_entry3.get()
+                holder.set_name_of_file(Host_entry3.get())
                 window5.destroy()
 
             calculate = tk.Button(window5, text='Enter', bd='15', bg='green', fg='white',
@@ -307,7 +309,7 @@ def main_window():
 
         else:
             a = "holder"
-            DataObject.holdData.name_of_file = a
+            holder.set_name_of_file(a)
             window.destroy()
 
     global model_prompt
@@ -351,7 +353,7 @@ def main_window():
                 for qparam in range(potential_model[q].nparam):
                     print(potential_model[q].param[qparam])
 
-            DataObject.holdData.model_data = potential_model
+            holder.model_data = potential_model
             # print(type(potential_model))
             # print(DataObject.holdData.model_data)
             window1.destroy()
@@ -506,11 +508,11 @@ def main_window():
         c1.place(x=60, y=130)
 
         def Enter():
-            DataObject.holdData.host = Host_entry.get()
-            DataObject.holdData.user = Username_entry.get()
-            DataObject.holdData.password = Password_entry.get()
+            holder.host = Host_entry.get()
+            holder.user = Username_entry.get()
+            holder.password = Password_entry.get()
             window3.destroy()
-            print(DataObject.holdData.host, DataObject.holdData.user, DataObject.holdData.password)
+            print(holder.host, holder.user, holder.password)
             save_file_prompt()
 
         Enter = tk.Button(window3, text='Enter', bd='15', bg='green', fg='white',
@@ -533,29 +535,32 @@ def main_window():
             Q1 and Q2 can not be the same.
             Fix N so that the user can not enter floating point values.
             """
-            DataObject.holdData.molecule = molecule.get()
-            DataObject.holdData.q_equation1 = q_equation1.get()
-            DataObject.holdData.q_equation2 = q_equation2.get()
-            DataObject.holdData.q_equation3 = q_equation3.get()
-            DataObject.holdData.N1 = N1.get()
-            DataObject.holdData.L1 = float(L1.get())
-            DataObject.holdData.N2 = N2.get()
-            DataObject.holdData.L2 = float(L2.get())
-            DataObject.holdData.N3 = N3.get()
-            DataObject.holdData.L3 = float(L3.get())
-            DataObject.holdData.t = t.get()
-            DataObject.holdData.g = g.get()
-            DataObject.holdData.remote = SSH_box.get()
+
+
+            holder.setMolecule(molecule.get())
+            print(holder.molecule)
+            holder.setQ1(q_equation1.get())
+            holder.setQ2(q_equation2.get())
+            holder.setQ3(q_equation3.get())
+            holder.setN1(N1.get())
+            holder.setN2(N2.get())
+            holder.setN3(N3.get())
+            holder.setL1(L1.get())
+            holder.setL2(L2.get())
+            holder.setL3(L3.get())
+            holder.setT(t.get())
+            holder.setG(g.get())
+            holder.set_remote(SSH_box.get())
 
             if value_holder:
-                molecule_gui.molecule_testing(int(DataObject.holdData.N1), int(DataObject.holdData.L1),
-                                              int(DataObject.holdData.N2),
-                                              int(DataObject.holdData.L2), int(DataObject.holdData.N3),
-                                              int(DataObject.holdData.L3))
+                molecule_gui.molecule_testing(int(holder.N1), int(holder.L1),
+                                              int(holder.N2),
+                                              int(holder.L2), int(holder.N3),
+                                              int(holder.L3))
 
 
             for i in range(3):
-                DataObject.holdData.v.append(v[i].get())
+                holder.v.append(v[i].get())
 
             # API_Class.outputAPI.items.file_name = filename
             # This is where error checking takes place.
@@ -569,32 +574,32 @@ def main_window():
                 messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
                 clear_data()
             # this makes sure that the values are positive
-            elif (int(DataObject.holdData.N1)) % 2 == 0:
+            elif (int(holder.N1)) % 2 == 0:
                 messagebox.showerror("PyFGH", "N must be odd!!!")
                 clear_data()
-            elif (int(DataObject.holdData.N2)) % 2 == 0:
+            elif (int(holder.N2)) % 2 == 0:
                 messagebox.showerror("PyFGH", "N must be odd!!!")
                 clear_data()
-            elif (int(DataObject.holdData.N3)) % 2 == 0:
+            elif (int(holder.N3)) % 2 == 0:
                 messagebox.showerror("PyFGH", "N must be odd!!!")
                 clear_data()
 
-            elif int(DataObject.holdData.N1) < 0:
+            elif int(holder.N1) < 0:
                 messagebox.showerror("PyFGH", "N must be positive!!!")
                 clear_data()
-            elif int(DataObject.holdData.L1) < 0:
+            elif int(holder.L1) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
-            elif int(DataObject.holdData.N2) < 0:
+            elif int(holder.N2) < 0:
                 messagebox.showerror("PyFGH", "N must be positive!!!")
                 clear_data()
-            elif int(DataObject.holdData.L2) < 0:
+            elif int(holder.L2) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
-            elif int(DataObject.holdData.N3) < 0:
+            elif int(holder.N3) < 0:
                 messagebox.showerror("PyFGH", "N must be positive!!!")
                 clear_data()
-            elif int(DataObject.holdData.L3) < 0:
+            elif int(holder.L3) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
             # This runs the model window when the user hits calculate.
@@ -612,7 +617,7 @@ def main_window():
 
                 for key, className in inspect.getmembers(model_objects):
                     for i in range(3):
-                        if DataObject.holdData.v[i] == key:
+                        if holder.v[i] == key:
                             holder_model.append(className())
 
                 print(holder_model)
@@ -731,10 +736,10 @@ def main_window():
             global value_holder
             value_holder = True
             molecule_gui.getData()
-            molecule_gui.molecule_testing(int(DataObject.holdData.N1), int(DataObject.holdData.L1),
-                                          int(DataObject.holdData.N2),
-                                          int(DataObject.holdData.L2), int(DataObject.holdData.N3),
-                                          int(DataObject.holdData.L3))
+            molecule_gui.molecule_testing(int(holder.N1), int(holder.L1),
+                                          int(holder.N2),
+                                          int(holder.L2), int(holder.N3),
+                                          int(holder.L3))
 
             close_window()
 
@@ -779,3 +784,5 @@ def main_window():
     L3.place(x=800, y=100, width=100)
 
     window.mainloop()
+    print ("after mainloop")
+    return holder

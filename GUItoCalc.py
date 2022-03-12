@@ -51,18 +51,19 @@ def main():
 def passToCalc(dataObj):
     print("Got an object.")
     print(dataObj)
-    for i in dataObj.holdData.v:
+    holder = DataObject.InputData()
+    for i in holder.v:
         print("a vtype: "+str(i))
     print("Model data")
-    print(dataObj.holdData.model_data)
+    print(holder.model_data)
     VMat = Vmatrix.VMatrixCalc(dataObj)
     print("Done with VMatrix")
     TMat = Tmatrix.TMatrixCalc(dataObj)
     print("Done with TMatrix")
     HMat = VMat + TMat
-    pd.DataFrame(HMat).to_csv(DataObject.holdData.name_of_file+".csv")
-    DataObject.holdData.Hmat = HMat
-    z = DataObject.holdData.name_of_file+".csv"
+    pd.DataFrame(HMat).to_csv(holder.name_of_file + ".csv")
+    holder.Hmat = HMat
+    z = holder.name_of_file+".csv"
     window(z)
     print(HMat)
     if os.path.exists("holder.csv"):

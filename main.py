@@ -32,7 +32,7 @@ def datamuncher(q):
     holder1 = q.get()
     print(holder1.message)
     print("Molecule: ", holder1.molecule)
-    print("Q1 equation: ", holder1.q_equation1)
+    print("Q1 equation: ", holder1.getQ1)
     print("Q2 equation: ", holder1.q_equation2)
     print("Q3 equation: ", holder1.q_equation3)
     print("N1: ", holder1.N1)
@@ -58,7 +58,7 @@ def datamuncher(q):
         file.write('%s\n' % x)
     file.close()
 
-    DataObject.holdData.user2 = holder1.user
+    #DataObject.holdData.user2 = holder1.user
 
 
     def SSH_connection():
@@ -92,8 +92,6 @@ def datamuncher(q):
         sftp.close()
         ssh.close()
 
-
-
     if holder1.remote == 'Yes':
         SSH_connection()
 
@@ -110,32 +108,18 @@ def datagrabber():
     p1 = Process(target=datamuncher, args=(q,))
     p1.start()
     time.sleep(1)
-    GUI.main_window()
+    holder = GUI.main_window()
     print('The interface is started Process: ', os.getpid())
-    holder = DataObject.InputData()
-    holder.setMolecule(DataObject.holdData.molecule)
-    holder.setQ1(DataObject.holdData.q_equation1)
-    holder.setQ2(DataObject.holdData.q_equation2)
-    holder.setQ3(DataObject.holdData.q_equation3)
-    holder.setN1(DataObject.holdData.N1)
-    holder.setL1(DataObject.holdData.L1)
-    holder.setN2(DataObject.holdData.N2)
-    holder.setL2(DataObject.holdData.L2)
-    holder.setN3(DataObject.holdData.N3)
-    holder.setL3(DataObject.holdData.L3)
-    holder.setT(DataObject.holdData.t)
-    holder.setG(DataObject.holdData.g)
-    holder.setV(DataObject.holdData.v)
-    holder.setFileName(DataObject.holdData.file_name)
-    v = int(DataObject.holdData.N1) + int(DataObject.holdData.N2) + int(DataObject.holdData.N3) + int(
-        DataObject.holdData.L1) + \
-        int(DataObject.holdData.L2) + int(DataObject.holdData.L3)
+    #holder = DataObject.InputData()
+
+    #holder.setFileName(holder.file_name)
+
+    v = int(holder.N1) + int(holder.N2) + int(holder.N3) + int(
+        holder.L1) + \
+        int(holder.L2) + int(holder.L3)
     holder.setMessage("This is from the child")
     holder.set_sum(v)
-    holder.set_host(DataObject.holdData.host)
-    holder.set_user(DataObject.holdData.user)
-    holder.set_password(DataObject.holdData.password)
-    holder.set_remote(DataObject.holdData.remote)
+
     # holder.setModelData(DataObject.holdData.model_data)  # look into pickling possibly un-pickling
     q.put(holder)
     Charles = q.get()
@@ -146,9 +130,6 @@ def datagrabber():
     GTC.passToCalc(DataObject)
     return
 
-
-
-    
 
 if __name__ == '__main__':
     datagrabber()

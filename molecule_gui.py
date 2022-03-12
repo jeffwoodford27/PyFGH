@@ -25,7 +25,7 @@ poty2 = []
 poty3 = []
 
 totalN = 0
-# totalN = DataObject.holdData.N1 * DataObject.holdData.N2 * DataObject.holdData.N3
+
 
 
 def getData():

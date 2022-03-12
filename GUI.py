@@ -719,7 +719,7 @@ def main_window():
             """
             Note: xlsx files are not accepted. Can only take CSV files or else the code will break.
             XLSX files do not abide by UTF-8 formatting and is a pain to get it to work. So to save everyone
-            time just only use a CSV file format!!!!!!!!! Excel has the ability to save it to CSV format. To find out 
+            time just only use a CSV file format!!!!!!!!!! Excel has the ability to save it to CSV format. To find out 
             how to save it to that format, just google it. This is the end of my rant. Happy Coding!
             """
 

@@ -31,25 +31,16 @@ def datamuncher(q):
     print('This is the parent process: ', os.getpid())
     holder1 = q.get()
     print(holder1.message)
-    print("Molecule: ", holder1.molecule)
-    print("Q1 equation: ", holder1.getQ1)
-    print("Q2 equation: ", holder1.q_equation2)
-    print("Q3 equation: ", holder1.q_equation3)
     print("N1: ", holder1.N1)
     print("L1: ", holder1.L1)
     print("N2: ", holder1.N2)
     print("L2: ", holder1.L2)
     print("N3: ", holder1.N3)
     print("L3: ", holder1.L3)
-    print("T : ", holder1.t)
-    print("G : ", holder1.g)
     print("Filename: ", holder1.file_name)
-    print("V : ", holder1.v)
     print("Values from the sum of N and L: ", holder1.sum)
-    data = [holder1.molecule, holder1.q_equation1, holder1.q_equation2,
-            holder1.q_equation3, holder1.N1, holder1.L1, holder1.N2,
-            holder1.L2, holder1.N3, holder1.L3, holder1.t,
-            holder1.g, holder1.v]
+    data = [holder1.equilibrium_file, holder1.N1, holder1.L1, holder1.N2,
+            holder1.L2, holder1.N3, holder1.L3]
     save_path = "./resources/"
     file_name = "DataList.txt"
     completeName = os.path.join(save_path, file_name)

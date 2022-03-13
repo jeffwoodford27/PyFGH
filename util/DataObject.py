@@ -11,49 +11,29 @@ class InputData:
 
     def __init__(self):
         self.name_of_file = 0
-        self.molecule = 0
-        self.q_equation1 = 0
-        self.q_equation2 = 0
-        self.q_equation3 = 0
         self.N1 = 0
         self.L1 = 0
         self.N2 = 0
         self.L2 = 0
         self.N3 = 0
         self.L3 = 0
-        self.t = 0
-        self.g = 0
-        self.v = []
         self.file_name = 0
-        self.model_data = []  # This does not work
         self.message = 0
         self.sum = 0
         self.host = 0
         self.user = 0
         self.password = 0
         self.remote = 0
-        self.Hmat = []
-        self.molecule = 0
-        self.potential_energy = 0
+        self.equilibrium_file = 50
+        self.potential_energy_file = 0
         name_of_file = 0
 
     """
     The following methods are setters. These values get set in test1.py
     """
 
-    def getQ1(self):
-        return self.q_equation1
-
-    def setMolecule(self, molecule):
-        self.molecule = molecule
-        return
-
     def setpotential_energy(self, potential_energy):
-        self.potential_energy = potential_energy
-        return
-
-    def setHmat(self, Hmat):
-        self.Hmat = Hmat
+        self.potential_energy_file = potential_energy
         return
 
     def setname_of_file(self, name_of_file):
@@ -62,22 +42,6 @@ class InputData:
 
     def setHmat(self, Hmat):
         self.Hmat = Hmat
-        return
-
-    def setMolecule(self, molecule):
-        self.molecule = molecule
-        return
-
-    def setQ1(self, q_equation1):
-        self.q_equation1 = q_equation1
-        return
-
-    def setQ2(self, q_equation2):
-        self.q_equation2 = q_equation2
-        return
-
-    def setQ3(self, q_equation3):
-        self.q_equation3 = q_equation3
         return
 
     def setN1(self, N1):
@@ -102,22 +66,6 @@ class InputData:
 
     def setL3(self, L3):
         self.L3 = L3
-        return
-
-    def setT(self, t):
-        self.t = t
-        return
-
-    def setV(self, v):
-        self.v = v
-        return
-
-    def setG(self, g):
-        self.g = g
-        return
-
-    def setV(self, v):
-        self.v = v
         return
 
     def setFileName(self, file_name):

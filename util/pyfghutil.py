@@ -123,6 +123,8 @@ class PESpoint:
 # N = a list of length 3 containing the number of grid points in each dimension
 # df = a Pandas object containing the CSV data read in from the file
 
+
+
 class PotentialEnergySurface:
     def __init__(self, atomlist, N, df):
         self.N = N

@@ -1,6 +1,6 @@
 #Import the needed modules
 import numpy as np
-from util import pyfghutil
+from util import pyfghutil, DataObject
 import math
 import multiprocessing as mp
 import sys
@@ -193,27 +193,22 @@ def VMatrixCalc(dataObj):
     #Establish variables needed
     NValue = []
     LValue = []
+    holder = DataObject.InputData()
     #Create the NValue and LValue list from scratch:
-    if int(dataObj.holdData.N1) > 0:
-        NValue.append(int(dataObj.holdData.N1))
-        LValue.append(float(dataObj.holdData.L1))
-    if int(dataObj.holdData.N2) > 0:
-        NValue.append(int(dataObj.holdData.N2))
-        LValue.append(float(dataObj.holdData.L2))
-    if int(dataObj.holdData.N3) > 0:
-        NValue.append(int(dataObj.holdData.N3))
-        LValue.append(float(dataObj.holdData.L3))
+    if int(holder.N1) > 0:
+        NValue.append(int(holder.N1))
+        LValue.append(float(holder.L1))
+    if int(holder.N2) > 0:
+        NValue.append(int(holder.N2))
+        LValue.append(float(holder.L2))
+    if int(holder.N3) > 0:
+        NValue.append(int(holder.N3))
+        LValue.append(float(holder.L3))
     
     dimensions = len(NValue)
-    VType = []
-    VModel = []
-    for VModelClass in dataObj.holdData.model_data:
-        VType.append(VModelClass.type)
-        VModel.append(VModelClass.param)
-
     '''
     VType = []
-    for VTypeString in dataObj.holdData.v:
+    for VTypeString in dataObj.InputData.v:
         if (VTypeString == "Harmonic Oscillator"):
             VType.append(0)
         elif (VTypeString == "Morse Oscillator"):
@@ -249,7 +244,7 @@ def VMatrixCalc(dataObj):
     '''
 
     #If using model or file
-    if(False):
+    if False:
         #Calculate by blocks:
         #Don't optimize for now. Just calculate blocks as needed.
         blockCoords = []

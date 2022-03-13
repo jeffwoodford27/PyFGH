@@ -39,8 +39,8 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     N2_1 = N2
     N3_1 = N3
     print(N1_1)
-    print(holder.molecule)
-    with open(holder.molecule, encoding='UTF-8') as f:
+    print(holder.equilibrium_file)
+    with open(holder.equilibrium_file, encoding='UTF-8') as f:
         for row in f:
             print(row)
             list2.append(row.split(',')[0])  # Li
@@ -96,7 +96,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
 
     def getNs():
         holder1 = DataObject.InputData()
-        java = holder1.potential_energy
+        java = holder1.potential_energy_file
         print(java)
         file = open(java, encoding='UTF-8')
         reader = csv.reader(file)
@@ -162,7 +162,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
 
     def hi():
         holder = DataObject.InputData()
-        r = holder.potential_energy
+        r = holder.potential_energy_file
         print(r)
         hola = open(r, encoding='UTF-8')
         for hello in hola:
@@ -262,7 +262,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     deltaQ2 = L2_2 / float(N2_2)
     deltaQ3 = L3_2 / float(N3_2)
     holder = DataObject.InputData()
-    r = holder.potential_energy
+    r = holder.potential_energy_file
     with open(r, encoding="utf-8") as a:
         for x in a:
             Q1.append(float(x.split(',')[0]))

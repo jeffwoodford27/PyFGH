@@ -538,7 +538,7 @@ def main_window():
 
 
             holder.setMolecule(molecule.get())
-            print(holder.molecule)
+            print(holder.equilibrium_file)
             holder.setQ1(q_equation1.get())
             holder.setQ2(q_equation2.get())
             holder.setQ3(q_equation3.get())

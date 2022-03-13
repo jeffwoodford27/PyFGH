@@ -52,10 +52,6 @@ def passToCalc(dataObj):
     print("Got an object.")
     print(dataObj)
     holder = DataObject.InputData()
-    for i in holder.v:
-        print("a vtype: "+str(i))
-    print("Model data")
-    print(holder.model_data)
     VMat = Vmatrix.VMatrixCalc(dataObj)
     print("Done with VMatrix")
     TMat = Tmatrix.TMatrixCalc(dataObj)

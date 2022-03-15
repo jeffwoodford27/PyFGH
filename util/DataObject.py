@@ -122,15 +122,35 @@ class InputData:
         self.name_of_file = name_of_file
         return
 
+    def setEquilMolecule(self,eq):
+        self.EquilMolecule = eq
+        return
 
+    def setPES(self,pes):
+        self.PES = pes
+        return
+
+#TODO take the values in Eignevalues and Eigenvectos and write them to a CSV file in main on line 104.
 class OutputData:
     def __init__(self):
         self.eigenvalues = []
+        self.eigenvectors = []
 
     def setEigenvalues(self, evalues):
         for i in range(len(evalues)):
             self.eigenvalues.append(evalues[i])
         return
+
+    def setEigenvectors(self, evectors):
+        for i in range(len(evectors)):
+            self.eigenvectors.append(evectors[i])
+        return
+
+    def getEigenvalues(self):
+        return self.eigenvalues
+
+    def getEigenvectors(self):
+        return self.eigenvectors
 
 
 class atom:

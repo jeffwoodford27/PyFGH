@@ -42,7 +42,7 @@ class MorseOscillatorModel:
 # A = mass number of the atom.
 # m = physical mass of the atom, from a lookup dictionary (below), converted from amu to atomic units
 
-class Atom:
+class Molecule:
     def __init__(self):
         self.x = 0
         self.y = 0
@@ -96,35 +96,23 @@ class Atom:
         return
 
 
-# A class to define a chemical structure.
-# Nat = number of atoms in the structure
-# at = a list of length Nat of Atom objects
-# x = a list of length Nat of x coordinates
-# y = a list of length Nat of y coordinates
-# z = a list of length Nat of z coordinates
-
-class Structure:
-    def __init__(self, Nat, at, x, y, z):
-        self.Nat = Nat
-        self.at = at
-        self.x = x
-        self.y = y
-        self.z = z
 
 
 # A class to define a point on the potential energy surface.
 # n = the number of the grid point (indexed from 0)
 # q = a list of length 3 to define the values of q for the grid point
-# struct = a member of class Structure to define the chemical structure at this point
+# x, y, z = a list of the x,y,z coordinates of the atoms at the point
 # en = the value of the potential energy at this point (in atomic units)
 
 
 class PESpoint:
-    def __init__(self, n, q, struct, en):
-        self.n = n
-        self.q = q
-        self.struct = struct
-        self.en = en
+    def __init__(self):
+        self.n = 0
+        self.q = 0
+        self.x = 0
+        self.y = 0
+        self.z = 0
+        self.en = 0
 
     def getq1(self):
         return self.q[0]
@@ -135,8 +123,29 @@ class PESpoint:
     def getq3(self):
         return self.q[2]
 
-    def getEnergy(self):
-        return self.en
+    def setN(self, n):
+        self.n = n
+        return
+
+    def setQ(self, q):
+        self.q = q
+        return
+
+    def setX(self, x):
+        self.x = x
+        return
+
+    def setY(self, y):
+        self.y = y
+        return
+
+    def setZ(self, z):
+        self.z = z
+        return
+
+    def setEnergy(self, en):
+        self.en = en
+        return
 
 
 # A class to define a potential energy surface.
@@ -146,38 +155,24 @@ class PESpoint:
 
 
 class PotentialEnergySurface:
-    def __init__(self, atomlist, N, df):
-        self.N = N
-        self.atomlist = atomlist
-        Nat = len(atomlist)
-        n = 0
+    def __init__(self):
+        self.N = 0
+        self.atomlist = 0
         self.pts = []
-        for i in range(N[0]):
-            self.pts.append([])
-            for j in range(N[1]):
-                self.pts[i].append([])
-                for k in range(N[2]):
-                    q = np.zeros(3)
-                    q[0] = df['q1'][n]
-                    q[1] = df['q2'][n]
-                    q[2] = df['q3'][n]
-                    x = np.zeros(3)
-                    x[0] = df['x1'][n]
-                    x[1] = df['x2'][n]
-                    x[2] = df['x3'][n]
-                    y = np.zeros(3)
-                    y[0] = df['y1'][n]
-                    y[1] = df['y2'][n]
-                    y[2] = df['y3'][n]
-                    struct = Structure(Nat, atomlist, x, y)
-                    self.pts[i][j].append(PESpoint(n, q, struct, df['en'][n]))
-                    n = n + 1
 
     def getPointByN(self, t, u, v):
         return self.pts[t][u][v]
 
     def setAtomList(self, atomlist):
         self.atomlist = atomlist
+        return
+
+    def setN (self, N):
+        self.N = N
+        return
+    
+    def appendPESpt(self, pt):
+        self.pts.append(pt)
         return
 
 

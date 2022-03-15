@@ -62,6 +62,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
                 s.append(x)
             else:
                 print(x + " is not a valid element")
+                # throw an error
 
         print("\n")
         for x in list2:  # x is the atomic symbol
@@ -98,7 +99,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
         lines = len(list(reader))
         totalN_2 = N1_1 * N2_1 * N3_1
         if lines == totalN_2:
-            print("The lines of waterpot-data equals the toal of all N vales")
+            print("The lines of waterpot-data equals the total of all N vales")
         else:
             print("The lines of waterpot-data do not equal the total of all N vales ", lines)
         return totalN_2
@@ -124,11 +125,13 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
             print("Cos Theta is: ", costheta)
         else:
             print("Molecule is linear")
+            # throw an error
 
         if d >= 0.10 and d2 >= 0.10 and d3 >= 0.10:
             print("Distance is", d + d2 + d3, " Atom is unique")
         else:
             print("Atom is not unique")
+            #throw an error
 
             # First atom is assumed to be the central atom
 
@@ -254,7 +257,6 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     """
     This is for validating the water potential energy file
     """
-    obj2 = pyfghutil.PotentialEnergySurface()
     N1_2 = N1
     L1_2 = L1
     N2_2 = N2
@@ -281,11 +283,19 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
                 q3 = deltaQ3 * float(k - int(N3_2 / 2))
                 if (round(q1, 3) == round(Q1[n], 3)) and (round(q2, 3) == round(Q2[n], 3)) and (
                         round(q3, 3) == round(Q3[n], 3)):
-                    continue
+                    print('Values are valid')
                 else:
                     print('Values are not valid')
+                    print(q1,q2,q3)
 
-
+                pt = pyfghutil.PESpoint()
+                pt.setN(n)
+                pt.setQ([q1,q2,q3])
+                pt.setX([potxlist1[n],potxlist2[n],potxlist3[n]])
+                pt.setY([potylist1[n], potylist2[n], potylist3[n]])
+                pt.setZ([0, 0, 0])
+                pt.setEnergy(potenergy[n])
+                pes.appendPESpt(pt)
                 n += 1
 
 

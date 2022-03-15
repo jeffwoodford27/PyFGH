@@ -466,12 +466,12 @@ def main_window():
             """
 
             print(DataObject.test.equilibrium_file)
-            holder.setN1(N1.get())
-            holder.setN2(N2.get())
-            holder.setN3(N3.get())
-            holder.setL1(L1.get())
-            holder.setL2(L2.get())
-            holder.setL3(L3.get())
+            holder.setN1(int(N1.get()))
+            holder.setN2(int(N2.get()))
+            holder.setN3(int(N3.get()))
+            holder.setL1(float(L1.get()))
+            holder.setL2(float(L2.get()))
+            holder.setL3(float(L3.get()))
             holder.set_remote(SSH_box.get())
             print(holder.N1, holder.N2, " holder")
 
@@ -482,7 +482,8 @@ def main_window():
                                           holder.N2, holder.L2, holder.N3,
                                           holder.L3)
 
-
+                holder.setEquilMolecule(eq)
+                holder.setPES(pes)
 
             if (int(holder.N1)) % 2 == 0:
                 messagebox.showerror("PyFGH", "N must be odd!!!")

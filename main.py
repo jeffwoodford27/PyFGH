@@ -80,9 +80,7 @@ def datamuncher(q):
     if holder1.remote == 'Yes':
         SSH_connection()
 
-    Charles = Bob()
-    Charles.setSum(holder1.sum)
-    q.put(Charles)
+
     # print("File Name : ", holder1.file_name, " This is from the child process")
     # print("Model Data : ", holder1.model_data, " This is from the child process")
     return

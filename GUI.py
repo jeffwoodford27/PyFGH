@@ -455,7 +455,6 @@ def main_window():
     This also checks for validation rules also for the values that were inputted.
     """
 
-    value_holder = False
 
     def output():
         try:
@@ -466,7 +465,7 @@ def main_window():
             Fix N so that the user can not enter floating point values.
             """
 
-            print(holder.equilibrium_file)
+            print(DataObject.test.equilibrium_file)
             holder.setN1(N1.get())
             holder.setN2(N2.get())
             holder.setN3(N3.get())
@@ -474,12 +473,21 @@ def main_window():
             holder.setL2(L2.get())
             holder.setL3(L3.get())
             holder.set_remote(SSH_box.get())
+            print(holder.N1, holder.N2, " holder")
 
-            if value_holder == True:
-                molecule_gui.molecule_testing(int(holder.N1), int(holder.L1),
-                                              int(holder.N2),
-                                              int(holder.L2), int(holder.N3),
-                                              int(holder.L3))
+            print(holder.value_holder)
+
+            if holder.value_holder:
+                test = molecule_gui.molecule_testing(int(holder.N1), int(holder.L1),
+                                          int(holder.N2),
+                                          int(holder.L2), int(holder.N3),
+                                          int(holder.L3))
+
+
+
+
+
+
 
             if (int(holder.N1)) % 2 == 0:
                 messagebox.showerror("PyFGH", "N must be odd!!!")
@@ -519,6 +527,7 @@ def main_window():
                 function that will build the GUI parameter box depending on the dimensions and parameters of each 
                 unique model.
                 """
+
                 save_file_prompt()
 
         except ValueError:
@@ -615,16 +624,13 @@ def main_window():
             XLSX files do not abide by UTF-8 formatting and is a pain to get it to work. So to save everyone
             time just only use a CSV file format!!!!!!!!!! Excel has the ability to save it to CSV format. To find out 
             how to save it to that format, just google it. This is the end of my rant. Happy Coding!
-            """
-        global value_holder
-        value_holder = True
-        molecule_gui.getData()
-        molecule_gui.molecule_testing(int(holder.N1), int(holder.L1),
-                                      int(holder.N2),
-                                      int(holder.L2), int(holder.N3),
-                                      int(holder.L3))
+        """
 
-        close_window()
+        x = askopenfilename()
+        y = askopenfilename()
+        DataObject.test.equilibrium_file = x
+        DataObject.test.potential_energy_file = y
+        holder.setvalue_holder(True)
 
     # This is a button called Read Structures
     readbutton = tk.Button(window, text='Read Structures and Energies from File', bd='10', bg='gray', fg='white',

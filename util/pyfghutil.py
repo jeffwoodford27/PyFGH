@@ -33,7 +33,7 @@ class MorseOscillatorModel:
         return self.mu
 
     def calcPotentialEnergy(self, x):
-        return (self.De * (1 - math.exp(-self.a * x)) ** 2)
+        return self.De * (1 - math.exp(-self.a * x)) ** 2
 
 
 # The atom class.  Defines a chemical atom.
@@ -43,23 +43,25 @@ class MorseOscillatorModel:
 # m = physical mass of the atom, from a lookup dictionary (below), converted from amu to atomic units
 
 class Atom:
-    def __init__(self, Z, A, m, x, y):
-        self.x = x
-        self.y = y
-        self.A = A
-        self.Z = Z
-        self.m = m
-        #self.m = MassLookup[self.s + "-" + str(self.A)] * 1822.89
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.A = 0
+        self.Z = 0
+        self.m = 0
+        # self.m = MassLookup[self.s + "-" + str(self.A)] * 1822.89
 
     def setAtomicNumber(self, Z):
         self.Z = Z
         return
 
     def getZ(self):
-        return self.z
+        return self.Z
 
+    """
     def getS(self):
-        return self.s
+        return self.S
+    """
 
     def getA(self):
         return self.A
@@ -72,6 +74,27 @@ class Atom:
 
     def getY(self):
         return self.y
+
+    def setX(self, x):
+        self.x = x
+        return
+
+    def setY(self, y):
+        self.y = y
+        return
+
+    def setA(self, A):
+        self.A = A
+        return
+
+    def setZ(self, Z):
+        self.Z = Z
+        return
+
+    def setM(self, m):
+        self.m = m
+        return
+
 
 # A class to define a chemical structure.
 # Nat = number of atoms in the structure
@@ -124,7 +147,6 @@ class PESpoint:
 # df = a Pandas object containing the CSV data read in from the file
 
 
-
 class PotentialEnergySurface:
     def __init__(self, atomlist, N, df):
         self.N = N
@@ -155,6 +177,10 @@ class PotentialEnergySurface:
 
     def getPointByN(self, t, u, v):
         return self.pts[t][u][v]
+
+    def setAtomList(self, atomlist):
+        self.atomlist = atomlist
+        return
 
 
 # A class to hold the calculation parameters.
@@ -714,7 +740,6 @@ MassLookup = {
     "Lv-293": 293.20449,
     "Ts-292": 292.20746,
     "Og-294": 294.21392
-
 
 }
 

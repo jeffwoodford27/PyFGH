@@ -25,22 +25,19 @@ poty3 = []
 
 totalN = 0
 
-
-
-def getData():
-    holder = DataObject.InputData()
-    holder.setMolecule(askopenfilename())
-    holder.setpotential_energy(askopenfilename())
+"""
+When selecting the files must select first and then select enter N and L values!!!
+"""
 
 
 def molecule_testing(N1, L1, N2, L2, N3, L3):
-    holder = DataObject.InputData()
+    print(DataObject.test.equilibrium_file)
     N1_1 = N1
     N2_1 = N2
     N3_1 = N3
     print(N1_1)
-    print(holder.equilibrium_file)
-    with open(holder.equilibrium_file, encoding='UTF-8') as f:
+    # print(holder_file.equilibrium_file)
+    with open(DataObject.test.equilibrium_file, encoding='UTF-8') as f:
         for row in f:
             print(row)
             list2.append(row.split(',')[0])  # Li
@@ -98,7 +95,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
         holder1 = DataObject.InputData()
         java = holder1.potential_energy_file
         print(java)
-        file = open(java, encoding='UTF-8')
+        file = open(DataObject.test.potential_energy_file, encoding='UTF-8')
         reader = csv.reader(file)
         lines = len(list(reader))
         totalN_2 = N1_1 * N2_1 * N3_1
@@ -164,7 +161,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
         holder = DataObject.InputData()
         r = holder.potential_energy_file
         print(r)
-        hola = open(r, encoding='UTF-8')
+        hola = open(DataObject.test.potential_energy_file, encoding='UTF-8')
         for hello in hola:
             potx1.append(hello.split(',')[3])
             potx2.append(hello.split(',')[5])
@@ -240,9 +237,15 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     print("Atomic Mass: ", A)  # Atomic Mass
     print("Symbol: ", s)  # Symbol
     calculations(x1, y1, z1, x2, y2, z2, xx2, yy2, zz2, xx3, yy3, zz3)
-    test = pyfghutil.Atom(Z, A, m, xlist,
-                          ylist)  # save only one molecule to the atom class. Save a collection of the atoms to the structure class.
-    print(getattr(test, 'Z'))
+
+    obj1 = pyfghutil.Atom()
+    obj1.setZ(Z)
+    obj1.setA(A)
+    obj1.setM(m)
+    obj1.setX(xlist)
+    obj1.setY(ylist)
+
+    print("This is from the molecule gui: ", obj1.Z)
     getNs()
 
     # validateQ()
@@ -250,7 +253,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     """
     This is for validating the water potential energy file
     """
-
+    obj2 = pyfghutil.PotentialEnergySurface()
     N1_2 = N1
     L1_2 = L1
     N2_2 = N2
@@ -261,9 +264,9 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     deltaQ1 = L1_2 / float(N1_2)
     deltaQ2 = L2_2 / float(N2_2)
     deltaQ3 = L3_2 / float(N3_2)
-    holder = DataObject.InputData()
-    r = holder.potential_energy_file
-    with open(r, encoding="utf-8") as a:
+    holder_file = DataObject.InputData()
+    r = holder_file.potential_energy_file
+    with open(DataObject.test.potential_energy_file, encoding="utf-8") as a:
         for x in a:
             Q1.append(float(x.split(',')[0]))
             Q2.append(float(x.split(',')[1]))
@@ -281,5 +284,10 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
                     continue
                 else:
                     print('Values are not valid')
-                    n += 1
-                    break
+
+
+                n += 1
+    obj2.setAtomList()
+
+    return obj1, obj2
+

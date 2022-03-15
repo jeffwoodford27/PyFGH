@@ -1,7 +1,7 @@
 import os
 import paramiko
 import GUI
-from util import DataObject
+from util import pyfghutil
 from multiprocessing import Process, Queue, Pool
 import GUItoCalc as GTC
 from multiprocessing import Pool
@@ -37,10 +37,13 @@ def datamuncher(q):
     print("L2: ", holder1.L2)
     print("N3: ", holder1.N3)
     print("L3: ", holder1.L3)
-    print("Filename: ", holder1.file_name)
-    print("Values from the sum of N and L: ", holder1.sum)
+    #print("Filename: ", holder1.file_name)
     data = [holder1.equilibrium_file, holder1.N1, holder1.L1, holder1.N2,
             holder1.L2, holder1.N3, holder1.L3]
+
+    test = pyfghutil.Atom()
+
+    print("Atoms from Main: ", test.Z, test.A)
     save_path = "./resources/"
     file_name = "DataList.txt"
     completeName = os.path.join(save_path, file_name)
@@ -105,12 +108,7 @@ def datagrabber():
 
     #holder.setFileName(holder.file_name)
 
-    v = int(holder.N1) + int(holder.N2) + int(holder.N3) + int(
-        holder.L1) + \
-        int(holder.L2) + int(holder.L3)
     holder.setMessage("This is from the child")
-    holder.set_sum(v)
-
     # holder.setModelData(DataObject.holdData.model_data)  # look into pickling possibly un-pickling
     q.put(holder)
     Charles = q.get()
@@ -118,7 +116,7 @@ def datagrabber():
 
     #At this point, insert the data into the handler
 
-    GTC.passToCalc(DataObject)
+    #GTC.passToCalc(DataObject)
     return
 
 

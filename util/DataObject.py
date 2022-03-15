@@ -5,7 +5,13 @@ DataObject is a place to hold data. All values in these classes are first assign
 reassigned new values based on the input of the GUI. When the GUI is terminated, these values change from zero to the 
 values from the input. After the GUI is terminated, these new values can be called from any file in this project.
 """
+class test:
+    equilibrium_file = 0
+    potential_energy_file = 0
 
+    def setEqulibrium(self, equilibrium_file):
+        self.equilibrium_file = equilibrium_file
+        return
 
 class InputData:
 
@@ -24,13 +30,22 @@ class InputData:
         self.user = 0
         self.password = 0
         self.remote = 0
-        self.equilibrium_file = 50
+        self.equilibrium_file = 0
         self.potential_energy_file = 0
+        self.value_holder = 0
         name_of_file = 0
 
     """
     The following methods are setters. These values get set in test1.py
     """
+
+    def setvalue_holder(self, value_holder):
+        self.value_holder = value_holder
+        return
+
+    def setequilibrium_file(self, equilibrium_file):
+        self.equilibrium_file = equilibrium_file
+        return
 
     def setpotential_energy(self, potential_energy):
         self.potential_energy_file = potential_energy

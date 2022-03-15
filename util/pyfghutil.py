@@ -118,6 +118,7 @@ class Structure:
 # struct = a member of class Structure to define the chemical structure at this point
 # en = the value of the potential energy at this point (in atomic units)
 
+
 class PESpoint:
     def __init__(self, n, q, struct, en):
         self.n = n
@@ -133,9 +134,6 @@ class PESpoint:
 
     def getq3(self):
         return self.q[2]
-
-    def getStruct(self):
-        return self.struct
 
     def getEnergy(self):
         return self.en

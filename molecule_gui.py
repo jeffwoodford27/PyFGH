@@ -22,7 +22,8 @@ potx3 = []
 poty1 = []
 poty2 = []
 poty3 = []
-
+potenergy = []
+energy = []
 totalN = 0
 
 """
@@ -92,9 +93,6 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
             print("amu to atomic ", m)
 
     def getNs():
-        holder1 = DataObject.InputData()
-        java = holder1.potential_energy_file
-        print(java)
         file = open(DataObject.test.potential_energy_file, encoding='UTF-8')
         reader = csv.reader(file)
         lines = len(list(reader))
@@ -102,7 +100,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
         if lines == totalN_2:
             print("The lines of waterpot-data equals the toal of all N vales")
         else:
-            print("The lines of waterpot-data do not equal the toal of all N vales ", lines)
+            print("The lines of waterpot-data do not equal the total of all N vales ", lines)
         return totalN_2
 
     def calculations(x1, y1, z1, x2, y2, z2, xx2, yy2, zz2, xx3, yy3, zz3):
@@ -170,8 +168,10 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
             poty1.append(hello.split(',')[4])
             poty2.append(hello.split(',')[6])
             poty3.append(hello.split(',')[8])
+            energy.append(hello.split(',')[9])
 
     hi()
+
     potxlist1 = [float(x) for x in potx1]
     potxlist2 = [float(x) for x in potx2]
     potxlist3 = [float(x) for x in potx3]
@@ -179,6 +179,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     potylist1 = [float(x) for x in poty1]
     potylist2 = [float(x) for x in poty2]
     potylist3 = [float(x) for x in poty3]
+    potenergy = [float(x) for x in energy]
 
     """
     This does validation checking. Calculates the distance and the cos theta
@@ -238,14 +239,14 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     print("Symbol: ", s)  # Symbol
     calculations(x1, y1, z1, x2, y2, z2, xx2, yy2, zz2, xx3, yy3, zz3)
 
-    obj1 = pyfghutil.Atom()
-    obj1.setZ(Z)
-    obj1.setA(A)
-    obj1.setM(m)
-    obj1.setX(xlist)
-    obj1.setY(ylist)
+    EquilMolecule = pyfghutil.Molecule()
+    EquilMolecule.setZ(Z)
+    EquilMolecule.setA(A)
+    EquilMolecule.setM(m)
+    EquilMolecule.setX(xlist)
+    EquilMolecule.setY(ylist)
 
-    print("This is from the molecule gui: ", obj1.Z)
+    print("This is from the molecule gui: ", EquilMolecule.Z)
     getNs()
 
     # validateQ()
@@ -264,14 +265,13 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     deltaQ1 = L1_2 / float(N1_2)
     deltaQ2 = L2_2 / float(N2_2)
     deltaQ3 = L3_2 / float(N3_2)
-    holder_file = DataObject.InputData()
-    r = holder_file.potential_energy_file
     with open(DataObject.test.potential_energy_file, encoding="utf-8") as a:
         for x in a:
             Q1.append(float(x.split(',')[0]))
             Q2.append(float(x.split(',')[1]))
             Q3.append(float(x.split(',')[2]))
 
+    pes = pyfghutil.PotentialEnergySurface()
     n = 0
     for i in range(N1_2):
         for j in range(N2_2):
@@ -287,7 +287,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
 
 
                 n += 1
-    obj2.setAtomList()
 
-    return obj1, obj2
+
+    return EquilMolecule, pes
 

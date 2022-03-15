@@ -35,6 +35,9 @@ class InputData:
         self.value_holder = 0
         name_of_file = 0
 
+        self.EquilMolecule = 0
+        self.PES = 0
+
     """
     The following methods are setters. These values get set in test1.py
     """

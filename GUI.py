@@ -478,14 +478,9 @@ def main_window():
             print(holder.value_holder)
 
             if holder.value_holder:
-                test = molecule_gui.molecule_testing(int(holder.N1), int(holder.L1),
-                                          int(holder.N2),
-                                          int(holder.L2), int(holder.N3),
-                                          int(holder.L3))
-
-
-
-
+                eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
+                                          holder.N2, holder.L2, holder.N3,
+                                          holder.L3)
 
 
 
@@ -502,19 +497,19 @@ def main_window():
             elif int(holder.N1) < 0:
                 messagebox.showerror("PyFGH", "N must be positive!!!")
                 clear_data()
-            elif int(holder.L1) < 0:
+            elif float(holder.L1) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
             elif int(holder.N2) < 0:
                 messagebox.showerror("PyFGH", "N must be positive!!!")
                 clear_data()
-            elif int(holder.L2) < 0:
+            elif float(holder.L2) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
             elif int(holder.N3) < 0:
                 messagebox.showerror("PyFGH", "N must be positive!!!")
                 clear_data()
-            elif int(holder.L3) < 0:
+            elif float(holder.L3) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
             # This runs the model window when the user hits calculate.

@@ -16,19 +16,9 @@ Author: Josiah Randleman
 © Copyright 2021, Josiah Randleman, All rights reserved. jrandl516@gmail.com
 """
 
-
-class Bob:
-    def __init__(self):
-        self.sum = 0
-
-    def setSum(self, sum):
-        self.sum = sum
-        return
-
-
 # This is the parent process
 def datamuncher(q):
-    print('This is the parent process: ', os.getpid())
+    print('This is the child process: ', os.getpid())
     holder1 = q.get()
     print(holder1.message)
     print("N1: ", holder1.N1)
@@ -41,9 +31,9 @@ def datamuncher(q):
     data = [holder1.equilibrium_file, holder1.N1, holder1.L1, holder1.N2,
             holder1.L2, holder1.N3, holder1.L3]
 
-    test = pyfghutil.Atom()
 
-    print("Atoms from Main: ", test.Z, test.A)
+
+    print("Energy from Main: ", holder1.PES.pts[0].en)
     save_path = "./resources/"
     file_name = "DataList.txt"
     completeName = os.path.join(save_path, file_name)
@@ -52,8 +42,9 @@ def datamuncher(q):
         file.write('%s\n' % x)
     file.close()
 
-    #DataObject.holdData.user2 = holder1.user
+    #GTC.passToCalc(holder1)
 
+    q.put("object on queue")
 
     def SSH_connection():
         host = holder1.host
@@ -96,7 +87,7 @@ def datamuncher(q):
     # print("Model Data : ", holder1.model_data, " This is from the child process")
     return
 
-
+# this is the parent process
 def datagrabber():
     q = Queue()
     p1 = Process(target=datamuncher, args=(q,))
@@ -104,19 +95,15 @@ def datagrabber():
     time.sleep(1)
     holder = GUI.main_window()
     print('The interface is started Process: ', os.getpid())
-    #holder = DataObject.InputData()
 
-    #holder.setFileName(holder.file_name)
-
-    holder.setMessage("This is from the child")
+    holder.setMessage("This is from the parent")
     # holder.setModelData(DataObject.holdData.model_data)  # look into pickling possibly un-pickling
     q.put(holder)
-    Charles = q.get()
-    print(Charles.sum)
 
     #At this point, insert the data into the handler
 
-    #GTC.passToCalc(DataObject)
+    ReturnData = q.get()  # an object of type OutputData
+    print(ReturnData)
     return
 
 

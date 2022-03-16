@@ -274,6 +274,8 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
             Q3.append(float(x.split(',')[2]))
 
     pes = pyfghutil.PotentialEnergySurface()
+    pes.setN([N1,N2,N3])
+    pes.setNpts(N1*N2*N3)
     n = 0
     for i in range(N1_2):
         for j in range(N2_2):

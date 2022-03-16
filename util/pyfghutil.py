@@ -36,11 +36,12 @@ class MorseOscillatorModel:
         return self.De * (1 - math.exp(-self.a * x)) ** 2
 
 
-# The atom class.  Defines a chemical atom.
-# Z = atomic number of the atom.
-# s = atomic symbol of the atom, from a lookup dictionary (below).
-# A = mass number of the atom.
-# m = physical mass of the atom, from a lookup dictionary (below), converted from amu to atomic units
+# The Molecule class.  Defines a chemical molecule.
+# Z = a list of length 3 of atomic numbers of the atoms.
+# A = a list of length 3 of mass numbers of the atoms.
+# m = a list of length 3 of the masses of the atoms
+# x = a list of length 3 of the x coordinates of each atom
+# y = a list of length 3 of the y coordinates of each atom
 
 class Molecule:
     def __init__(self):
@@ -95,9 +96,6 @@ class Molecule:
         self.m = m
         return
 
-
-
-
 # A class to define a point on the potential energy surface.
 # n = the number of the grid point (indexed from 0)
 # q = a list of length 3 to define the values of q for the grid point
@@ -149,22 +147,23 @@ class PESpoint:
 
 
 # A class to define a potential energy surface.
-# atomlist = a list of length Nat containing members of the Atom class
 # N = a list of length 3 containing the number of grid points in each dimension
-# df = a Pandas object containing the CSV data read in from the file
+# Npts = number of points in the PES
+# pts = a list of length Npts of PESpoint objects
 
 
 class PotentialEnergySurface:
     def __init__(self):
         self.N = 0
-        self.atomlist = 0
+        self.Npts = 0
         self.pts = []
 
     def getPointByN(self, t, u, v):
-        return self.pts[t][u][v]
+        m = v + self.N[2] * (u + self.N[1] * t)
+        return self.pts[m]
 
-    def setAtomList(self, atomlist):
-        self.atomlist = atomlist
+    def setNpts(self, Npts):
+        self.Npts = Npts
         return
 
     def setN (self, N):

@@ -145,6 +145,9 @@ class PESpoint:
         self.en = en
         return
 
+    def getEnergy(self):
+        return self.en
+
 
 # A class to define a potential energy surface.
 # N = a list of length 3 containing the number of grid points in each dimension
@@ -413,6 +416,9 @@ MassLookup = {
     "P-33": 32.97145891,
     "P-34": 33.967867,
     "P-36": 35.96708071,
+    "S-32": 31.97207117,
+    "S-33": 32.97145890,
+    "S-34": 33.96786701,
     "Cl-35": 34.96885268,
     "Cl-37": 36.9659026,
     "Ar-36": 35.96754511,

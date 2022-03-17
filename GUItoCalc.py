@@ -3,6 +3,7 @@ import os
 from tqdm.contrib.concurrent import process_map
 import Vmatrix
 import Tmatrix
+import Gmatrix
 import numpy as np
 import scipy
 import pandas as pd
@@ -50,18 +51,29 @@ def main():
 
 def passToCalc(dataObj):
     print("Got an object.")
-    print(dataObj)
+    #print(dataObj)
+    print("Creating GMatrix")
+    N = [dataObj.N1, dataObj.N2, dataObj.N3]
+    GMat = Gmatrix.calcGMatrix(N, dataObj.PES, dataObj.EquilMolecule)
     holder = DataObject.InputData()
     VMat = Vmatrix.VMatrixCalc(dataObj)
     print("Done with VMatrix")
-    TMat = Tmatrix.TMatrixCalc(dataObj)
+    TMat = Tmatrix.TMatrixCalc(dataObj, GMat)
     print("Done with TMatrix")
     HMat = VMat + TMat
-    pd.DataFrame(HMat).to_csv(holder.name_of_file + ".csv")
-    holder.Hmat = HMat
-    z = holder.name_of_file+".csv"
+    pd.DataFrame(HMat).to_csv(str(holder.name_of_file) + ".csv")
+    holder.setHmat(HMat)
+
+    print("Calculating eigenvalues")
+    eigenval,eigenvec = scipy.linalg.eigh(HMat)
+    eigenval = eigenval*219474.6
+    wfnorder = np.argsort(eigenval)
+    print("Eigenvalues:")
+    for i in range(1,20):
+        print(eigenval[wfnorder[i]]-eigenval[wfnorder[0]])
+    
+    z = str(holder.name_of_file)+".csv"
     window(z)
-    print(HMat)
     if os.path.exists("holder.csv"):
         os.remove("holder.csv")
 
@@ -70,4 +82,3 @@ def passToCalc(dataObj):
 
 if __name__ == '__main__':
     r = process_map(main, range(0, 30), max_workers=12)
-    #main()

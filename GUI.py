@@ -472,6 +472,7 @@ def main_window():
             holder.setL1(float(L1.get()))
             holder.setL2(float(L2.get()))
             holder.setL3(float(L3.get()))
+            holder.setcores_amount(max(1,int(cores.get())))
             holder.set_remote(SSH_box.get())
             print(holder.N1, holder.N2, " holder")
 

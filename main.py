@@ -42,7 +42,7 @@ def datamuncher(q):
         file.write('%s\n' % x)
     file.close()
 
-    #GTC.passToCalc(holder1)
+    GTC.passToCalc(holder1)
 
     q.put("object on queue")
 

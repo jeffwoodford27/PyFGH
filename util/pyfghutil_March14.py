@@ -1,7 +1,18 @@
+import scipy
+from scipy import interpolate
 import math
-
+from scipy import linalg
 import numpy as np
+import pandas
+import sys
+import csv
 
+class Molecule:
+    def __init__(self,s,m,x,y):
+        self.s = s
+        self.m = m
+        self.x = x
+        self.y = y
 
 # Object storing the parameters for the harmonic oscillator model.
 # V(q) = 1/2 k q**2
@@ -33,36 +44,33 @@ class MorseOscillatorModel:
         return self.mu
 
     def calcPotentialEnergy(self, x):
-        return self.De * (1 - math.exp(-self.a * x)) ** 2
+        return (self.De * (1 - math.exp(-self.a * x)) ** 2)
 
 
-# The Molecule class.  Defines a chemical molecule.
-# Z = a list of length 3 of atomic numbers of the atoms.
-# A = a list of length 3 of mass numbers of the atoms.
-# m = a list of length 3 of the masses of the atoms
-# x = a list of length 3 of the x coordinates of each atom
-# y = a list of length 3 of the y coordinates of each atom
+# The atom class.  Defines a chemical atom.
+# Z = atomic number of the atom.
+# s = atomic symbol of the atom, from a lookup dictionary (below).
+# A = mass number of the atom.
+# m = physical mass of the atom, from a lookup dictionary (below), converted from amu to atomic units
 
-class Molecule:
-    def __init__(self):
-        self.x = 0
-        self.y = 0
-        self.A = 0
-        self.Z = 0
-        self.m = 0
-        # self.m = MassLookup[self.s + "-" + str(self.A)] * 1822.89
+class Atom:
+    def __init__(self, Z, A, m, x, y):
+        self.x = x
+        self.y = y
+        self.A = A
+        self.Z = Z
+        self.m = m
+        #self.m = MassLookup[self.s + "-" + str(self.A)] * 1822.89
 
     def setAtomicNumber(self, Z):
         self.Z = Z
         return
 
     def getZ(self):
-        return self.Z
+        return self.z
 
-    """
     def getS(self):
-        return self.S
-    """
+        return self.s
 
     def getA(self):
         return self.A
@@ -76,41 +84,34 @@ class Molecule:
     def getY(self):
         return self.y
 
-    def setX(self, x):
+# A class to define a chemical structure.
+# Nat = number of atoms in the structure
+# at = a list of length Nat of Atom objects
+# x = a list of length Nat of x coordinates
+# y = a list of length Nat of y coordinates
+# z = a list of length Nat of z coordinates
+
+class Structure:
+    def __init__(self, Nat, at, x, y, z):
+        self.Nat = Nat
+        self.at = at
         self.x = x
-        return
-
-    def setY(self, y):
         self.y = y
-        return
+        self.z = z
 
-    def setA(self, A):
-        self.A = A
-        return
-
-    def setZ(self, Z):
-        self.Z = Z
-        return
-
-    def setM(self, m):
-        self.m = m
-        return
 
 # A class to define a point on the potential energy surface.
 # n = the number of the grid point (indexed from 0)
 # q = a list of length 3 to define the values of q for the grid point
-# x, y, z = a list of the x,y,z coordinates of the atoms at the point
+# struct = a member of class Structure to define the chemical structure at this point
 # en = the value of the potential energy at this point (in atomic units)
 
-
 class PESpoint:
-    def __init__(self):
-        self.n = 0
-        self.q = 0
-        self.x = 0
-        self.y = 0
-        self.z = 0
-        self.en = 0
+    def __init__(self, n, q, mol, en):
+        self.n = n
+        self.q = q
+        self.mol = mol
+        self.en = en
 
     def getq1(self):
         return self.q[0]
@@ -121,58 +122,101 @@ class PESpoint:
     def getq3(self):
         return self.q[2]
 
-    def setN(self, n):
-        self.n = n
-        return
+    def getMol(self):
+        return self.mol
 
-    def setQ(self, q):
-        self.q = q
-        return
-
-    def setX(self, x):
-        self.x = x
-        return
-
-    def setY(self, y):
-        self.y = y
-        return
-
-    def setZ(self, z):
-        self.z = z
-        return
-
-    def setEnergy(self, en):
-        self.en = en
-        return
+    def getEnergy(self):
+        return self.en
 
 
 # A class to define a potential energy surface.
+# atomlist = a list of length Nat containing members of the Atom class
 # N = a list of length 3 containing the number of grid points in each dimension
-# Npts = number of points in the PES
-# pts = a list of length Npts of PESpoint objects
-
+# df = a Pandas object containing the CSV data read in from the file
 
 class PotentialEnergySurface:
-    def __init__(self):
-        self.N = 0
-        self.Npts = 0
-        self.pts = []
-
-    def getPointByN(self, t, u, v):
-        m = v + self.N[2] * (u + self.N[1] * t)
-        return self.pts[m]
-
-    def setNpts(self, Npts):
-        self.Npts = Npts
-        return
-
-    def setN (self, N):
+    def __init__(self, N, df, equil):
+        s = equil.mol.s
+        m = equil.mol.m
         self.N = N
-        return
-    
-    def appendPESpt(self, pt):
-        self.pts.append(pt)
-        return
+        n = 0
+        self.pts = []
+        for i in range(N[0]):
+            self.pts.append([])
+            for j in range(N[1]):
+                self.pts[i].append([])
+                for k in range(N[2]):
+                    q = np.zeros(3)
+                    q[0] = df['q1'][n]
+                    q[1] = df['q2'][n]
+                    q[2] = df['q3'][n]
+                    x = np.zeros(3)
+                    x[0] = df['x1'][n]
+                    x[1] = df['x2'][n]
+                    x[2] = df['x3'][n]
+                    y = np.zeros(3)
+                    y[0] = df['y1'][n]
+                    y[1] = df['y2'][n]
+                    y[2] = df['y3'][n]
+                    mol = Molecule(s,m,x,y)
+                    en = df['en'][n]
+#                    if (en > 0.1):
+#                        en = 0.1
+                    self.pts[i][j].append(PESpoint(n,q,mol,en))
+                    n = n + 1
+
+    def getPointByN(self,t,u,v):
+        return self.pts[t][u][v]
+
+
+def eckartTranslation(N,pes,equil):
+    M = 0.0
+    for i in range(3):
+        M += equil.mol.m[i]
+
+    for i in range(N[0]):
+        for j in range(N[1]):
+            for k in range(N[2]):
+                xcm = ycm = 0.0
+                for p in range(3):
+                    xcm += pes.pts[i][j][k].mol.m[p]*pes.pts[i][j][k].mol.x[p]
+                    ycm += pes.pts[i][j][k].mol.m[p]*pes.pts[i][j][k].mol.y[p]
+                xcm = xcm/M
+                ycm = ycm/M
+                for p in range(3):
+                    pes.pts[i][j][k].mol.x[p] = pes.pts[i][j][k].mol.x[p] - xcm
+                    pes.pts[i][j][k].mol.y[p] = pes.pts[i][j][k].mol.y[p] - ycm
+
+    return
+
+def eckartRotation(N,pes,equil):
+    xeq = equil.mol.x
+    yeq = equil.mol.y
+    for i in range(N[0]):
+        for j in range(N[1]):
+            for k in range(N[2]):
+                numer = denom = 0.0
+                for p in range(3):
+                    m = pes.pts[i][j][k].mol.m[p]
+                    x = pes.pts[i][j][k].mol.x[p]
+                    y = pes.pts[i][j][k].mol.y[p]
+                    numer += m*(x*yeq[p] - y*xeq[p])
+                    denom += m*(x*xeq[p] + y*yeq[p])
+                theta = math.atan2(numer,denom)
+                for p in range(3):
+                    x = pes.pts[i][j][k].mol.x[p]
+                    y = pes.pts[i][j][k].mol.y[p]
+                    xnew = x*math.cos(theta) - y*math.sin(theta)
+                    ynew = x*math.sin(theta) + y*math.cos(theta)
+                    pes.pts[i][j][k].mol.x[p] = xnew
+                    pes.pts[i][j][k].mol.y[p] = ynew
+    return
+
+
+def compute_derivative (x, y):
+    spl = scipy.interpolate.splrep(x,y,s=0)
+    yprime = scipy.interpolate.splev(x,spl,der=1)
+    return yprime
 
 
 # A class to hold the calculation parameters.
@@ -732,6 +776,7 @@ MassLookup = {
     "Lv-293": 293.20449,
     "Ts-292": 292.20746,
     "Og-294": 294.21392
+
 
 }
 

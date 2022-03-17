@@ -17,7 +17,6 @@ class InputData:
 
     def __init__(self):
         self.name_of_file = 0
-        self.cores_amount = 1
         self.N1 = 0
         self.L1 = 0
         self.N2 = 0
@@ -34,6 +33,7 @@ class InputData:
         self.equilibrium_file = 0
         self.potential_energy_file = 0
         self.value_holder = 0
+        name_of_file = 0
 
         self.EquilMolecule = 0
         self.PES = 0
@@ -44,10 +44,6 @@ class InputData:
 
     def setvalue_holder(self, value_holder):
         self.value_holder = value_holder
-        return
-
-    def setcores_amount(self, cores):
-        self.cores_amount = cores
         return
 
     def setequilibrium_file(self, equilibrium_file):

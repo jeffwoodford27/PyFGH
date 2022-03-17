@@ -15,10 +15,6 @@ from util import model_objects
 import numpy as np
 from tkinter import filedialog as fd
 
-#TODO take the Atom class and add it to InputData so Nelson can grab it
-#TODO 3 Atom class. Have a list of the three members of the atom class. [Atom1, Atom2, Atom3]
-#TODO [List of all of the molecules] made into a equalibrium class.
-#TODO
 
 import csv
 
@@ -40,7 +36,6 @@ This is the main method.
 
 def main_window():
     holder = DataObject.InputData()
-
     def close_window():
         global running
         running = False
@@ -54,7 +49,7 @@ def main_window():
     running = True
     style = Style()
     window.title('PyFGH')
-    window.geometry('910x275')
+    window.geometry('910x425')
 
     # Water molecule icon in the top left conner
     window.iconbitmap(default='icon.ico')
@@ -79,6 +74,38 @@ def main_window():
 
     # definition for calculating core counts.
     # Label
+    ttk.Label(window, text="Molecule Specification:", font=("Times New Roman", 10)).place(x=200, y=50)
+    m = tk.StringVar()
+    molecule = ttk.Combobox(window, width=10, textvariable=m, state='readonly')
+
+    # creates values inside of the choice box
+    molecule["values"] = u'H\u2082O'
+
+    # Label
+    ttk.Label(window, text="Q\u2081:", font=("Times New Roman", 15)).place(x=425, y=47)
+    n = tk.StringVar()
+    q_equation1 = ttk.Combobox(window, width=15, textvariable=n)
+
+    # creates values inside of the choice box
+    q_equation1["values"] = (
+        'OH\u2081 Bond Stretch', 'OH\u2082 Bond Stretch', 'Symmetric Stretch', 'Asymmetric Stretch')
+
+    # Label
+    ttk.Label(window, text="Q\u2082:", font=("Times New Roman", 15)).place(x=590, y=47)
+    f = tk.StringVar()
+    q_equation2 = ttk.Combobox(window, width=15, textvariable=f)
+
+    # creates values inside of the choice box
+    q_equation2["values"] = (
+        'OH\u2081 Bond Stretch', 'OH\u2082 Bond Stretch', 'Symmetric Stretch', 'Asymmetric Stretch')
+
+    # Label
+    ttk.Label(window, text="Q\u2083:", font=("Times New Roman", 15)).place(x=755, y=47)
+    f2 = tk.StringVar()
+    q_equation3 = ttk.Combobox(window, width=15, textvariable=f2)
+
+    # creates values inside of the choice box
+    q_equation3["values"] = ('Angle', 'Cosine')
 
     # Label
     ttk.Label(window, text="N\u2081:", font=("Times New Roman", 15)).place(x=10, y=98)
@@ -141,7 +168,7 @@ def main_window():
     L3box = ttk.Combobox(window, textvariable=i5)
 
     # Label
-    ttk.Label(window, text="Equilibrium Coordinates:", font=("Times New Roman", 10)).place(x=645, y=50)
+    ttk.Label(window, text="Equilibrium Coordinates:", font=("Times New Roman", 10)).place(x=645, y=155)
 
     # Allows the user to chose a file in their file explorer
     def open_file():
@@ -164,38 +191,81 @@ def main_window():
 
     # Open Button
     open = tk.Button(window, text='Open', bd='5', bg='black', fg='white',
-                     command=open_file).place(x=795, y=45)
+                     command=open_file).place(x=795, y=150)
+
+    # Label
+    ttk.Label(window, text="T:", font=("Times New Roman", 20)).place(x=50, y=150)
+    b = tk.StringVar()
+    t = ttk.Combobox(window, width=15, textvariable=b)
+
+    # creates values inside of the choice box
+    t["values"] = (
+        'None', 'Approximation 1', 'Approximation 2', 'Approximation 3', 'Approximation 4', 'Approximation 5')
+
+    # Label
+    ttk.Label(window, text="G:", font=("Times New Roman", 20)).place(x=405, y=150)
+    c = tk.StringVar()
+    g = ttk.Combobox(window, width=15, textvariable=c)
+
+    # creates values inside of the choice box
+    g["values"] = 'q(x) = x', 'q(x) = x^2', 'q(x) = sinx', 'q(x) = cosx', 'Let us choose'
+
+    # TODO: if the user selects read from a file or compute on the fly disable the q, n, and l buttons!!!
+    # Label
+    v = []
+    value = 1
+    # This appends the models to the choice boxes for V
+    for i in range(3):
+        ttk.Label(window, text="V for Q" + str(i + 1) + ":", font=("Times New Roman", 15)).place(x=value, y=205)
+        d = tk.StringVar()
+        v.append(ttk.Combobox(window, width=32, textvariable=d))
+        v[i]["values"] = model_objects.Oscillator_List
+        value += 310
 
     # Button
     exit = tk.Button(window, text='Exit', bd='10', bg='red', fg='white',
-                     command=window.destroy).place(x=365, y=160)
+                     command=window.destroy).place(x=365, y=260)
 
     # Label for SSH
     SSH = ttk.Label(window, text="Run remotely:", font=("Times New Roman", 15))
     SSH.pack()
-    SSH.place(x=5, y=170)
+    SSH.place(x=5, y=270)
 
     b = tk.StringVar()
     SSH_box = ttk.Combobox(window, width=10, textvariable=b)
 
     # creates values inside of the choice box
     SSH_box["values"] = ('Yes', 'No')
-    SSH_box.place(x=125, y=173)
+    SSH_box.place(x=125, y=273)
 
     # This is just a method for testing the values
     def apioutput():
-
+        print(molecule.get())
+        print(q_equation1.get())
+        print(q_equation2.get())
+        print(q_equation3.get())
         print(N1.get())
         print(L1.get())
         print(N2.get())
         print(L2.get())
         print(N3.get())
         print(L3.get())
+        print(t.get())
+        print(g.get())
+        for i in range(3):
+            print(v[i].get())
 
     # This method clears all of the data in the GUI
     def clear_data():
         cores.set('')
-
+        molecule.set('')
+        q_equation1.set('')
+        q_equation2.set('')
+        q_equation3.set('')
+        t.set('')
+        g.set('')
+        for i in range(3):
+            v[i].set('')
         N1.delete(0, END)
         L1.delete(0, END)
         N2.delete(0, END)
@@ -455,6 +525,7 @@ def main_window():
     This also checks for validation rules also for the values that were inputted.
     """
 
+    value_holder=False
 
     def output():
         try:
@@ -465,27 +536,45 @@ def main_window():
             Fix N so that the user can not enter floating point values.
             """
 
-            print(DataObject.test.equilibrium_file)
-            holder.setN1(int(N1.get()))
-            holder.setN2(int(N2.get()))
-            holder.setN3(int(N3.get()))
-            holder.setL1(float(L1.get()))
-            holder.setL2(float(L2.get()))
-            holder.setL3(float(L3.get()))
+
+            holder.setMolecule(molecule.get())
+            print(holder.equilibrium_file)
+            holder.setQ1(q_equation1.get())
+            holder.setQ2(q_equation2.get())
+            holder.setQ3(q_equation3.get())
+            holder.setN1(N1.get())
+            holder.setN2(N2.get())
+            holder.setN3(N3.get())
+            holder.setL1(L1.get())
+            holder.setL2(L2.get())
+            holder.setL3(L3.get())
+            holder.setT(t.get())
+            holder.setG(g.get())
             holder.set_remote(SSH_box.get())
-            print(holder.N1, holder.N2, " holder")
 
-            print(holder.value_holder)
+            if value_holder:
+                molecule_gui.molecule_testing(int(holder.N1), int(holder.L1),
+                                              int(holder.N2),
+                                              int(holder.L2), int(holder.N3),
+                                              int(holder.L3))
 
-            if holder.value_holder:
-                eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
-                                          holder.N2, holder.L2, holder.N3,
-                                          holder.L3)
 
-                holder.setEquilMolecule(eq)
-                holder.setPES(pes)
+            for i in range(3):
+                holder.v.append(v[i].get())
 
-            if (int(holder.N1)) % 2 == 0:
+            # API_Class.outputAPI.items.file_name = filename
+            # This is where error checking takes place.
+
+            # These are validation rules for the input.
+            if q_equation1.get() == 'OH\u2081 Bond Stretch' and q_equation2.get() == 'OH\u2081 Bond Stretch':
+                messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
+                clear_data()
+
+            elif q_equation1.get() == 'OH\u2082 Bond Stretch' and q_equation2.get() == 'OH\u2082 Bond Stretch':
+                messagebox.showerror("PyFGH", "ERROR, Q\u2081 Bond and Q\u2082 Bond can not be the same!!!")
+                clear_data()
+            # this makes sure that the values are positive
+            elif (int(holder.N1)) % 2 == 0:
                 messagebox.showerror("PyFGH", "N must be odd!!!")
                 clear_data()
             elif (int(holder.N2)) % 2 == 0:
@@ -498,19 +587,19 @@ def main_window():
             elif int(holder.N1) < 0:
                 messagebox.showerror("PyFGH", "N must be positive!!!")
                 clear_data()
-            elif float(holder.L1) < 0:
+            elif int(holder.L1) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
             elif int(holder.N2) < 0:
                 messagebox.showerror("PyFGH", "N must be positive!!!")
                 clear_data()
-            elif float(holder.L2) < 0:
+            elif int(holder.L2) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
             elif int(holder.N3) < 0:
                 messagebox.showerror("PyFGH", "N must be positive!!!")
                 clear_data()
-            elif float(holder.L3) < 0:
+            elif int(holder.L3) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
             # This runs the model window when the user hits calculate.
@@ -523,8 +612,16 @@ def main_window():
                 function that will build the GUI parameter box depending on the dimensions and parameters of each 
                 unique model.
                 """
+                import inspect
+                holder_model = []
 
-                save_file_prompt()
+                for key, className in inspect.getmembers(model_objects):
+                    for i in range(3):
+                        if holder.v[i] == key:
+                            holder_model.append(className())
+
+                print(holder_model)
+                model_prompt(holder_model)
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")
@@ -534,11 +631,11 @@ def main_window():
 
     # This is the calculate button.
     calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',
-                          command=output).place(x=420, y=150)
+                          command=output).place(x=420, y=250)
 
     # This is the clear button.
     clear = tk.Button(window, text='Clear', bd='10', bg='blue', fg='white',
-                      command=clear_data).place(x=525, y=160)
+                      command=clear_data).place(x=525, y=260)
 
     # This method displays the about window in the GUI interface.
     def about_window():
@@ -557,7 +654,7 @@ def main_window():
 
     # This is the about button.
     about = tk.Button(window, text='About', bd='10', bg='purple', fg='white',
-                      command=about_window).place(x=590, y=160)
+                      command=about_window).place(x=590, y=260)
 
     # This method here displays the T equations.
     def t0():
@@ -609,28 +706,47 @@ def main_window():
 
         window.mainloop()
 
+    tbutton = tk.Button(window, text='Display T equation', bd='10', bg='orange', fg='white',
+                        command=t0).place(x=232, y=260)
     """
     This is a validation checker for the Read Structures button. You can not read in values and also try to run the 
     GUI interface at the same time.
     """
 
     def Read_Structures_Button():
-        """
+        def is_list_empty(list):
+            # checking the length
+            if len(list) == 0:
+                # returning true as length is 0
+                return True
+            # returning false as length is greater than 0
+            return False
+
+        if is_list_empty(v):
+            messagebox.showerror("PyFGH", "ERROR, Can not read data from file and have data from interface!!!")
+
+        else:
+
+            """
             Note: xlsx files are not accepted. Can only take CSV files or else the code will break.
             XLSX files do not abide by UTF-8 formatting and is a pain to get it to work. So to save everyone
             time just only use a CSV file format!!!!!!!!!! Excel has the ability to save it to CSV format. To find out 
             how to save it to that format, just google it. This is the end of my rant. Happy Coding!
-        """
+            """
+            global value_holder
+            value_holder = True
+            molecule_gui.getData()
+            molecule_gui.molecule_testing(int(holder.N1), int(holder.L1),
+                                          int(holder.N2),
+                                          int(holder.L2), int(holder.N3),
+                                          int(holder.L3))
 
-        x = askopenfilename()
-        y = askopenfilename()
-        DataObject.test.equilibrium_file = x
-        DataObject.test.potential_energy_file = y
-        holder.setvalue_holder(True)
+            close_window()
+
 
     # This is a button called Read Structures
     readbutton = tk.Button(window, text='Read Structures and Energies from File', bd='10', bg='gray', fg='white',
-                           command=Read_Structures_Button).place(x=360, y=220)
+                           command=Read_Structures_Button).place(x=360, y=320)
     # Disabled the compute button for now
     # compute = tk.Button(window, text='Compute on the fly', bd='10', bg='gray', fg='white',
     #                    command=open_file).place(x=410, y=370)
@@ -641,7 +757,25 @@ def main_window():
     # This places a lot of things in the GUI
     cores.place(x=105, y=50)
     cores.current()
+    molecule.place(x=330, y=50)
+    molecule.current()
+    q_equation1.place(x=455, y=50)
+    q_equation1.current()
+    q_equation2.place(x=620, y=50)
+    q_equation2.current()
+    q_equation3.place(x=785, y=50)
+    q_equation3.current()
+    t.place(x=80, y=157)
+    t.current()
+    g.place(x=440, y=157)
+    g.current()
     vales2 = 80
+
+    for i in range(3):
+        v[i].place(x=vales2, y=207, width=175)
+        v[i].current()
+        vales2 += 310
+
     N1.place(x=40, y=100, width=100)
     L1.place(x=185, y=100, width=100)
     N2.place(x=340, y=100, width=100)
@@ -650,5 +784,5 @@ def main_window():
     L3.place(x=800, y=100, width=100)
 
     window.mainloop()
-    print("after mainloop")
+    print ("after mainloop")
     return holder

@@ -741,6 +741,8 @@ MassLookup = {
 
 }
 
+<<<<<<< HEAD
+=======
 """
 This is the original not edited version!
 MassLookup = {
@@ -1100,3 +1102,4 @@ MassLookup = {
     "Og-294": 294.21392
 
 """
+>>>>>>> origin/devel

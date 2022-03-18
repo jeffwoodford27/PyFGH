@@ -1,6 +1,6 @@
-#Interface between GUI and Calculation Scripts
+# Interface between GUI and Calculation Scripts
 import os
-from tqdm.contrib.concurrent import process_map
+# from tqdm.contrib.concurrent import process_map
 import Vmatrix
 import Tmatrix
 import Gmatrix
@@ -45,13 +45,14 @@ def window(x):
     SHBar.config(command=listbox1.xview)
     root.mainloop()
 
+
 def main():
     pass
 
 
 def passToCalc(dataObj):
     print("Got an object.")
-    #print(dataObj)
+    # print(dataObj)
     print("Creating GMatrix")
     N = [dataObj.N1, dataObj.N2, dataObj.N3]
     GMat = Gmatrix.calcGMatrix(N, dataObj.PES, dataObj.EquilMolecule)
@@ -65,20 +66,19 @@ def passToCalc(dataObj):
     holder.setHmat(HMat)
 
     print("Calculating eigenvalues")
-    eigenval,eigenvec = scipy.linalg.eigh(HMat)
-    eigenval = eigenval*219474.6
+    eigenval, eigenvec = scipy.linalg.eigh(HMat)
+    eigenval = eigenval * 219474.6
     wfnorder = np.argsort(eigenval)
     print("Eigenvalues:")
-    for i in range(1,20):
-        print(eigenval[wfnorder[i]]-eigenval[wfnorder[0]])
-    
-    z = str(holder.name_of_file)+".csv"
+    for i in range(1, 20):
+        print(eigenval[wfnorder[i]] - eigenval[wfnorder[0]])
+
+    z = str(holder.name_of_file) + ".csv"
     window(z)
     if os.path.exists("holder.csv"):
         os.remove("holder.csv")
 
 
-
-
+# r = process_map(main, range(0, 30), max_workers=12)
 if __name__ == '__main__':
-    r = process_map(main, range(0, 30), max_workers=12)
+    main()

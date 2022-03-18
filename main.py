@@ -6,6 +6,7 @@ from multiprocessing import Process, Queue, Pool
 import GUItoCalc as GTC
 from multiprocessing import Pool
 import time
+from util import DataObject
 from tqdm import *
 
 """
@@ -15,6 +16,7 @@ Also connected to test3.py
 Author: Josiah Randleman
 © Copyright 2021, Josiah Randleman, All rights reserved. jrandl516@gmail.com
 """
+
 
 # This is the parent process
 def datamuncher(q):
@@ -27,11 +29,9 @@ def datamuncher(q):
     print("L2: ", holder1.L2)
     print("N3: ", holder1.N3)
     print("L3: ", holder1.L3)
-    #print("Filename: ", holder1.file_name)
+    # print("Filename: ", holder1.file_name)
     data = [holder1.equilibrium_file, holder1.N1, holder1.L1, holder1.N2,
             holder1.L2, holder1.N3, holder1.L3]
-
-
 
     print("Energy from Main: ", holder1.PES.pts[0].en)
     save_path = "./resources/"
@@ -42,48 +42,118 @@ def datamuncher(q):
         file.write('%s\n' % x)
     file.close()
 
-    GTC.passToCalc(holder1)
-
-    q.put("object on queue")
-
     def SSH_connection():
+        #TODO Make new files for the remote main!
+        #TODO Add these variables to the remote files!
+
+        DataObject.test.testing = holder1
+        DataObject.test.N1 = holder1.N1
+        DataObject.test.N2 = holder1.N2
+        DataObject.test.N3 = holder1.N3
+        DataObject.test.L1 = holder1.L1
+        DataObject.test.L2 = holder1.L2
+        DataObject.test.L3 = holder1.L3
+
         host = holder1.host
         port = 22
         username = holder1.user
         password = holder1.password
-        command = "python3 test3.py"
-        command2 = "rm DataList.txt"
-        command3 = "rm test3.py"
-        command4 = "rm Results.txt"
+
+        command = "python3 RemoteMain.py"
+        command2 = "rm RemoteMain.py"
+        command3 = "rm GUItoCalc.py"
+        command4 = "rm Vmatrix.py"
+        command5 = "rm Tmatrix.py"
+        command6 = "rm Gmatrix.py"
+        command7 = "rm -vr util"
+        command8 = "rm -vr __pycache__"
 
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(host, port, username, password)
         sftp = ssh.open_sftp()
 
-        path = "/home/" + username + "/DataList.txt"
-        localpath = "./resources/DataList.txt"
+        path = "/home/" + username + "/RemoteMain.py"
+        localpath = "RemoteMain.py"
         sftp.put(localpath, path)
-        path2 = "/home/" + username + "/test3.py"
-        localpath2 = "test3.py"
+
+        path1 = "/home/" + username + "/GUItoCalc.py"
+        localpath1 = "GUItoCalc.py"
+        sftp.put(localpath1, path1)
+
+        path2 = "/home/" + username + "/Vmatrix.py"
+        localpath2 = "Vmatrix.py"
         sftp.put(localpath2, path2)
+
+        path3 = "/home/" + username + "/Tmatrix.py"
+        localpath3 = "Tmatrix.py"
+        sftp.put(localpath3, path3)
+
+        path4 = "/home/" + username + "/Gmatrix.py"
+        localpath4 = "Gmatrix.py"
+        sftp.put(localpath4, path4)
+
+        command10 = "mkdir util"
+
+        stdin, stdout, stderr = ssh.exec_command(command10)
+
+        path5 = "/home/" + username + "/util/DataObject.py"
+        localpath5 = "./util/DataObject.py"
+        sftp.put(localpath5, path5)
+
+        path6 = "/home/" + username + "/util/model_objects.py"
+        localpath6 = "./util/model_objects.py"
+        sftp.put(localpath6, path6)
+
+        path7 = "/home/" + username + "/util/pyfghutil.py"
+        localpath7 = "./util/pyfghutil.py"
+        sftp.put(localpath7, path7)
+        """
         stdin, stdout, stderr = ssh.exec_command(command)
         stdin, stdout, stderr = ssh.exec_command(command2)
         stdin, stdout, stderr = ssh.exec_command(command3)
-        path3 = "/home/" + username + "/Results.txt"
-        localpath3 = "./resources/Results.txt"
-        sftp.get(path3, localpath3)
         stdin, stdout, stderr = ssh.exec_command(command4)
+        stdin, stdout, stderr = ssh.exec_command(command5)
+        stdin, stdout, stderr = ssh.exec_command(command6)
+        stdin, stdout, stderr = ssh.exec_command(command7)
+        stdin, stdout, stderr = ssh.exec_command(command8)
+        """
+
+        """
+                path = "/home/" + username + "/DataList.txt"
+                localpath = "./resources/DataList.txt"
+                sftp.put(localpath, path)
+                path2 = "/home/" + username + "/test3.py"
+                localpath2 = "test3.py"
+                sftp.put(localpath2, path2)
+                stdin, stdout, stderr = ssh.exec_command(command)
+                stdin, stdout, stderr = ssh.exec_command(command2)
+                stdin, stdout, stderr = ssh.exec_command(command3)
+                path3 = "/home/" + username + "/Results.txt"
+                localpath3 = "./resources/Results.txt"
+                sftp.get(path3, localpath3)
+                #stdin, stdout, stderr = ssh.exec_command(command4)
+
+        """
+
         sftp.close()
         ssh.close()
 
-    if holder1.remote == 'Yes':
+    if holder1.remote == 1:
         SSH_connection()
 
+        GTC.passToCalc(holder1)
+        q.put("object on queue")
+
+    else:
+        GTC.passToCalc(holder1)
+
+        q.put("object on queue")
 
     # print("File Name : ", holder1.file_name, " This is from the child process")
     # print("Model Data : ", holder1.model_data, " This is from the child process")
     return
+
 
 # this is the parent process
 def datagrabber():
@@ -98,7 +168,7 @@ def datagrabber():
     # holder.setModelData(DataObject.holdData.model_data)  # look into pickling possibly un-pickling
     q.put(holder)
 
-    #At this point, insert the data into the handler
+    # At this point, insert the data into the handler
 
     ReturnData = q.get()  # an object of type OutputData
     print(ReturnData)

@@ -370,6 +370,15 @@ def main_window():
             print(holder.host, holder.user, holder.password)
 
 
+            holder.set_remote(1)
+
+            eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
+                                                    holder.N2, holder.L2, holder.N3,
+                                                    holder.L3)
+
+            holder.setEquilMolecule(eq)
+            holder.setPES(pes)
+
             save_file_prompt()
 
         Enter = tk.Button(window3, text='Enter', bd='15', bg='green', fg='white',
@@ -385,23 +394,21 @@ def main_window():
         if holder.value_holder:
             if SSH_box.get() == 'Yes':
                 SSH_prompt()
-                eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
-                                                        holder.N2, holder.L2, holder.N3,
-                                                        holder.L3)
-
-                holder.setEquilMolecule(eq)
-                holder.setPES(pes)
             else:
                 eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
                                                         holder.N2, holder.L2, holder.N3,
                                                         holder.L3)
-
                 holder.setEquilMolecule(eq)
                 holder.setPES(pes)
                 save_file_prompt()
 
         else:
-            save_file_prompt()
+            if SSH_box.get() == 'Yes':
+                holder.set_remote(1)
+                SSH_prompt()
+            else:
+                save_file_prompt()
+
 
 
 

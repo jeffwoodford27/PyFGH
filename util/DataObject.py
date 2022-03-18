@@ -8,10 +8,22 @@ values from the input. After the GUI is terminated, these new values can be call
 class test:
     equilibrium_file = 0
     potential_energy_file = 0
+    testing = 0
+    N1 = 0
+    L1 = 0
+    N2 = 0
+    L2 = 0
+    N3 = 0
+    L3 = 0
 
     def setEqulibrium(self, equilibrium_file):
         self.equilibrium_file = equilibrium_file
         return
+
+    def settesting(self, testing):
+        self.testing = testing
+        return
+
 
 class InputData:
 
@@ -38,9 +50,12 @@ class InputData:
         self.EquilMolecule = 0
         self.PES = 0
 
+
+
     """
     The following methods are setters. These values get set in test1.py
     """
+
 
     def setvalue_holder(self, value_holder):
         self.value_holder = value_holder

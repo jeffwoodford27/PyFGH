@@ -360,82 +360,7 @@ def main_window():
         Password_entry.place(x=115, y=103)
 
         # For running slum on a server
-        def Srun():
-            window1 = tk.Tk()
-            style = Style()
-            window1.title('Srun Configuration')
-            window1.geometry('300x300')
-            window.iconbitmap(default='key.ico')
-            text = "Srun Configuration"
-            Remote = ttk.Label(window1, text=text, font=("Times New Roman", 15), background='green',
-                               foreground="white")
-            Remote.pack()
-            Remote.place(x=75, y=0)
 
-            Partition = ttk.Label(window1, text="Partition:", font=("Times New Roman", 18))
-            Partition.pack()
-            Partition.place(x=20, y=30)
-
-            Partition_entry = ttk.Entry(window1, font=("Times New Roman", 12))
-            zebra2 = tk.StringVar()
-            Partition_box = ttk.Combobox(window1, textvariable=zebra2)
-            Partition_entry.place(x=115, y=32)
-
-            QOS = ttk.Label(window1, text="QOS:", font=("Times New Roman", 18))
-            QOS.pack()
-            QOS.place(x=50, y=65)
-
-            QOS_entry = ttk.Entry(window1, font=("Times New Roman", 12))
-            lion2 = tk.StringVar()
-            Echo2 = ttk.Combobox(window1, textvariable=lion2)
-            QOS_entry.place(x=115, y=68)
-
-            Cores = ttk.Label(window1, text="Cores:", font=("Times New Roman", 18))
-            Cores.pack()
-            Cores.place(x=45, y=100)
-
-            Cores_entry = ttk.Entry(window1, font=("Times New Roman", 12))
-            tiger2 = tk.StringVar()
-            Hunter2 = ttk.Combobox(window1, textvariable=tiger2)
-            Cores_entry.place(x=115, y=103)
-
-            Memory = ttk.Label(window1, text="Memory:", font=("Times New Roman", 18))
-            Memory.pack()
-            Memory.place(x=20, y=130)
-
-            Memory_entry = ttk.Entry(window1, font=("Times New Roman", 12))
-            tiger3 = tk.StringVar()
-            Hunter3 = ttk.Combobox(window1, textvariable=tiger3)
-            Memory_entry.place(x=115, y=135)
-
-            Memory = ttk.Label(window1, text="Time:", font=("Times New Roman", 18))
-            Memory.pack()
-            Memory.place(x=50, y=165)
-
-            Memory_entry = ttk.Entry(window1, font=("Times New Roman", 12))
-            tiger3 = tk.StringVar()
-            Hunter3 = ttk.Combobox(window1, textvariable=tiger3)
-            Memory_entry.place(x=115, y=170)
-
-            PTY = ttk.Label(window1, text="PTY:", font=("Times New Roman", 18))
-            PTY.pack()
-            PTY.place(x=55, y=200)
-
-            PTY_entry = ttk.Entry(window1, font=("Times New Roman", 12))
-            leopard = tk.StringVar()
-            Omega = ttk.Combobox(window1, textvariable=leopard)
-            PTY_entry.place(x=115, y=203)
-
-            Enter2 = tk.Button(window1, text='Enter', bd='15', bg='green', fg='white',
-                               command=window1.destroy).place(x=120, y=235)
-            window3.destroy()
-            window1.mainloop()
-
-        var1 = tk.IntVar()
-        c1 = tk.Checkbutton(window3, text='Configure with srun', font=("Times New Roman", 15), variable=var1, onvalue=1,
-                            offvalue=0, command=Srun)
-        c1.pack()
-        c1.place(x=60, y=130)
 
         def Enter():
             holder.host = Host_entry.get()
@@ -443,6 +368,8 @@ def main_window():
             holder.password = Password_entry.get()
             window3.destroy()
             print(holder.host, holder.user, holder.password)
+
+
             save_file_prompt()
 
         Enter = tk.Button(window3, text='Enter', bd='15', bg='green', fg='white',
@@ -454,6 +381,28 @@ def main_window():
     This method gets called when the GUI is terminated. This saves the values from the input to the DataObject file.
     This also checks for validation rules also for the values that were inputted.
     """
+    def test():
+        if holder.value_holder:
+            if SSH_box.get() == 'Yes':
+                SSH_prompt()
+                eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
+                                                        holder.N2, holder.L2, holder.N3,
+                                                        holder.L3)
+
+                holder.setEquilMolecule(eq)
+                holder.setPES(pes)
+            else:
+                eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
+                                                        holder.N2, holder.L2, holder.N3,
+                                                        holder.L3)
+
+                holder.setEquilMolecule(eq)
+                holder.setPES(pes)
+                save_file_prompt()
+
+        else:
+            save_file_prompt()
+
 
 
     def output():
@@ -478,13 +427,6 @@ def main_window():
 
             print(holder.value_holder)
 
-            if holder.value_holder:
-                eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
-                                          holder.N2, holder.L2, holder.N3,
-                                          holder.L3)
-
-                holder.setEquilMolecule(eq)
-                holder.setPES(pes)
 
             if (int(holder.N1)) % 2 == 0:
                 messagebox.showerror("PyFGH", "N must be odd!!!")
@@ -524,8 +466,11 @@ def main_window():
                 function that will build the GUI parameter box depending on the dimensions and parameters of each 
                 unique model.
                 """
+                test()
 
-                save_file_prompt()
+
+
+
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")

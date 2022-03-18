@@ -1,40 +1,4 @@
-import math
-
 import numpy as np
-
-
-# Object storing the parameters for the harmonic oscillator model.
-# V(q) = 1/2 k q**2
-# mu is needed for the kinetic energy calculation.
-
-class HarmonicOscillatorModel:
-    def __init__(self, mu, k):
-        self.mu = mu
-        self.k = k
-
-    def getMu(self):
-        return self.mu
-
-    def calcPotentialEnergy(self, x):
-        return (0.5 * self.k * x * x)
-
-
-# Object storing the parameters for the Morse Oscillator Model:
-# V(q) = De*(1-exp(-a*q))^2
-# mu is needed for the kinetic energy calculation.
-
-class MorseOscillatorModel:
-    def __init__(self, mu, De, a):
-        self.mu = mu
-        self.De = De
-        self.a = a
-
-    def getMu(self):
-        return self.mu
-
-    def calcPotentialEnergy(self, x):
-        return self.De * (1 - math.exp(-self.a * x)) ** 2
-
 
 # The Molecule class.  Defines a chemical molecule.
 # Z = a list of length 3 of atomic numbers of the atoms.
@@ -741,8 +705,7 @@ MassLookup = {
 
 }
 
-<<<<<<< HEAD
-=======
+
 """
 This is the original not edited version!
 MassLookup = {
@@ -1102,4 +1065,4 @@ MassLookup = {
     "Og-294": 294.21392
 
 """
->>>>>>> origin/devel
+

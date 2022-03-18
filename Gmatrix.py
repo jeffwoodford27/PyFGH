@@ -4,10 +4,17 @@ import math
 from scipy import linalg
 import numpy as np
 
+# Computes the derivative dy/dx.  x and y are numpy objects that have the same length.
+
 def compute_derivative (x, y):
     spl = scipy.interpolate.splrep(x,y,s=0)
     yprime = scipy.interpolate.splev(x,spl,der=1)
     return yprime
+
+# Applies the Eckart translation condition to all the points in the PES.
+# N = a list of length 3 with the number of grid points in each dimension
+# pes = the PES object containing the N1xN2xN3 points
+# equil = the Molecule object containing the equilibrium molecular structure
 
 def eckartTranslation(N,pes,equil):
     m = equil.getM()
@@ -35,6 +42,11 @@ def eckartTranslation(N,pes,equil):
                 pes.getPointByN(i,j,k).setY(ynew)
     return
 
+# Applies the Eckart rotation condition to all the points in the PES.
+# N = a list of length 3 with the number of grid points in each dimension
+# pes = the PES object containing the N1xN2xN3 points
+# equil = the Molecule object containing the equilibrium molecular structure
+
 def eckartRotation(N,pes,equil):
     xeq = equil.getX()
     yeq = equil.getY()
@@ -58,10 +70,19 @@ def eckartRotation(N,pes,equil):
                 pes.getPointByN(i,j,k).setY(ynew)
     return
 
+# Calculates the G matrix at each PES point.
+# It actually calculates the inverse of the G matrix and then inverts each one.
+# N = a list of length 3 with the number of grid points in each dimension
+# pes = the PES object containing the N1xN2xN3 points
+# equil = the Molecule object containing the equilibrium molecular structure
+
 def calcGMatrix(N,pes,equil):
+
+    # First, make sure that the Eckart conditions are applied to each PES point
     eckartTranslation(N,pes,equil)
     eckartRotation(N,pes,equil)
 
+    # Create the N1xN2xN3 objects that will hold the derivatives
     dx1dq1 = np.zeros([N[0],N[1],N[2]])
     dy1dq1 = np.zeros([N[0],N[1],N[2]])
     dx2dq1 = np.zeros([N[0],N[1],N[2]])
@@ -80,6 +101,8 @@ def calcGMatrix(N,pes,equil):
     dy2dq3 = np.zeros([N[0],N[1],N[2]])
     dx3dq3 = np.zeros([N[0],N[1],N[2]])
     dy3dq3 = np.zeros([N[0],N[1],N[2]])
+
+    # Compute dxi/dq3 and dyi/dq3 (i = 1,2,3) at each PES point
 
     for i in range(N[0]):
         for j in range(N[1]):
@@ -114,6 +137,7 @@ def calcGMatrix(N,pes,equil):
                 dx3dq3[i][j][k] = x3p[k]
                 dy3dq3[i][j][k] = y3p[k]
 
+    # Compute dxi/dq2 and dyi/dq2 (i = 1,2,3) at each PES point
     for i in range(N[0]):
         for k in range(N[2]):
             q2 = np.zeros(N[1])
@@ -147,6 +171,7 @@ def calcGMatrix(N,pes,equil):
                 dx3dq2[i][j][k] = x3p[j]
                 dy3dq2[i][j][k] = y3p[j]
 
+    # Compute dxi/dq1 and dyi/dq1 (i = 1,2,3) at each PES point
     for j in range(N[1]):
         for k in range(N[2]):
             q1 = np.zeros(N[0])
@@ -180,12 +205,19 @@ def calcGMatrix(N,pes,equil):
                 dx3dq1[i][j][k] = x3p[i]
                 dy3dq1[i][j][k] = y3p[i]
 
+    # Get the mass of each atom
     m = equil.getM()
     m1 = m[0]
     m2 = m[1]
     m3 = m[2]
 
+    # Create the numpy object that will hold the G matrix
+    # Gmatrix[i][j][k][r][s] = the G(r,s) element for PES point (i,j,k)
+
     Gmatrix = np.zeros([N[0],N[1],N[2],3,3],float)
+
+    # Calculate the inverted G matrix at each PES point, then invert it,
+    # and store the result in Gmatrix.
 
     for i in range(N[0]):
         for j in range(N[1]):

@@ -1,3 +1,4 @@
+import csv
 import os
 import paramiko
 import GUI
@@ -53,11 +54,52 @@ def datamuncher(q):
         DataObject.test.L1 = holder1.L1
         DataObject.test.L2 = holder1.L2
         DataObject.test.L3 = holder1.L3
+        print("N1: ", DataObject.test.N1)
 
-        host = holder1.host
+        header = [holder1.N1, holder1.N2, holder1.N3, holder1.L1, holder1.L2, holder1.L3]
+        header2 = [holder1.PES]
+        header3 = [holder1.EquilMolecule]
+
+        with open('countries.csv', 'w', encoding='UTF8') as f:
+            writer = csv.writer(f)
+
+            # write the header
+            writer.writerow(header)
+
+            # write the data
+            #writer.writerow(data)
+
+            #writer.writerow(data2)
+            f.close()
+
+        with open('PES.csv', 'w', encoding='UTF8') as f:
+            writer = csv.writer(f)
+
+            # write the header
+            writer.writerow(header2)
+
+            # write the data
+            #writer.writerow(data)
+
+            #writer.writerow(data2)
+            f.close()
+
+        with open('EquilMolecule.csv', 'w', encoding='UTF8') as f:
+            writer = csv.writer(f)
+
+            # write the header
+            writer.writerow(header3)
+
+            # write the data
+            #writer.writerow(data)
+
+            #writer.writerow(data2)
+            f.close()
+
+        host = "euclid.chem.missouriwestern.edu" #holder1.host
         port = 22
-        username = holder1.user
-        password = holder1.password
+        username = "jrandleman" #holder1.user
+        password = "Huskers1"#holder1.password
 
         command = "python3 RemoteMain.py"
         command2 = "rm RemoteMain.py"
@@ -73,24 +115,36 @@ def datamuncher(q):
         ssh.connect(host, port, username, password)
         sftp = ssh.open_sftp()
 
+        path12 = "/home/" + username + "/EquilMolecule.csv"
+        localpath12 = "EquilMolecule.csv"
+        sftp.put(localpath12, path12)
+
+        path11 = "/home/" + username + "/PES.csv"
+        localpath11 = "PES.csv"
+        sftp.put(localpath11, path11)
+
+        path10 = "/home/" + username + "/countries.csv"
+        localpath10 = "countries.csv"
+        sftp.put(localpath10, path10)
+
         path = "/home/" + username + "/RemoteMain.py"
         localpath = "RemoteMain.py"
         sftp.put(localpath, path)
 
-        path1 = "/home/" + username + "/GUItoCalc.py"
-        localpath1 = "GUItoCalc.py"
+        path1 = "/home/" + username + "/RemoteGUItoCalc.py"
+        localpath1 = "RemoteGUItoCalc.py"
         sftp.put(localpath1, path1)
 
-        path2 = "/home/" + username + "/Vmatrix.py"
-        localpath2 = "Vmatrix.py"
+        path2 = "/home/" + username + "/RemoteVmatrix.py"
+        localpath2 = "RemoteVmatrix.py"
         sftp.put(localpath2, path2)
 
-        path3 = "/home/" + username + "/Tmatrix.py"
-        localpath3 = "Tmatrix.py"
+        path3 = "/home/" + username + "/RemoteTmatrix.py"
+        localpath3 = "RemoteTmatrix.py"
         sftp.put(localpath3, path3)
 
-        path4 = "/home/" + username + "/Gmatrix.py"
-        localpath4 = "Gmatrix.py"
+        path4 = "/home/" + username + "/RemoteGmatrix.py"
+        localpath4 = "RemoteGmatrix.py"
         sftp.put(localpath4, path4)
 
         command10 = "mkdir util"

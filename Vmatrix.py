@@ -1,28 +1,7 @@
 #Import the needed modules
 import numpy as np
-from util import pyfghutil, DataObject
-import math
+from util import pyfghutil
 import multiprocessing as mp
-import sys
-import pandas
-
-
-class HarmonicOscillatorModel:
-    def __init__(self,k):
-        self.k = k
-
-class MorseOscillatorModel:
-    def __init__(self,De,a):
-        self.De = De
-        self.a = a
-
-class Molecule:
-    def __init__(self, D, N, L, mu, Vtype, Vmodel):
-        self.N = N
-        self.L = L
-        self.mu = mu
-        self.Vtype = Vtype
-        self.Vmodel = Vmodel
 
 class NBlock:
     def __init__(self, D, NValues):
@@ -39,10 +18,10 @@ class NBlock:
             self.difblocks = [None]*(self.N-1)
             for x in range(self.N):
                 self.diagblocks[x] = NBlock(D-1, NValues)
-                    
+
             for y in range(self.N-1):
                 self.difblocks[y] = NBlock(D-1, NValues)
-                
+
         else:
             self.difblocks = np.zeros((self.N, self.N), float)
     def difSetup(self):
@@ -51,12 +30,12 @@ class NBlock:
                 self.diagblocks[x].xboffset = self.xboffset + int(x * (self.NProd/self.SmallestN))
                 self.diagblocks[x].yboffset = self.yboffset + int(x * (self.NProd/self.SmallestN))
                 self.diagblocks[x].difSetup()
-                        
+
             for y in range(self.N-1):
                 self.difblocks[y].xboffset = self.xboffset + 0
                 self.difblocks[y].yboffset = self.yboffset + 1+int(y * (self.NProd/self.SmallestN))
                 self.difblocks[y].difSetup()
-                
+
     def coordGen(self):
         if(self.D>1):
             coords = []
@@ -67,7 +46,7 @@ class NBlock:
             return(coords)
         elif(self.D == 1):
             return([(self.xboffset, self.yboffset)])
-            
+
     def print1x1(self):
         if(self.D != 1):
             blank = 0
@@ -141,11 +120,11 @@ def Vab(d, NValue, LValue, deltax, pes, dimensionCounterArray):
         if(dimensionCounterArray[Vcounter*2] == dimensionCounterArray[(Vcounter*2)+1]):
             Deltacounter += 1
     #If the deltacounter amount equals the amount of dimensions, perform a summation for the formula
-    #Otherwise, the total will remain 0.0 
+    #Otherwise, the total will remain 0.0
     if (Deltacounter == d):
         total += pes.getPointByN(int(dimensionCounterArray[1]),int(dimensionCounterArray[3]),int(dimensionCounterArray[5])).getEnergy()
-        
-    return(total)        
+
+    return(total)
 
 def VBlockCalc(dimensions, NValue, LValue, pes, blockX, blockY):
     #Blocks will be 0 index
@@ -176,7 +155,7 @@ def VMatrixCalc(dataObject):
     if(int(dataObject.N3) > 0):
         NValue.append(int(dataObject.N3))
         LValue.append(float(dataObject.L3))
-        
+
     dimensions = len(NValue)
     pes = dataObject.PES
 
@@ -208,12 +187,12 @@ def VMatrixCalc(dataObject):
 
     #Pool and run
     p = mp.Pool(dataObject.cores_amount)
-    print("Pool go V")
+    #print("Pool go V")
     blocks = p.starmap(VBlockCalc, paramz)
-    print("Pool's done V")
+    #print("Pool's done V")
     p.close()
-    
-    
+
+
     precalc = 0
     for i in range(len(optBlockCoords)):
         block = blocks[i]

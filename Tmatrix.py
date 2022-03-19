@@ -1,14 +1,15 @@
-#Import the needed modules
 import numpy as np
-import scipy as scipy
-import scipy.linalg
-from util import pyfghutil, DataObject
+from util import pyfghutil
 import math
 import multiprocessing as mp
-import sys
-import pandas
 
 #A function to calculate the BMatrix
+# B(j,l) = ((4*pi)/(L*N) * sum(p=1,n)(p*sin(2*pi*p*(l-j)/N))
+# where n = (N-1)/2
+# LValue = L = length of the dimension
+# NValue = N = number of points in the dimension
+# Each dimension has its own set of B matrices
+
 def bmatrixgen(NValue, LValue):
     n = int((NValue - 1)/2)
     b_matrix = np.zeros((NValue, NValue), float)
@@ -21,11 +22,17 @@ def bmatrixgen(NValue, LValue):
     return(b_matrix)
 
 #A function to calculate the CMatrix
+# C(j,l) = ((-8*pi*pi)/(L*L*N) * sum(p=1,n)(p*p*cos(2*pi*p*(l-j)/N))
+# where n = (N-1)/2
+# LValue = L = length of the dimension
+# NValue = N = number of points in the dimension
+# Each dimension has its own set of C matrices
+
 def cmatrixgen(NValue, LValue):
     #Generate the CMatrix
-    c_matrix_local = scipy.zeros((NValue, NValue), float)
+    c_matrix_local = np.zeros((NValue, NValue), float)
     #Calculate the similar values shared between x,y differences to improve efficiency
-    difc_matrix = scipy.zeros((NValue, 1), float)
+    difc_matrix = np.zeros((NValue, 1), float)
     for a in range(NValue):
         for b in range(int((NValue-1)/2)):
             difc_matrix[a] += (((b+1)*(b+1))*math.cos(((b+1)*2*math.pi*a)/ NValue))
@@ -38,6 +45,9 @@ def cmatrixgen(NValue, LValue):
     return c_matrix_local
 
 #A function to calculate the individual values for the TMatrix
+# Right now, only "approximation 2" is tested.  The other approximations will be for a
+# future release.
+
 def Tab(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray, approximation, b_matrix_insert, GMat):
     #Deltacounter is used to makes sure that the value being calculated is in the diagonal of the matrix
     Deltacounter = 0
@@ -131,11 +141,13 @@ def Tab(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray, approxima
         exit()                
 
     return(total)        
-    #return(total*((-1.0*1.0**2)/(2.0*mu)))        
+
+# A function that splits the Tmatrix calculation into blocks to be calculated in parallel.
+# Each block uses the Tab function above to calculate individual matrix elements.
 
 def TBlockCalc(dimensions, NValue, LValue, mu, c_matrix, approximation, blockX, blockY, b_matrix, gmatrix):
     #Blocks will be 0 index
-    blockHolder = scipy.zeros((NValue[0], NValue[0]), float)
+    blockHolder = np.zeros((NValue[0], NValue[0]), float)
     #The 0Start variables will always be 0 at the beginning to act as loop variables that correspond to the blockHolder size
     alpha0start = 0
     beta0start = 0
@@ -154,7 +166,7 @@ def TBlockCalc(dimensions, NValue, LValue, mu, c_matrix, approximation, blockX, 
         beta0start = 0
     return blockHolder
 
-#The function to calculate a TMatrix using the mol class from input
+#The function to calculate a TMatrix using the dataObject class from input
 def TMatrixCalc(dataObject, GMatrix):
     #Establish variables needed
     NValue = []
@@ -170,14 +182,14 @@ def TMatrixCalc(dataObject, GMatrix):
         LValue.append(float(dataObject.L3))
     D = len(NValue)
     pes = dataObject.PES
-    dimensionCounterArray = scipy.zeros(D*2, int)
+    dimensionCounterArray = np.zeros(D*2, int)
     mu = []
     Tapprox = 2
 
     #Create the TMatrix and the TFlagMatrix
     #The alpha and beta values are used to create the TMatrix in the correct position
-    tmatrix = scipy.zeros((np.prod(NValue), np.prod(NValue)), float)
-    tflag = scipy.zeros((np.prod(NValue), np.prod(NValue)), int)
+    tmatrix = np.zeros((np.prod(NValue), np.prod(NValue)), float)
+    tflag = np.zeros((np.prod(NValue), np.prod(NValue)), int)
     alpha = 0
     beta = 0
     
@@ -213,9 +225,9 @@ def TMatrixCalc(dataObject, GMatrix):
         pass
     #Pool and run
     p = mp.Pool(dataObject.cores_amount)
-    print("Pool go T")
+#    print("Pool go T")
     blocks = p.starmap(TBlockCalc, paramz)
-    print("Pool's done T")
+#    print("Pool's done T")
     p.close()
     
     precalc = 0

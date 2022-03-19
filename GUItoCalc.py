@@ -21,7 +21,7 @@ def window(x):
     File = open(x)
     Reader = csv.reader(File)
     Data = list(Reader)
-    del (Data[0])
+    #del (Data[0])
 
     list_of_entries = []
     x = 0
@@ -32,7 +32,7 @@ def window(x):
     root = Tk()
     v = Scrollbar(root)
     v2 = Scrollbar(root)
-    root.geometry('1550x800')
+    root.geometry('500x500')
     root.title('Results')
     v.pack(side=RIGHT, fill=Y)
     SHBar = tk.Scrollbar(root,
@@ -87,8 +87,10 @@ def passToCalc(dataObj):
     ResultObj.setEigenvalues(eigenvalsort)
     ResultObj.setEigenvectors(eigenvecsort)
     hola = []
+    hola.append('Eigen Vectors: ')
     hola.append(ResultObj.getEigenvectors())
     hi = []
+    hi.append('Eigen Values: ')
     print("Eigenvalues:")
     for i in range(1, 20):
         value = eigenval[wfnorder[i]] - eigenval[wfnorder[0]]
@@ -121,10 +123,11 @@ def passToCalc(dataObj):
         # writer.writerow(data2)
         f.close()
 
-    # z = str(holder.name_of_file) + ".csv"
-    # window(z)
-    # if os.path.exists("holder.csv"):
-    #    os.remove("holder.csv")
+
+    window('./output files/Eigenvalues.csv')
+    window('./output files/Eigenvectors.csv')
+
+
 
     return ResultObj
 

@@ -17,7 +17,8 @@ Also connected to test3.py
 Author: Josiah Randleman
 © Copyright 2021, Josiah Randleman, All rights reserved. jrandl516@gmail.com
 """
-
+#TODO fix the name of file. not passing file name.
+#TODO fix ssh problem. problem is with pes in remotegmatrix.py
 
 # This is the parent process
 def datamuncher(q):
@@ -72,7 +73,7 @@ def datamuncher(q):
             #writer.writerow(data)
 
             #writer.writerow(data2)
-            f.close()
+            j.close()
 
         with open('PES.csv', 'w', encoding='UTF8') as f:
             writer = csv.writer(f)

@@ -205,8 +205,10 @@ def main_window():
 
     # This method saves the output of the GUI to a text file
     def save_file_prompt():
+        """
         box: bool = tk.messagebox.askyesno("PyFGH", "Would you like to save the data to a CSV file?")
         if box:
+            DataObject.test.NewFileholder = 1
             window5 = tk.Tk()
             style = Style()
             window5.title('File')
@@ -232,8 +234,8 @@ def main_window():
                 print(holder.name_of_file, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 window5.destroy()
 
-            calculate = tk.Button(window5, text='Enter', bd='15', bg='green', fg='white',
-                                  command=enter6).place(x=110, y=70)
+            tk.Button(window5, text='Enter', bd='15', bg='green', fg='white',
+                      command=enter6).place(x=110, y=70)
 
             window.destroy()
             window5.mainloop()
@@ -242,7 +244,10 @@ def main_window():
             a = "holder"
             holder.set_name_of_file(a)
             window.destroy()
-
+        """
+        a = "holder"
+        holder.set_name_of_file(a)
+        window.destroy()
     global model_prompt
 
     def model_prompt(potential_model):
@@ -369,7 +374,7 @@ def main_window():
             holder.password = Password_entry.get()
             window3.destroy()
             print(holder.host, holder.user, holder.password)
-
+            save_file_prompt()
 
             holder.set_remote(1)
 
@@ -380,7 +385,7 @@ def main_window():
             holder.setEquilMolecule(eq)
             holder.setPES(pes)
 
-            save_file_prompt()
+
 
         Enter = tk.Button(window3, text='Enter', bd='15', bg='green', fg='white',
                           command=Enter).place(x=110, y=170)
@@ -396,12 +401,13 @@ def main_window():
             if SSH_box.get() == 'Yes':
                 SSH_prompt()
             else:
+                save_file_prompt()
                 eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
                                                         holder.N2, holder.L2, holder.N3,
                                                         holder.L3)
                 holder.setEquilMolecule(eq)
                 holder.setPES(pes)
-                save_file_prompt()
+
 
         else:
             if SSH_box.get() == 'Yes':

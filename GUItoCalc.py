@@ -13,7 +13,7 @@ from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
 import csv
 from tkinter import *
-from util import DataObject
+from util import DataObject, OutputData
 
 
 def window(x):
@@ -51,33 +51,51 @@ def main():
 
 
 def passToCalc(dataObj):
-    print("Got an object.")
+    #print("Got an object.")
     # print(dataObj)
-    print("Creating GMatrix")
+
     N = [dataObj.N1, dataObj.N2, dataObj.N3]
+    print("Creating G Matrix")
     GMat = Gmatrix.calcGMatrix(N, dataObj.PES, dataObj.EquilMolecule)
     holder = DataObject.InputData()
+    print("Creating V Matrix")
     VMat = Vmatrix.VMatrixCalc(dataObj)
-    print("Done with VMatrix")
+    print("Done with V Matrix")
+    print("Creating T Matrix")
     TMat = Tmatrix.TMatrixCalc(dataObj, GMat)
-    print("Done with TMatrix")
+    print("Done with T Matrix")
     HMat = VMat + TMat
-    pd.DataFrame(HMat).to_csv(str(holder.name_of_file) + ".csv")
-    holder.setHmat(HMat)
+    #pd.DataFrame(HMat).to_csv(str(holder.name_of_file) + ".csv")
+    #holder.setHmat(HMat)
 
     print("Calculating eigenvalues")
     eigenval, eigenvec = scipy.linalg.eigh(HMat)
     eigenval = eigenval * 219474.6
     wfnorder = np.argsort(eigenval)
+
+    Npts = np.prod(N)
+    eigenvalsort = np.zeros(Npts, float)
+    eigenvecsort = np.zeros([Npts,Npts],float)
+
+    for i in range(Npts):
+        eigenvalsort[i] = eigenval[wfnorder[i]]
+        for j in range(Npts):
+            eigenvecsort[i] = eigenvec[j][wfnorder[i]]
+
+    ResultObj = OutputData()
+    ResultObj.setEigenvalues(eigenvalsort)
+    ResultObj.setEigenvectors(eigenvecsort)
+
     print("Eigenvalues:")
     for i in range(1, 20):
         print(eigenval[wfnorder[i]] - eigenval[wfnorder[0]])
 
-    z = str(holder.name_of_file) + ".csv"
-    window(z)
-    if os.path.exists("holder.csv"):
-        os.remove("holder.csv")
+    #z = str(holder.name_of_file) + ".csv"
+    #window(z)
+    #if os.path.exists("holder.csv"):
+    #    os.remove("holder.csv")
 
+    return ResultObj
 
 # r = process_map(main, range(0, 30), max_workers=12)
 if __name__ == '__main__':

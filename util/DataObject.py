@@ -156,13 +156,11 @@ class OutputData:
         self.eigenvectors = []
 
     def setEigenvalues(self, evalues):
-        for i in range(len(evalues)):
-            self.eigenvalues.append(evalues[i])
+        self.eigenvalues = evalues
         return
 
     def setEigenvectors(self, evectors):
-        for i in range(len(evectors)):
-            self.eigenvectors.append(evectors[i])
+        self.eigenvectors = evectors
         return
 
     def getEigenvalues(self):

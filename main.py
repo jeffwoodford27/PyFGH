@@ -43,6 +43,8 @@ def datamuncher(q):
         file.write('%s\n' % x)
     file.close()
 
+
+
     def SSH_connection():
         #TODO Make new files for the remote main!
         #TODO Add these variables to the remote files!
@@ -60,8 +62,8 @@ def datamuncher(q):
         header2 = [holder1.PES]
         header3 = [holder1.EquilMolecule]
 
-        with open('countries.csv', 'w', encoding='UTF8') as f:
-            writer = csv.writer(f)
+        with open('countries.csv', 'w', encoding='UTF8') as j:
+            writer = csv.writer(j)
 
             # write the header
             writer.writerow(header)
@@ -84,8 +86,8 @@ def datamuncher(q):
             #writer.writerow(data2)
             f.close()
 
-        with open('EquilMolecule.csv', 'w', encoding='UTF8') as f:
-            writer = csv.writer(f)
+        with open('EquilMolecule.csv', 'w', encoding='UTF8') as a:
+            writer = csv.writer(a)
 
             # write the header
             writer.writerow(header3)
@@ -94,7 +96,7 @@ def datamuncher(q):
             #writer.writerow(data)
 
             #writer.writerow(data2)
-            f.close()
+            a.close()
 
         host = "euclid.chem.missouriwestern.edu" #holder1.host
         port = 22
@@ -201,7 +203,6 @@ def datamuncher(q):
 
     else:
         GTC.passToCalc(holder1)
-
         q.put("object on queue")
 
     # print("File Name : ", holder1.file_name, " This is from the child process")

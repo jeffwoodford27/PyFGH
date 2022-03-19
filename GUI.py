@@ -229,6 +229,7 @@ def main_window():
 
             def enter6():
                 holder.set_name_of_file(Host_entry3.get())
+                print(holder.name_of_file, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 window5.destroy()
 
             calculate = tk.Button(window5, text='Enter', bd='15', bg='green', fg='white',

@@ -13,7 +13,8 @@ from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
 import csv
 from tkinter import *
-from util import DataObject, OutputData
+from util import DataObject
+from util.DataObject import OutputData
 
 
 def window(x):
@@ -51,7 +52,7 @@ def main():
 
 
 def passToCalc(dataObj):
-    #print("Got an object.")
+    # print("Got an object.")
     # print(dataObj)
 
     N = [dataObj.N1, dataObj.N2, dataObj.N3]
@@ -65,8 +66,8 @@ def passToCalc(dataObj):
     TMat = Tmatrix.TMatrixCalc(dataObj, GMat)
     print("Done with T Matrix")
     HMat = VMat + TMat
-    #pd.DataFrame(HMat).to_csv(str(holder.name_of_file) + ".csv")
-    #holder.setHmat(HMat)
+    # pd.DataFrame(HMat).to_csv(str(holder.name_of_file) + ".csv")
+    # holder.setHmat(HMat)
 
     print("Calculating eigenvalues")
     eigenval, eigenvec = scipy.linalg.eigh(HMat)
@@ -75,7 +76,7 @@ def passToCalc(dataObj):
 
     Npts = np.prod(N)
     eigenvalsort = np.zeros(Npts, float)
-    eigenvecsort = np.zeros([Npts,Npts],float)
+    eigenvecsort = np.zeros([Npts, Npts], float)
 
     for i in range(Npts):
         eigenvalsort[i] = eigenval[wfnorder[i]]
@@ -85,17 +86,48 @@ def passToCalc(dataObj):
     ResultObj = OutputData()
     ResultObj.setEigenvalues(eigenvalsort)
     ResultObj.setEigenvectors(eigenvecsort)
-
+    hola = []
+    hola.append(ResultObj.getEigenvectors())
+    hi = []
     print("Eigenvalues:")
     for i in range(1, 20):
-        print(eigenval[wfnorder[i]] - eigenval[wfnorder[0]])
+        value = eigenval[wfnorder[i]] - eigenval[wfnorder[0]]
+        print(value)
+        hi.append(value)
 
-    #z = str(holder.name_of_file) + ".csv"
-    #window(z)
-    #if os.path.exists("holder.csv"):
+    with open("./output files/Eigenvalues.csv", 'w', encoding='UTF8') as f:
+        writer = csv.writer(f)
+
+        # write the header
+        for word in hi:
+            writer.writerow([word])
+
+        # write the data
+        # writer.writerow(data)
+
+        # writer.writerow(data2)
+        f.close()
+
+    with open("./output files/Eigenvectors.csv", 'w', encoding='UTF8') as f:
+        writer = csv.writer(f)
+
+        # write the header
+        for word in hola:
+            writer.writerow([word])
+
+        # write the data
+        # writer.writerow(data)
+
+        # writer.writerow(data2)
+        f.close()
+
+    # z = str(holder.name_of_file) + ".csv"
+    # window(z)
+    # if os.path.exists("holder.csv"):
     #    os.remove("holder.csv")
 
     return ResultObj
+
 
 # r = process_map(main, range(0, 30), max_workers=12)
 if __name__ == '__main__':

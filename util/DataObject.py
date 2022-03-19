@@ -15,6 +15,7 @@ class test:
     L2 = 0
     N3 = 0
     L3 = 0
+    PES = 0
 
     def setEqulibrium(self, equilibrium_file):
         self.equilibrium_file = equilibrium_file

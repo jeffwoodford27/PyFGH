@@ -85,6 +85,15 @@ class PESpoint:
     def getq3(self):
         return self.q[2]
 
+    def getX(self):
+        return self.x
+
+    def getY(self):
+        return self.y
+
+    def getZ(self):
+        return self.z
+
     def setN(self, n):
         self.n = n
         return

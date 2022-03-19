@@ -41,6 +41,7 @@ def calcGMatrix(N, pes, equil):
             x3 = np.zeros(int(N[2]))
             y3 = np.zeros(int(N[2]))
             for k in range(int(N[2])):
+                print(i, j, k)
                 q3[k] = pes.getPointByN(i, j, k).getq3()
                 x1[k] = pes.getPointByN(i, j, k).x[0]
                 y1[k] = pes.getPointByN(i, j, k).y[0]

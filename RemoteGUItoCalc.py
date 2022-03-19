@@ -55,12 +55,9 @@ PES = list5[0]
 EquilMolecule = list6[0]
 
 N1 = list3[0][0]
-N2 = list3[0][1]
-N3 = list3[0][3]
-L1 = list3[0][4]
-L2 = list3[0][5]
-L3 = list3[0][6]
-
+N2 = list3[0][2]
+N3 = list3[0][4]
+print(N1, N2, N3)
 
 def window(x):
     File = open(x)
@@ -100,7 +97,8 @@ def passToCalc(dataObj):
     print("Got an object.")
     # print(dataObj)
     print("Creating GMatrix")
-    N = [N1, N2, N3]
+    print(N1, N2, N3)
+    N = [int(float(N1)), int(float(N2)), int(float(N3))]
     GMat = RemoteGmatrix.calcGMatrix(N, PES, EquilMolecule)
     holder = DataObject.InputData()
     VMat = RemoteVmatrix.VMatrixCalc(dataObj)

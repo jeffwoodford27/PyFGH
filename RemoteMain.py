@@ -1,6 +1,6 @@
 import csv
 import os
-import molecule_gui
+import Remotemoleule_gui
 from multiprocessing import Process, Queue
 import RemoteGUItoCalc as GTC
 import time
@@ -36,15 +36,14 @@ N1 = list3[0][0]
 N2 = list3[0][2]
 N3 = list3[0][4]
 
-L1 = list3[0][1]
-L2 = list3[0][3]
-L3 = list3[0][5]
+L1 = list3[0][6]
+L2 = list3[0][8]
+L3 = list3[0][10]
 
 # This is the parent process
 def datamuncher(q):
     print('This is the child process: ', os.getpid())
     holder1 = q.get()
-    print(holder1.message)
     # print("Filename: ", holder1.file_name)
 
     print("Energy from Main: ", holder1.PES.pts[0].en)
@@ -63,10 +62,8 @@ def datagrabber():
     p1 = Process(target=datamuncher, args=(q,))
     p1.start()
     time.sleep(1)
-    holder = molecule_gui.molecule_testing(N1, L1, N2, L2, N3, L3)
+    holder = Remotemoleule_gui.molecule_testing(N1, L1, N2, L2, N3, L3)
     print('The interface is started Process: ', os.getpid())
-
-    holder.setMessage("This is from the parent")
     # holder.setModelData(DataObject.holdData.model_data)  # look into pickling possibly un-pickling
     q.put(holder)
 

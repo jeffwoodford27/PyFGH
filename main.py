@@ -148,8 +148,8 @@ def datamuncher(q):
         ssh.connect(host, port, username, password)
         sftp = ssh.open_sftp()
 
-        path15 = "/home/" + username + "/molecule_gui.py"
-        localpath15 = "molecule_gui.py"
+        path15 = "/home/" + username + "/Remotemoleule_gui.py"
+        localpath15 = "Remotemoleule_gui.py"
         sftp.put(localpath15, path15)
 
         path12 = "/home/" + username + "/EquilMolecule.csv"

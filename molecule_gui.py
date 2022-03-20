@@ -300,6 +300,8 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
                 pes.appendPESpt(pt)
                 n += 1
 
-
     return EquilMolecule, pes
 
+
+def setMessage(param):
+    return None

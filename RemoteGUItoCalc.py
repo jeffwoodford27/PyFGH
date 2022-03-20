@@ -117,11 +117,6 @@ def passToCalc(dataObj):
     for i in range(1, 20):
         print(eigenval[wfnorder[i]] - eigenval[wfnorder[0]])
 
-    z = str(holder.name_of_file) + ".csv"
-    window(z)
-    if os.path.exists("holder.csv"):
-        os.remove("holder.csv")
-
 
 # r = process_map(main, range(0, 30), max_workers=12)
 if __name__ == '__main__':

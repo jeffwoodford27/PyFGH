@@ -264,7 +264,7 @@ def datagrabber():
     hi = []
     hi.append('Eigen Values: ')
     print("Eigenvalues:")
-    for i in range(1, 20):
+    for i in range(1, holder.N1*holder.N2*holder.N3):
         value = ResultObj.eigenvalues[i] - ResultObj.eigenvalues[0]
         print(value)
         hi.append(value)

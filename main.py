@@ -9,6 +9,7 @@ from multiprocessing import Pool
 import time
 from util import DataObject
 from tqdm import *
+import tkinter as tk
 
 """
 This one uses Queues
@@ -20,34 +21,34 @@ Author: Josiah Randleman
 #TODO fix the name of file. not passing file name.
 #TODO fix ssh problem. problem is with pes in remotegmatrix.py
 
-def window(x):
-    File = open(x)
-    Reader = csv.reader(File)
-    Data = list(Reader)
+#def window(x):
+#    File = open(x)
+#    Reader = csv.reader(File)
+#    Data = list(Reader)
     #del (Data[0])
 
-    list_of_entries = []
-    x = 0
-    for x in list(range(0, len(Data))):
-        list_of_entries.append(Data[x])
-        x += 1
+#    list_of_entries = []
+#    x = 0
+#    for x in list(range(0, len(Data))):
+#        list_of_entries.append(Data[x])
+#        x += 1
 
-    root = Tk()
-    v = Scrollbar(root)
-    v2 = Scrollbar(root)
-    root.geometry('500x500')
-    root.title('Results')
-    v.pack(side=RIGHT, fill=Y)
-    SHBar = tk.Scrollbar(root,
-                         orient=tk.HORIZONTAL)
-    SHBar.pack(side=tk.BOTTOM,
-               fill="x")
-    var = StringVar(value=list_of_entries)
-    listbox1 = Listbox(root, listvariable=var)
-    listbox1.pack(side=LEFT, fill=BOTH)
-    listbox1.config(width=1550, height=800, yscrollcommand=v.set)
-    SHBar.config(command=listbox1.xview)
-    root.mainloop()
+#    root = tk()
+#    v = Scrollbar(root)
+#    v2 = Scrollbar(root)
+#    root.geometry('500x500')
+#    root.title('Results')
+#    v.pack(side=RIGHT, fill=Y)
+#    SHBar = tk.Scrollbar(root,
+#                         orient=tk.HORIZONTAL)
+#    SHBar.pack(side=tk.BOTTOM,
+#               fill="x")
+#    var = StringVar(value=list_of_entries)
+#    listbox1 = Listbox(root, listvariable=var)
+#    listbox1.pack(side=LEFT, fill=BOTH)
+#    listbox1.config(width=1550, height=800, yscrollcommand=v.set)
+#    SHBar.config(command=listbox1.xview)
+#    root.mainloop()
 
 # This is the parent process
 def datamuncher(q):
@@ -264,7 +265,7 @@ def datagrabber():
     hi.append('Eigen Values: ')
     print("Eigenvalues:")
     for i in range(1, 20):
-        value = eigenval[i] - eigenval[0]
+        value = ResultObj.eigenvalues[i] - ResultObj.eigenvalues[0]
         print(value)
         hi.append(value)
 
@@ -295,8 +296,8 @@ def datagrabber():
         f.close()
 
 
-    window('./output files/Eigenvalues.csv')
-    window('./output files/Eigenvectors.csv')
+ #   window('./output files/Eigenvalues.csv')
+ #   window('./output files/Eigenvectors.csv')
 
 
 

@@ -19,10 +19,10 @@ Instructions:
 Symbol,A,x,y
 
 where:
-Symbol is the one- or two-letter atomic symbol for the atom.
-A is the mass number (an integer!) for the atom.
-x is the x-coordinate of the atom (in bohr)
-y is the y-coordinate of the atom (in bohr)
+* Symbol is the one- or two-letter atomic symbol for the atom.
+* A is the mass number (an integer!) for the atom.
+* x is the x-coordinate of the atom (in bohr)
+* y is the y-coordinate of the atom (in bohr)
 
 7. In the SECOND dialog box, upload a CSV with the potential energy file.  This CSV must also be encoded "UTF-8" and must have the following format:
 

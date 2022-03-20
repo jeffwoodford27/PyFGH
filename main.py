@@ -20,6 +20,35 @@ Author: Josiah Randleman
 #TODO fix the name of file. not passing file name.
 #TODO fix ssh problem. problem is with pes in remotegmatrix.py
 
+def window(x):
+    File = open(x)
+    Reader = csv.reader(File)
+    Data = list(Reader)
+    #del (Data[0])
+
+    list_of_entries = []
+    x = 0
+    for x in list(range(0, len(Data))):
+        list_of_entries.append(Data[x])
+        x += 1
+
+    root = Tk()
+    v = Scrollbar(root)
+    v2 = Scrollbar(root)
+    root.geometry('500x500')
+    root.title('Results')
+    v.pack(side=RIGHT, fill=Y)
+    SHBar = tk.Scrollbar(root,
+                         orient=tk.HORIZONTAL)
+    SHBar.pack(side=tk.BOTTOM,
+               fill="x")
+    var = StringVar(value=list_of_entries)
+    listbox1 = Listbox(root, listvariable=var)
+    listbox1.pack(side=LEFT, fill=BOTH)
+    listbox1.config(width=1550, height=800, yscrollcommand=v.set)
+    SHBar.config(command=listbox1.xview)
+    root.mainloop()
+
 # This is the parent process
 def datamuncher(q):
     print('This is the child process: ', os.getpid())
@@ -199,12 +228,12 @@ def datamuncher(q):
     if holder1.remote == 1:
         SSH_connection()
 
-        GTC.passToCalc(holder1)
-        q.put("object on queue")
+        ReturnObj = GTC.passToCalc(holder1)
+        q.put(ReturnObj)
 
     else:
-        GTC.passToCalc(holder1)
-        q.put("object on queue")
+        ReturnObj = GTC.passToCalc(holder1)
+        q.put(ReturnObj)
 
     # print("File Name : ", holder1.file_name, " This is from the child process")
     # print("Model Data : ", holder1.model_data, " This is from the child process")
@@ -226,8 +255,51 @@ def datagrabber():
 
     # At this point, insert the data into the handler
 
-    ReturnData = q.get()  # an object of type OutputData
-    print(ReturnData)
+    ResultObj = q.get()  # an object of type OutputData
+
+    hola = []
+    hola.append('Eigen Vectors: ')
+    hola.append(ResultObj.getEigenvectors())
+    hi = []
+    hi.append('Eigen Values: ')
+    print("Eigenvalues:")
+    for i in range(1, 20):
+        value = eigenval[i] - eigenval[0]
+        print(value)
+        hi.append(value)
+
+    with open("./output files/Eigenvalues.csv", 'w', encoding='UTF8') as f:
+        writer = csv.writer(f)
+
+        # write the header
+        for word in hi:
+            writer.writerow([word])
+
+        # write the data
+        # writer.writerow(data)
+
+        # writer.writerow(data2)
+        f.close()
+
+    with open("./output files/Eigenvectors.csv", 'w', encoding='UTF8') as f:
+        writer = csv.writer(f)
+
+        # write the header
+        for word in hola:
+            writer.writerow([word])
+
+        # write the data
+        # writer.writerow(data)
+
+        # writer.writerow(data2)
+        f.close()
+
+
+    window('./output files/Eigenvalues.csv')
+    window('./output files/Eigenvectors.csv')
+
+
+
     return
 
 

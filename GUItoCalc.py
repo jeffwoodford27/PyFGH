@@ -86,46 +86,46 @@ def passToCalc(dataObj):
     ResultObj = OutputData()
     ResultObj.setEigenvalues(eigenvalsort)
     ResultObj.setEigenvectors(eigenvecsort)
-    hola = []
-    hola.append('Eigen Vectors: ')
-    hola.append(ResultObj.getEigenvectors())
-    hi = []
-    hi.append('Eigen Values: ')
-    print("Eigenvalues:")
-    for i in range(1, 20):
-        value = eigenval[wfnorder[i]] - eigenval[wfnorder[0]]
-        print(value)
-        hi.append(value)
+#    hola = []
+#    hola.append('Eigen Vectors: ')
+#    hola.append(ResultObj.getEigenvectors())
+#    hi = []
+#    hi.append('Eigen Values: ')
+#    print("Eigenvalues:")
+#    for i in range(1, 20):
+#        value = eigenval[wfnorder[i]] - eigenval[wfnorder[0]]
+#        print(value)
+#        hi.append(value)
+#
+#    with open("./output files/Eigenvalues.csv", 'w', encoding='UTF8') as f:
+#        writer = csv.writer(f)
+#
+#        # write the header
+#        for word in hi:
+#            writer.writerow([word])
+#
+#        # write the data
+#        # writer.writerow(data)
+#
+#        # writer.writerow(data2)
+#        f.close()
+#
+#    with open("./output files/Eigenvectors.csv", 'w', encoding='UTF8') as f:
+#        writer = csv.writer(f)
+#
+#        # write the header
+#        for word in hola:
+#            writer.writerow([word])
+#
+#        # write the data
+#        # writer.writerow(data)
+#
+#        # writer.writerow(data2)
+#        f.close()
 
-    with open("./output files/Eigenvalues.csv", 'w', encoding='UTF8') as f:
-        writer = csv.writer(f)
 
-        # write the header
-        for word in hi:
-            writer.writerow([word])
-
-        # write the data
-        # writer.writerow(data)
-
-        # writer.writerow(data2)
-        f.close()
-
-    with open("./output files/Eigenvectors.csv", 'w', encoding='UTF8') as f:
-        writer = csv.writer(f)
-
-        # write the header
-        for word in hola:
-            writer.writerow([word])
-
-        # write the data
-        # writer.writerow(data)
-
-        # writer.writerow(data2)
-        f.close()
-
-
-    window('./output files/Eigenvalues.csv')
-    window('./output files/Eigenvectors.csv')
+#    window('./output files/Eigenvalues.csv')
+#    window('./output files/Eigenvectors.csv')
 
 
 

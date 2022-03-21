@@ -171,6 +171,7 @@ def main_window():
                      command=window.destroy).place(x=365, y=160)
 
     # Label for SSH
+    """
     SSH = ttk.Label(window, text="Run remotely:", font=("Times New Roman", 15))
     SSH.pack()
     SSH.place(x=5, y=170)
@@ -181,7 +182,7 @@ def main_window():
     # creates values inside of the choice box
     SSH_box["values"] = ('Yes', 'No')
     SSH_box.place(x=125, y=173)
-
+    """
     # This is just a method for testing the values
     def apioutput():
 
@@ -293,10 +294,12 @@ def main_window():
             # print(type(potential_model))
             # print(DataObject.holdData.model_data)
             window1.destroy()
+            """
             if SSH_box.get() == 'Yes':
                 SSH_prompt()
             else:
                 save_file_prompt()
+            """
 
         enter = tk.Button(window1, text='Enter', bd='20', bg='green', fg='white',
                           command=enter_button).place(x=110, y=y)
@@ -397,6 +400,7 @@ def main_window():
     This also checks for validation rules also for the values that were inputted.
     """
     def test():
+        """
         if holder.value_holder:
             if SSH_box.get() == 'Yes':
                 SSH_prompt()
@@ -415,8 +419,17 @@ def main_window():
                 SSH_prompt()
             else:
                 save_file_prompt()
+        """
+        if holder.value_holder:
+            save_file_prompt()
+            eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
+                                                        holder.N2, holder.L2, holder.N3,
+                                                        holder.L3)
+            holder.setEquilMolecule(eq)
+            holder.setPES(pes)
 
-
+        else:
+            save_file_prompt()
 
 
     def output():
@@ -436,7 +449,7 @@ def main_window():
             holder.setL2(float(L2.get()))
             holder.setL3(float(L3.get()))
             holder.setcores_amount(max(1,int(cores.get())))
-            holder.set_remote(SSH_box.get())
+            #holder.set_remote(SSH_box.get())
             #print(holder.N1, holder.N2, " holder")
 
             #print(holder.value_holder)
@@ -489,7 +502,7 @@ def main_window():
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")
         except IndexError:  # TODO this is not working properly. After the error restart the interface!
-            messagebox.showerror("PyFGH", "Please select the appropriate models!!!")
+            messagebox.showerror("PyFGH", "Error, Please restart program!!!")
             main_window()
 
     # This is the calculate button.

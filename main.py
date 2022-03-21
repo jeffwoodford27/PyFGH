@@ -78,7 +78,7 @@ def datamuncher(q):
     file.close()
 
 
-
+    """
     def SSH_connection():
         #TODO Make new files for the remote main!
         #TODO Add these variables to the remote files!
@@ -202,7 +202,7 @@ def datamuncher(q):
         path7 = "/home/" + username + "/util/pyfghutil.py"
         localpath7 = "./util/pyfghutil.py"
         sftp.put(localpath7, path7)
-        """
+        
         stdin, stdout, stderr = ssh.exec_command(command)
         stdin, stdout, stderr = ssh.exec_command(command2)
         stdin, stdout, stderr = ssh.exec_command(command3)
@@ -211,9 +211,9 @@ def datamuncher(q):
         stdin, stdout, stderr = ssh.exec_command(command6)
         stdin, stdout, stderr = ssh.exec_command(command7)
         stdin, stdout, stderr = ssh.exec_command(command8)
-        """
+    
 
-        """
+        
                 path = "/home/" + username + "/DataList.txt"
                 localpath = "./resources/DataList.txt"
                 sftp.put(localpath, path)
@@ -228,14 +228,14 @@ def datamuncher(q):
                 sftp.get(path3, localpath3)
                 #stdin, stdout, stderr = ssh.exec_command(command4)
 
-        """
+        
 
         sftp.close()
         ssh.close()
+        """
 
     if holder1.remote == 1:
-        SSH_connection()
-
+        #SSH_connection()
         ReturnObj = GTC.passToCalc(holder1)
         q.put(ReturnObj)
 

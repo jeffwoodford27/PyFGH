@@ -40,7 +40,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     N3_1 = N3
     #print(N1_1)
     # print(holder_file.equilibrium_file)
-    with open(DataObject.test.equilibrium_file, encoding='UTF-8') as f:
+    with open(DataObject.test.equilibrium_file) as f:
         for row in f:
             #print(row)
             list2.append(row.split(',')[0])  # Li
@@ -104,7 +104,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
             #print("amu to atomic ", m)
 
     def getNs():
-        file = open(DataObject.test.potential_energy_file, encoding='UTF-8')
+        file = open(DataObject.test.potential_energy_file)
         reader = csv.reader(file)
         lines = len(list(reader))
         totalN_2 = N1_1 * N2_1 * N3_1
@@ -178,7 +178,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
         holder = DataObject.InputData()
         r = holder.potential_energy_file
         #print(r)
-        hola = open(DataObject.test.potential_energy_file, encoding='UTF-8')
+        hola = open(DataObject.test.potential_energy_file)
         for hello in hola:
             potx1.append(hello.split(',')[3])
             potx2.append(hello.split(',')[5])
@@ -286,7 +286,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     deltaQ1 = L1_2 / float(N1_2)
     deltaQ2 = L2_2 / float(N2_2)
     deltaQ3 = L3_2 / float(N3_2)
-    with open(DataObject.test.potential_energy_file, encoding="UTF-8") as a:
+    with open(DataObject.test.potential_energy_file) as a:
         for x in a:
             Q1.append(float(x.split(',')[0]))
             Q2.append(float(x.split(',')[1]))
@@ -299,21 +299,25 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     for i in range(N1_2):
         for j in range(N2_2):
             for k in range(N3_2):
-                q1 = deltaQ1 * float(i - int(N1_2 / 2))
-                q2 = deltaQ2 * float(j - int(N2_2 / 2))
-                q3 = deltaQ3 * float(k - int(N3_2 / 2))
+                q1 = deltaQ1 * float(i - (N1_2 / 2))
+                q2 = deltaQ2 * float(j - (N2_2 / 2))
+                q3 = deltaQ3 * float(k - (N3_2 / 2))
                 """
                 if (round(q1, 3) == round(Q1[n], 3)) and (round(q2, 3) == round(Q2[n], 3)) and (
                         round(q3, 3) == round(Q3[n], 3)):
+                         
+                         if (round(q1, 3) == round(Q1[n], 3)) and (round(q2, 3) == round(Q2[n], 3)) and (
+                        round(q3, 3) == round(Q3[n], 3)):
                 """
 
-                if (q1 + (Q1[n]) < 1) and (q2 + Q2[n] < 1) and (q3 + Q3[n] < 1.5):
+                if (q1 + (Q1[n]) < 1.5) and (q2 + Q2[n] < 1.5) and (q3 + Q3[n] < 1.5):
                     pass
                 else:
+                    #print(round(q1, 3), round(Q1[n], 3), round(q2, 3), round(Q2[n], 3), round(q3, 3), round(Q3[n], 3))
                     print("Error!!!!!!!!!!!!!!!, File is NOT Valid")
                     os._exit(0)
                     #print('Values are not valid')
-                    #print(round(q1, 3), round(Q1[n], 3), round(q2, 3), round(Q2[n], 3), round(q3, 3), round(Q3[n]))
+
 
                 pt = pyfghutil.PESpoint()
                 pt.setN(n)

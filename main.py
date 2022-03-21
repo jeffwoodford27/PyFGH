@@ -2,6 +2,7 @@ import csv
 import os
 import paramiko
 import GUI
+import numpy as np
 from util import pyfghutil
 from multiprocessing import Process, Queue, Pool
 import GUItoCalc as GTC
@@ -265,48 +266,47 @@ def datagrabber():
 
     ResultObj = q.get()  # an object of type OutputData
 
-    hola = []
-    hola.append('Eigen Vectors: ')
-    hola.append(ResultObj.getEigenvectors())
-    hi = []
-    hi.append('Eigen Values: ')
-    #print("Eigenvalues:")
-    for i in range(1, holder.N1*holder.N2*holder.N3):
-        value = ResultObj.eigenvalues[i] - ResultObj.eigenvalues[0]
-        #print(value)
-        hi.append(value)
+    wfnorder = np.argsort(ResultObj.eigenvalues)
+    Npts = holder.N1*holder.N2*holder.N3
 
-    with open("./output files/Eigenvalues.csv", 'w', encoding='UTF8') as f:
+    with open("./output files/Eigenvalues.csv", 'w', newline='', encoding='UTF8') as f:
         writer = csv.writer(f)
+        for i in range(Npts):
+            val = ResultObj.eigenvalues[wfnorder[i]]-ResultObj.eigenvalues[wfnorder[0]]
+            writer.writerow([val])
 
-        # write the header
-        for word in hi:
-            writer.writerow([word])
+    wfn = np.zeros([Npts, holder.N1, holder.N2, holder.N3], float)
 
-        # write the data
-        # writer.writerow(data)
+    for p in range(Npts):
+        for alpha in range(Npts):
+            l = np.mod(alpha, holder.N3)
+            f = int(alpha / holder.N3)
+            k = np.mod(f, holder.N2)
+            f2 = int(f / holder.N2)
+            j = np.mod(f2, holder.N1)
 
-        # writer.writerow(data2)
-        f.close()
+            wfn[p][j][k][l] = ResultObj.eigenvectors[alpha][wfnorder[p]]
 
-    with open("./output files/Eigenvectors.csv", 'w', encoding='UTF8') as f:
-        writer = csv.writer(f)
+    dq1 = holder.L1/float(holder.N1)
+    dq2 = holder.L2/float(holder.N2)
+    dq3 = holder.L3/float(holder.N3)
 
-        # write the header
-        for word in hola:
-            writer.writerow([word])
+    for p in range(0,11):
+        filename = "./output files/Eigenvector-" + str(p) + ".csv"
+        with open(filename, 'w', newline='',encoding='UTF8') as f:
+            writer = csv.writer(f)
 
-        # write the data
-        # writer.writerow(data)
+            for n in range(holder.N1*holder.N2*holder.N3):
+                l = np.mod(n, holder.N3)
+                f = int(n / holder.N3)
+                k = np.mod(f, holder.N2)
+                f2 = int(f / holder.N2)
+                j = np.mod(f2, holder.N1)
 
-        # writer.writerow(data2)
-        f.close()
-
-
- #   window('./output files/Eigenvalues.csv')
- #   window('./output files/Eigenvectors.csv')
-
-
+                q1 = dq1 * float(j - int(holder.N1/2))
+                q2 = dq2 * float(k - int(holder.N2/2))
+                q3 = dq3 * float(l - int(holder.N3/2))
+                writer.writerow([q1,q2,q3,wfn[p][j][k][l]])
 
     return
 

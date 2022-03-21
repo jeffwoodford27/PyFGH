@@ -12,9 +12,8 @@ Instructions:
 1. Run main.py.  A GUI window will pop up.
 2. Enter the parameters for the grid length for each of the three vibrational coordinates.   N must be odd.  For L1 and L2 (stretching coordinates), the units are in bohr.  For L3 (bending coordinate), the units are in radians.
 3. Select the number of cores desired for the calculation.  The computation of both the T matrix and the V matrix is able to be run in parallel.  The default is 1 (no parallelism).
-4. Select whether the computation will be run remotely via SSH.  The default is "No".
-5. Click "Read Structures and Energies from File".  Two dialog boxes will pop up.
-6. In the FIRST dialog box, upload a CSV with the equilibrium geometry of the molecule.  The molecule is assumed to be in the x-y plane.  The CSV must be encoded "UTF-8".  It should have three lines, one per atom, and each line must be in the following format:
+4. Click "Read Structures and Energies from File".  Two dialog boxes will pop up.
+5. In the FIRST dialog box, upload a CSV with the equilibrium geometry of the molecule.  The molecule is assumed to be in the x-y plane.  The CSV must be encoded "UTF-8".  It should have three lines, one per atom, and each line must be in the following format:
 
 Symbol,A,x,y
 
@@ -24,7 +23,7 @@ where:
 * x is the x-coordinate of the atom (in bohr)
 * y is the y-coordinate of the atom (in bohr)
 
-7. In the SECOND dialog box, upload a CSV with the potential energy file.  This CSV must also be encoded "UTF-8" and must have the following format:
+6. In the SECOND dialog box, upload a CSV with the potential energy file.  This CSV must also be encoded "UTF-8" and must have the following format:
 
 q1,q2,q3,x1,y1,x2,y2,x3,y3,energy
 
@@ -62,7 +61,7 @@ There must be N1×N2×N3 points total, and they must be arranged in order of inc
 
 Examples of these two files are provided in the "testing files" folder.
 
-8. Click the "Calculate" button.
+7. Click the "Calculate" button.
 
 The program will then compute the kinetic energy (T) matrix, the potential energy (V) matrix, find the eigenvalues and eigenfunctions, and print the first 10 eigenvalues (in cm-1) to the screen.  The program will also save the eigenvalues and first 20 eigenvectors as CSV files in the "output files" folder. The eigenvector CSVs are arranged in the order: q1, q2, q3, value.
 
@@ -97,6 +96,5 @@ System Requirements:
 * Numpy (we used v1.21.1)
 * Scipy (we used v1.7.0)
 * Tkinter (we used v???)
-* Paramiko (we used v2.10.3) - for SSH
 
 We recommend using the PyCharm Development Environment (https://www.jetbrains.com/pycharm/) for running this code.

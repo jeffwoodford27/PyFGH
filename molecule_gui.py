@@ -1,5 +1,7 @@
 import csv
 import math
+import os
+from tkinter import messagebox
 from tkinter.filedialog import askopenfile, askopenfilenames, askopenfilename
 from util import pyfghutil, DataObject
 
@@ -32,15 +34,15 @@ When selecting the files must select first and then select enter N and L values!
 
 
 def molecule_testing(N1, L1, N2, L2, N3, L3):
-    print(DataObject.test.equilibrium_file)
+    #print(DataObject.test.equilibrium_file)
     N1_1 = N1
     N2_1 = N2
     N3_1 = N3
-    print(N1_1)
+    #print(N1_1)
     # print(holder_file.equilibrium_file)
     with open(DataObject.test.equilibrium_file, encoding='UTF-8') as f:
         for row in f:
-            print(row)
+            #print(row)
             list2.append(row.split(',')[0])  # Li
             new_row = ['-'.join([row.split(',')[0], row.split(',')[1]])]
             x = ' '.join(new_row)
@@ -51,17 +53,20 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
             mass.append(row.split(',')[1])
             masslist = ([float(x) for x in mass])
             # print(list2)  # ['Li']
-            print(list3)  # ['Li-6']
-            print("\n")
+            #print(list3)  # ['Li-6']
+            #print("\n")
+
+        """
         for x in list2:
             print(x)
+        """
 
         for x in list2:  # x is the atomic symbol
             if x in pyfghutil.AtomicSymbolLookup.values():
-                print(x + " is a valid element")
+                #print(x + " is a valid element")
                 s.append(x)
             else:
-                print(x + " is not a valid element")
+                raise Exception("Atom is not valid")
                 # throw an error
 
         print("\n")
@@ -69,18 +74,22 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
             for key, value in pyfghutil.AtomicSymbolLookup.items():
                 if x == value:
                     Z.append(key)
-                    print("Atomic number of " + x + ":", key)
+                    #print("Atomic number of " + x + ":", key)
 
         print("\n")
         for x in list3:  # x is the atomic symbol
             for key, value in pyfghutil.MassLookup.items():
-                if value in masslist:
-                    print("valid atomic mass")
-
+                if value is masslist:
+                    #raise Exception("Atom is not valid")
+                    pass
+                """
+                else:
+                    raise Exception("Atom is not valid")
+                """
                 if x == key:
                     A.append(value)
-                    print("Atomic mass of " + x + ":", value)
-
+                    #print("Atomic mass of " + x + ":", value)
+        """
         print("\n")
         for x in list3:
             for key, value in pyfghutil.MassLookup.items():
@@ -88,10 +97,11 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
                     print(x + " is a valid element")
                     if value in masslist:
                         print("valid atomic mass")
+        """
         for x in A:
             atomic = x * 1822.89
             m.append(atomic)
-            print("amu to atomic ", m)
+            #print("amu to atomic ", m)
 
     def getNs():
         file = open(DataObject.test.potential_energy_file, encoding='UTF-8')
@@ -99,9 +109,13 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
         lines = len(list(reader))
         totalN_2 = N1_1 * N2_1 * N3_1
         if lines == totalN_2:
-            print("The lines of waterpot-data equals the total of all N vales")
+            #print("The lines of waterpot-data equals the total of all N vales")
+            pass
         else:
-            print("The lines of waterpot-data do not equal the total of all N vales ", lines)
+            #print("The lines of waterpot-data do not equal the total of all N vales ", lines)
+            #raise Exception("N is not valid")
+            pass
+            # come back and fix this
         return totalN_2
 
     def calculations(x1, y1, z1, x2, y2, z2, xx2, yy2, zz2, xx3, yy3, zz3):
@@ -118,19 +132,21 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
                        math.pow(zz3 - zz2, 2))
         # cos theta equation
         costheta = (((x2 - x1) * (xx3 - x1) + (y2 - y1) * (yy3 - y1) + (z2 - z1) * (zz3 - z1)) / (d * d2))
-        print("Cos Theta is: ", costheta)
+        #print("Cos Theta is: ", costheta)
 
         if -1 < costheta < 1:
-            print('molecule is non-linear')
-            print("Cos Theta is: ", costheta)
+            #print('molecule is non-linear')
+            #print("Cos Theta is: ", costheta)
+            pass
         else:
-            print("Molecule is linear")
+            raise Exception("Molecular is linear")
             # throw an error
 
         if d >= 0.10 and d2 >= 0.10 and d3 >= 0.10:
-            print("Distance is", d + d2 + d3, " Atom is unique")
+            #print("Distance is", d + d2 + d3, " Atom is unique")
+            pass
         else:
-            print("Atom is not unique")
+            raise Exception("Atom is not unique")
             #throw an error
 
             # First atom is assumed to be the central atom
@@ -161,7 +177,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     def hi():
         holder = DataObject.InputData()
         r = holder.potential_energy_file
-        print(r)
+        #print(r)
         hola = open(DataObject.test.potential_energy_file, encoding='UTF-8')
         for hello in hola:
             potx1.append(hello.split(',')[3])
@@ -200,19 +216,21 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
 
         # cos theta equation
         costheta = (((x2 - x1) * (x3 - x1) + (y2 - y1) * (y3 - y1)) / (d * d2))
-        print("Cos Theta is: ", costheta)
+        #print("Cos Theta is: ", costheta)
 
         if -1 < costheta < 1:
-            print('molecule is non-linear')
-            print("Cos Theta is: ", costheta)
+            #print('molecule is non-linear')
+            #print("Cos Theta is: ", costheta)
+            pass
         else:
-            print("Molecule is linear")
+            #print("Molecule is linear")
             raise Exception("Molecule is linear")
 
         if d >= 0.10 and d2 >= 0.10 and d3 >= 0.10:
-            print("Distance is", d + d2 + d3, " Atom is unique")
+            #print("Distance is", d + d2 + d3, " Atom is unique")
+            pass
         else:
-            print("Atom is not unique")
+            #print("Atom is not unique")
             raise Exception("Atom is not unique")
 
             # First atom is assumed to be the central atom
@@ -224,7 +242,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
             len(potxlist1) and len(potxlist2) and len(potxlist3) and len(potylist1) and len(potylist2) and len(
                 potylist3)):
         calculations2(potxlist1[x], potylist1[x], potxlist2[x], potylist2[x], potxlist3[x], potylist3[x])
-
+    """
     print("\n")
     print("WaterPot for x1: ", potxlist1)
     print("WaterPot for x2: ", potxlist2)
@@ -240,6 +258,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     print("Atomic Number: ", Z)  # Atomic Number
     print("Atomic Mass: ", A)  # Atomic Mass
     print("Symbol: ", s)  # Symbol
+    """
     calculations(x1, y1, z1, x2, y2, z2, xx2, yy2, zz2, xx3, yy3, zz3)
 
     EquilMolecule = pyfghutil.Molecule()
@@ -249,7 +268,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     EquilMolecule.setX(xlist)
     EquilMolecule.setY(ylist)
 
-    print("This is from the molecule gui: ", EquilMolecule.Z)
+    #print("This is from the molecule gui: ", EquilMolecule.Z)
     getNs()
 
     # validateQ()
@@ -267,7 +286,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     deltaQ1 = L1_2 / float(N1_2)
     deltaQ2 = L2_2 / float(N2_2)
     deltaQ3 = L3_2 / float(N3_2)
-    with open(DataObject.test.potential_energy_file, encoding="utf-8") as a:
+    with open(DataObject.test.potential_energy_file, encoding="UTF-8") as a:
         for x in a:
             Q1.append(float(x.split(',')[0]))
             Q2.append(float(x.split(',')[1]))
@@ -283,12 +302,18 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
                 q1 = deltaQ1 * float(i - int(N1_2 / 2))
                 q2 = deltaQ2 * float(j - int(N2_2 / 2))
                 q3 = deltaQ3 * float(k - int(N3_2 / 2))
+                """
                 if (round(q1, 3) == round(Q1[n], 3)) and (round(q2, 3) == round(Q2[n], 3)) and (
                         round(q3, 3) == round(Q3[n], 3)):
-                    print('Values are valid')
+                """
+
+                if (q1 + (Q1[n]) < 1) and (q2 + Q2[n] < 1) and (q3 + Q3[n] < 1.5):
+                    pass
                 else:
-                    print('Values are not valid')
-                    print(q1,q2,q3)
+                    print("Error!!!!!!!!!!!!!!!, File is NOT Valid")
+                    os._exit(0)
+                    #print('Values are not valid')
+                    #print(round(q1, 3), round(Q1[n], 3), round(q2, 3), round(Q2[n], 3), round(q3, 3), round(Q3[n]))
 
                 pt = pyfghutil.PESpoint()
                 pt.setN(n)

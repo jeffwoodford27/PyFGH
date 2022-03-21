@@ -55,17 +55,20 @@ def datamuncher(q):
     print('This is the child process: ', os.getpid())
     holder1 = q.get()
     print(holder1.message)
+
+    """
     print("N1: ", holder1.N1)
     print("L1: ", holder1.L1)
     print("N2: ", holder1.N2)
     print("L2: ", holder1.L2)
     print("N3: ", holder1.N3)
     print("L3: ", holder1.L3)
+    """
     # print("Filename: ", holder1.file_name)
     data = [holder1.equilibrium_file, holder1.N1, holder1.L1, holder1.N2,
             holder1.L2, holder1.N3, holder1.L3]
 
-    print("Energy from Main: ", holder1.PES.pts[0].en)
+    #print("Energy from Main: ", holder1.PES.pts[0].en)
     save_path = "./resources/"
     file_name = "DataList.txt"
     completeName = os.path.join(save_path, file_name)
@@ -87,7 +90,7 @@ def datamuncher(q):
         DataObject.test.L1 = holder1.L1
         DataObject.test.L2 = holder1.L2
         DataObject.test.L3 = holder1.L3
-        print("N1: ", DataObject.test.N1)
+        #print("N1: ", DataObject.test.N1)
 
         header = [holder1.N1, holder1.N2, holder1.N3, holder1.L1, holder1.L2, holder1.L3]
         header2 = [holder1.PES]
@@ -129,10 +132,10 @@ def datamuncher(q):
             #writer.writerow(data2)
             a.close()
 
-        host = "euclid.chem.missouriwestern.edu" #holder1.host
+        host = holder1.host
         port = 22
-        username = "jrandleman" #holder1.user
-        password = "Huskers1"#holder1.password
+        username = holder1.user
+        password = holder1.password
 
         command = "python3 RemoteMain.py"
         command2 = "rm RemoteMain.py"
@@ -267,10 +270,10 @@ def datagrabber():
     hola.append(ResultObj.getEigenvectors())
     hi = []
     hi.append('Eigen Values: ')
-    print("Eigenvalues:")
+    #print("Eigenvalues:")
     for i in range(1, holder.N1*holder.N2*holder.N3):
         value = ResultObj.eigenvalues[i] - ResultObj.eigenvalues[0]
-        print(value)
+        #print(value)
         hi.append(value)
 
     with open("./output files/Eigenvalues.csv", 'w', encoding='UTF8') as f:

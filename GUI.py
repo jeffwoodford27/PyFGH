@@ -373,7 +373,7 @@ def main_window():
             holder.user = Username_entry.get()
             holder.password = Password_entry.get()
             window3.destroy()
-            print(holder.host, holder.user, holder.password)
+            #print(holder.host, holder.user, holder.password)
             save_file_prompt()
 
             holder.set_remote(1)
@@ -428,7 +428,7 @@ def main_window():
             Fix N so that the user can not enter floating point values.
             """
 
-            print(DataObject.test.equilibrium_file)
+            #print(DataObject.test.equilibrium_file)
             holder.setN1(int(N1.get()))
             holder.setN2(int(N2.get()))
             holder.setN3(int(N3.get()))
@@ -437,9 +437,9 @@ def main_window():
             holder.setL3(float(L3.get()))
             holder.setcores_amount(max(1,int(cores.get())))
             holder.set_remote(SSH_box.get())
-            print(holder.N1, holder.N2, " holder")
+            #print(holder.N1, holder.N2, " holder")
 
-            print(holder.value_holder)
+            #print(holder.value_holder)
 
 
             if (int(holder.N1)) % 2 == 0:
@@ -610,5 +610,4 @@ def main_window():
     L3.place(x=800, y=100, width=100)
 
     window.mainloop()
-    print("after mainloop")
     return holder

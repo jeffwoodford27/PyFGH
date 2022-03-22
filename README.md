@@ -15,13 +15,14 @@ Instructions:
 4. Click "Read Structures and Energies from File".  Two dialog boxes will pop up.
 5. In the FIRST dialog box, upload a CSV with the equilibrium geometry of the molecule.  The molecule is assumed to be in the x-y plane.  The CSV must be encoded "UTF-8".  It should have three lines, one per atom, and each line must be in the following format:
 
-Symbol,A,x,y
+Symbol,A,x,y,z
 
 where:
 * Symbol is the one- or two-letter atomic symbol for the atom.
 * A is the mass number (an integer!) for the atom.
-* x is the x-coordinate of the atom (in bohr)
-* y is the y-coordinate of the atom (in bohr)
+* x is the x-coordinate of the atom (in bohr).
+* y is the y-coordinate of the atom (in bohr).
+* z is the z-coordinate of the atom (must be zero).
 
 6. In the SECOND dialog box, upload a CSV with the potential energy file.  This CSV must also be encoded "UTF-8" and must have the following format:
 

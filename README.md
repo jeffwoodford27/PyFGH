@@ -96,6 +96,6 @@ System Requirements:
 * Python interpreter (we used v3.8)
 * Numpy (we used v1.21.1)
 * Scipy (we used v1.7.0)
-* Tkinter (we used v???)
+* Tkinter (as a part of the standard library)
 
 We recommend using the PyCharm Development Environment (https://www.jetbrains.com/pycharm/) for running this code.

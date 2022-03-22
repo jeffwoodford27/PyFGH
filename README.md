@@ -80,17 +80,17 @@ L3 = 1.65 (rad)
 
 Using these files, the first six eigenvalues (relative to the lowest energy eigenvalue) should be:
 
-1763.5 -- fundamental vibrational frequency for q3, bending  mode
+1758.1 -- fundamental vibrational frequency for q3, bending mode
 
-3484.0 -- first overtone for q3
+3472.3 -- first overtone for q3
 
-3912.3 -- fundamental vibrational frequency for q2, symmetric stretch
+3912.5 -- fundamental vibrational frequency for q2, symmetric stretch
 
-3998.2 -- fundamental vibrational frequency for q1, antisymmetric stretch
+4000.1 -- fundamental vibrational frequency for q1, antisymmetric stretch
 
-5168.9 -- second overtone for q3
+5150.6 -- second overtone for q3
 
-5663.2 -- combination of q3 + q2
+5658.9 -- combination of q3 + q2
 
 System Requirements:
 * Python interpreter (we used v3.8)
@@ -99,3 +99,9 @@ System Requirements:
 * Tkinter (as a part of the standard library)
 
 We recommend using the PyCharm Development Environment (https://www.jetbrains.com/pycharm/) for running this code.
+
+Acknowledgements
+
+The theoretical method behind this work is based on the following paper:
+Stare, J., and Balint-Kurti, G. G., "Fourier Grid Hamiltonian Method for Solving the Vibrational Schrodinger Equation in Internal Coordinates: Theory and Test Applications", J. Phys. Chem. A 2003, 107, 7204-7214
+

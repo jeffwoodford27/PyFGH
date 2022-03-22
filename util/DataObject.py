@@ -152,6 +152,30 @@ class InputData:
         self.PES = pes
         return
 
+    def getN1(self):
+        return self.N1
+
+    def getN2(self):
+        return self.N2
+
+    def getN3(self):
+        return self.N3
+
+    def getL1(self):
+        return self.L1
+
+    def getL2(self):
+        return self.L2
+
+    def getL3(self):
+        return self.L3
+
+    def getEquilMolecule(self):
+        return self.EquilMolecule
+
+    def getPES(self):
+        return self.PES
+
 #TODO take the values in Eignevalues and Eigenvectos and write them to a CSV file in main on line 104.
 class OutputData:
     def __init__(self):
@@ -172,18 +196,3 @@ class OutputData:
     def getEigenvectors(self):
         return self.eigenvectors
 
-
-class atom:
-    def __init__(self, m, x, y, z):
-        self.m = m
-        self.x = x
-        self.y = y
-        self.z = z
-
-
-class molecule:
-    def __init__(self, N, m, x, y, z):
-        self.N = N
-        self.at = []
-        for i in range(0, N):
-            self.at.append(atom(m[i], x[i], y[i], z[i]))

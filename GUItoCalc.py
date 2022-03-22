@@ -1,64 +1,88 @@
 # Interface between GUI and Calculation Scripts
-import os
-# from tqdm.contrib.concurrent import process_map
+
 import Vmatrix
 import Tmatrix
 import Gmatrix
 import numpy as np
 import scipy
-import pandas as pd
-import tkinter as tk
-from tkinter import ttk, messagebox, NW, END
-from tkinter.filedialog import askopenfilename
-from tkinter.ttk import Style
-import csv
-from tkinter import *
-from util import DataObject
+import math
 from util.DataObject import OutputData
 
+def eckartTranslation(dataObj):
+    equil = dataObj.getEquilMolecule()
+    pes = dataObj.getPES()
+    N1 = dataObj.getN1()
+    N2 = dataObj.getN2()
+    N3 = dataObj.getN3()
+    m = equil.getM()
+    M = 0.0
+    for i in range(3):
+        M += m[i]
 
-def window(x):
-    File = open(x)
-    Reader = csv.reader(File)
-    Data = list(Reader)
-    #del (Data[0])
+    for i in range(N1):
+        for j in range(N2):
+            for k in range(N3):
+                xcm = ycm = 0.0
+                x = pes.getPointByN(i, j, k).getX()
+                y = pes.getPointByN(i, j, k).getY()
+                for p in range(3):
+                    xcm += m[p]*x[p]
+                    ycm += m[p]*y[p]
+                xcm = xcm/M
+                ycm = ycm/M
+                xnew = np.zeros(3,float)
+                ynew = np.zeros(3,float)
+                for p in range(3):
+                    xnew[p] = x[p] - xcm
+                    ynew[p] = y[p] - ycm
+                pes.getPointByN(i,j,k).setX(xnew)
+                pes.getPointByN(i,j,k).setY(ynew)
+    return
 
-    list_of_entries = []
-    x = 0
-    for x in list(range(0, len(Data))):
-        list_of_entries.append(Data[x])
-        x += 1
-
-    root = Tk()
-    v = Scrollbar(root)
-    v2 = Scrollbar(root)
-    root.geometry('500x500')
-    root.title('Results')
-    v.pack(side=RIGHT, fill=Y)
-    SHBar = tk.Scrollbar(root,
-                         orient=tk.HORIZONTAL)
-    SHBar.pack(side=tk.BOTTOM,
-               fill="x")
-    var = StringVar(value=list_of_entries)
-    listbox1 = Listbox(root, listvariable=var)
-    listbox1.pack(side=LEFT, fill=BOTH)
-    listbox1.config(width=1550, height=800, yscrollcommand=v.set)
-    SHBar.config(command=listbox1.xview)
-    root.mainloop()
-
+def eckartRotation(dataObj):
+    equil = dataObj.getEquilMolecule()
+    pes = dataObj.getPES()
+    N1 = dataObj.getN1()
+    N2 = dataObj.getN2()
+    N3 = dataObj.getN3()
+    m = equil.getM()
+    xeq = equil.getX()
+    yeq = equil.getY()
+    for i in range(N1):
+        for j in range(N2):
+            for k in range(N3):
+                x = pes.getPointByN(i, j, k).getX()
+                y = pes.getPointByN(i, j, k).getY()
+                numer = denom = 0.0
+                for p in range(3):
+                    numer += m[p]*(x[p]*yeq[p] - y[p]*xeq[p])
+                    denom += m[p]*(x[p]*xeq[p] + y[p]*yeq[p])
+                theta = math.atan2(numer,denom)
+                xnew = np.zeros(3,float)
+                ynew = np.zeros(3,float)
+                for p in range(3):
+                    xnew[p] = x[p]*math.cos(theta) - y[p]*math.sin(theta)
+                    ynew[p] = x[p]*math.sin(theta) + y[p]*math.cos(theta)
+                pes.getPointByN(i,j,k).setX(xnew)
+                pes.getPointByN(i,j,k).setY(ynew)
+    return
 
 def main():
     pass
-
 
 def passToCalc(dataObj):
     # print("Got an object.")
     # print(dataObj)
 
     N = [dataObj.N1, dataObj.N2, dataObj.N3]
+
+    print("Imposing Eckart conditions")
+    eckartTranslation(dataObj)
+    eckartRotation(dataObj)
+
     print("Creating G Matrix")
     GMat = Gmatrix.calcGMatrix(N, dataObj.PES, dataObj.EquilMolecule)
-    holder = DataObject.InputData()
+    print("Done with G Matrix")
     print("Creating V Matrix")
     VMat = Vmatrix.VMatrixCalc(dataObj)
     print("Done with V Matrix")
@@ -66,22 +90,10 @@ def passToCalc(dataObj):
     TMat = Tmatrix.TMatrixCalc(dataObj, GMat)
     print("Done with T Matrix")
     HMat = VMat + TMat
-    # pd.DataFrame(HMat).to_csv(str(holder.name_of_file) + ".csv")
-    # holder.setHmat(HMat)
 
     print("Calculating eigenvalues")
     eigenval, eigenvec = scipy.linalg.eigh(HMat)
     eigenval = eigenval * 219474.6
-#    wfnorder = np.argsort(eigenval)
-
-#    Npts = np.prod(N)
-#    eigenvalsort = np.zeros(Npts, float)
-#    eigenvecsort = np.zeros([Npts, Npts], float)
-
-#    for i in range(Npts):
-#        eigenvalsort[i] = eigenval[wfnorder[i]]
-#        for j in range(Npts):
-#            eigenvecsort[i] = eigenvec[j][wfnorder[i]]
 
     ResultObj = OutputData()
     ResultObj.setEigenvalues(eigenval)

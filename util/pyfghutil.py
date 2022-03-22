@@ -9,11 +9,11 @@ import numpy as np
 
 class Molecule:
     def __init__(self):
-        self.x = 0
-        self.y = 0
-        self.A = 0
-        self.Z = 0
-        self.m = 0
+        self.x = []
+        self.y = []
+        self.A = []
+        self.Z = []
+        self.m = []
         # self.m = MassLookup[self.s + "-" + str(self.A)] * 1822.89
 
     def setAtomicNumber(self, Z):
@@ -70,10 +70,10 @@ class Molecule:
 class PESpoint:
     def __init__(self):
         self.n = 0
-        self.q = 0
-        self.x = 0
-        self.y = 0
-        self.z = 0
+        self.q = []
+        self.x = []
+        self.y = []
+        self.z = []
         self.en = 0
 
     def getq1(self):
@@ -130,7 +130,7 @@ class PESpoint:
 
 class PotentialEnergySurface:
     def __init__(self):
-        self.N = 0
+        self.N = []
         self.Npts = 0
         self.pts = []
 
@@ -149,20 +149,6 @@ class PotentialEnergySurface:
     def appendPESpt(self, pt):
         self.pts.append(pt)
         return
-
-
-# A class to hold the calculation parameters.
-# This class will be superseded by Josiah's class.
-
-class Parameters:
-    def __init__(self, D, N, L, Tapprox, Vtype, Vmodel, PES, GMatrix):
-        self.N = N
-        self.L = L
-        self.Tapprox = Tapprox
-        self.Vtype = Vtype
-        self.Vmodel = Vmodel
-        self.PES = PES
-        self.GMatrix = GMatrix
 
 
 def AlphaCalc(D, counterarray, NValues):

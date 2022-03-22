@@ -1,6 +1,5 @@
 import scipy
 from scipy import interpolate
-import math
 from scipy import linalg
 import numpy as np
 
@@ -8,6 +7,7 @@ def compute_derivative (x, y):
     spl = scipy.interpolate.splrep(x,y,s=0)
     yprime = scipy.interpolate.splev(x,spl,der=1)
     return yprime
+
 def calcGMatrix(N,pes,equil):
     dx1dq1 = np.zeros([N[0],N[1],N[2]])
     dy1dq1 = np.zeros([N[0],N[1],N[2]])

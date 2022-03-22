@@ -1,8 +1,6 @@
 import csv
 import math
 import os
-from tkinter import messagebox
-from tkinter.filedialog import askopenfile, askopenfilenames, askopenfilename
 from util import pyfghutil, DataObject
 
 Q1 = []

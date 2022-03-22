@@ -1,4 +1,3 @@
-import numpy as np
 
 """
 DataObject is a place to hold data. All values in these classes are first assigned to zero. In GUI.py these values get 

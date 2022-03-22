@@ -299,18 +299,13 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     for i in range(N1_2):
         for j in range(N2_2):
             for k in range(N3_2):
-                q1 = deltaQ1 * float(i - (N1_2 / 2))
-                q2 = deltaQ2 * float(j - (N2_2 / 2))
-                q3 = deltaQ3 * float(k - (N3_2 / 2))
-                """
-                if (round(q1, 3) == round(Q1[n], 3)) and (round(q2, 3) == round(Q2[n], 3)) and (
-                        round(q3, 3) == round(Q3[n], 3)):
-                         
-                         if (round(q1, 3) == round(Q1[n], 3)) and (round(q2, 3) == round(Q2[n], 3)) and (
-                        round(q3, 3) == round(Q3[n], 3)):
-                """
+                q1 = deltaQ1 * float(i - int(N1_2 / 2))
+                q2 = deltaQ2 * float(j - int(N2_2 / 2))
+                q3 = deltaQ3 * float(k - int(N3_2 / 2))
 
-                if (q1 + (Q1[n]) < 1.5) and (q2 + Q2[n] < 1.5) and (q3 + Q3[n] < 1.5):
+                if (round(q1, 3) == round(Q1[n], 3)) \
+                        and (round(q2, 3) == round(Q2[n], 3))\
+                        and (round(q3, 3) == round(Q3[n], 3)):
                     pass
                 else:
                     #print(round(q1, 3), round(Q1[n], 3), round(q2, 3), round(Q2[n], 3), round(q3, 3), round(Q3[n], 3))

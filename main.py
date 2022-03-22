@@ -275,6 +275,10 @@ def datagrabber():
             val = ResultObj.eigenvalues[wfnorder[i]]-ResultObj.eigenvalues[wfnorder[0]]
             writer.writerow([val])
 
+    for i in range(1,11):
+        val = ResultObj.eigenvalues[wfnorder[i]]-ResultObj.eigenvalues[wfnorder[0]]
+        print(val)
+
     wfn = np.zeros([Npts, holder.N1, holder.N2, holder.N3], float)
 
     for p in range(Npts):
@@ -291,7 +295,7 @@ def datagrabber():
     dq2 = holder.L2/float(holder.N2)
     dq3 = holder.L3/float(holder.N3)
 
-    for p in range(0,11):
+    for p in range(0,21):
         filename = "./output files/Eigenvector-" + str(p) + ".csv"
         with open(filename, 'w', newline='',encoding='UTF8') as f:
             writer = csv.writer(f)

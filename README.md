@@ -10,7 +10,7 @@ The grid is symmetric about the equilibrium geometry, and each grid point qi is 
 
 Instructions:
 1. Run main.py.  A GUI window will pop up.
-2. Enter the parameters for the grid length for each of the three vibrational coordinates.   N must be odd.  For L1 and L2 (stretching coordinates), the units are in bohr.  For L3 (bending coordinate), the units are in radians.
+2. Enter the parameters for the grid length for each of the three vibrational coordinates.   N must be odd.  N must also be greater than or equal to 5.  For L1 and L2 (stretching coordinates), the units are in bohr.  For L3 (bending coordinate), the units are in radians.
 3. Select the number of cores desired for the calculation.  The computation of both the T matrix and the V matrix is able to be run in parallel.  The default is 1 (no parallelism).
 4. Click "Read Structures and Energies from File".  Two dialog boxes will pop up.
 5. In the FIRST dialog box, upload a CSV with the equilibrium geometry of the molecule.  The molecule is assumed to be in the x-y plane.  The CSV must be encoded "UTF-8".  It should have three lines, one per atom, and each line must be in the following format:

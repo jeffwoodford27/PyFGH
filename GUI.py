@@ -502,7 +502,7 @@ def main_window():
         x.pack()
         x.place(x=0, y=0)
 
-    # This is the about button.
+    # This is the about button
     about = tk.Button(window, text='About', bd='10', bg='purple', fg='white',
                       command=about_window).place(x=590, y=160)
 

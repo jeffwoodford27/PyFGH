@@ -15,10 +15,10 @@ from util import model_objects
 import numpy as np
 from tkinter import filedialog as fd
 
-#TODO take the Atom class and add it to InputData so Nelson can grab it
-#TODO 3 Atom class. Have a list of the three members of the atom class. [Atom1, Atom2, Atom3]
-#TODO [List of all of the molecules] made into a equalibrium class.
-#TODO
+# TODO take the Atom class and add it to InputData so Nelson can grab it
+# TODO 3 Atom class. Have a list of the three members of the atom class. [Atom1, Atom2, Atom3]
+# TODO [List of all of the molecules] made into a equalibrium class.
+# TODO
 
 import csv
 
@@ -71,7 +71,7 @@ def main_window():
 
         # label
     ttk.Label(window, text="Computer Cores:",
-              font=("Times New Roman", 10)).place(x=10, y=50)
+              font=("Times New Roman", 10)).place(x=350, y=50)
 
     # Combobox creation
     n = tk.StringVar()
@@ -140,35 +140,9 @@ def main_window():
     i5 = tk.StringVar()
     L3box = ttk.Combobox(window, textvariable=i5)
 
-    # Label
-    ttk.Label(window, text="Equilibrium Coordinates:", font=("Times New Roman", 10)).place(x=645, y=50)
-
-    # Allows the user to chose a file in their file explorer
-    def open_file():
-        filetypes = (
-            ('text files', '*.txt'),
-            ('All files', '*.*')
-        )
-        filename = fd.askopenfilename(
-            title='Open a file',
-            initialdir='/',
-            filetypes=filetypes)
-
-        showinfo(
-            title='Selected File',
-            message=filename
-        )
-
-        # kinter.Tk().withdraw()
-        # DataObject.holdData.file_name = askopenfilename()
-
-    # Open Button
-    open = tk.Button(window, text='Open', bd='5', bg='black', fg='white',
-                     command=open_file).place(x=795, y=45)
-
     # Button
     exit = tk.Button(window, text='Exit', bd='10', bg='red', fg='white',
-                     command=window.destroy).place(x=365, y=160)
+                     command=close_window).place(x=365, y=160)
 
     # Label for SSH
     """
@@ -183,6 +157,7 @@ def main_window():
     SSH_box["values"] = ('Yes', 'No')
     SSH_box.place(x=125, y=173)
     """
+
     # This is just a method for testing the values
     def apioutput():
 
@@ -249,6 +224,7 @@ def main_window():
         a = "holder"
         holder.set_name_of_file(a)
         window.destroy()
+
     global model_prompt
 
     def model_prompt(potential_model):
@@ -370,13 +346,12 @@ def main_window():
 
         # For running slum on a server
 
-
         def Enter():
             holder.host = Host_entry.get()
             holder.user = Username_entry.get()
             holder.password = Password_entry.get()
             window3.destroy()
-            #print(holder.host, holder.user, holder.password)
+            # print(holder.host, holder.user, holder.password)
             save_file_prompt()
 
             holder.set_remote(1)
@@ -388,8 +363,6 @@ def main_window():
             holder.setEquilMolecule(eq)
             holder.setPES(pes)
 
-
-
         Enter = tk.Button(window3, text='Enter', bd='15', bg='green', fg='white',
                           command=Enter).place(x=110, y=170)
 
@@ -399,6 +372,7 @@ def main_window():
     This method gets called when the GUI is terminated. This saves the values from the input to the DataObject file.
     This also checks for validation rules also for the values that were inputted.
     """
+
     def test():
         """
         if holder.value_holder:
@@ -423,14 +397,13 @@ def main_window():
         if holder.value_holder:
             save_file_prompt()
             eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
-                                                        holder.N2, holder.L2, holder.N3,
-                                                        holder.L3)
+                                                    holder.N2, holder.L2, holder.N3,
+                                                    holder.L3)
             holder.setEquilMolecule(eq)
             holder.setPES(pes)
 
         else:
             save_file_prompt()
-
 
     def output():
         try:
@@ -441,19 +414,18 @@ def main_window():
             Fix N so that the user can not enter floating point values.
             """
 
-            #print(DataObject.test.equilibrium_file)
+            # print(DataObject.test.equilibrium_file)
             holder.setN1(int(N1.get()))
             holder.setN2(int(N2.get()))
             holder.setN3(int(N3.get()))
             holder.setL1(float(L1.get()))
             holder.setL2(float(L2.get()))
             holder.setL3(float(L3.get()))
-            holder.setcores_amount(max(1,int(cores.get())))
-            #holder.set_remote(SSH_box.get())
-            #print(holder.N1, holder.N2, " holder")
+            holder.setcores_amount(max(1, int(cores.get())))
+            # holder.set_remote(SSH_box.get())
+            # print(holder.N1, holder.N2, " holder")
 
-            #print(holder.value_holder)
-
+            # print(holder.value_holder)
 
             if (int(holder.N1)) % 2 == 0:
                 messagebox.showerror("PyFGH", "N must be odd!!!")
@@ -483,6 +455,8 @@ def main_window():
             elif float(holder.L3) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
+            elif not opened:
+                messagebox.showerror("PyFGH", "Data is missing! Click The Read Structures Button and Add Your Equilibrium and Potential Energies Files!!!")
             # This runs the model window when the user hits calculate.
             else:
                 """
@@ -531,6 +505,24 @@ def main_window():
     # This is the about button.
     about = tk.Button(window, text='About', bd='10', bg='purple', fg='white',
                       command=about_window).place(x=590, y=160)
+
+    def help_window():
+        window = tk.Toplevel()
+        window.title("About")
+        window.geometry("500x235")
+        canvas = tkinter.Canvas(window, width=500, height=235)
+        canvas.pack()
+
+        text = ""
+
+        x = ttk.Label(window, text=text, font=("Times New Roman", 15))
+        x.pack()
+        x.place(x=0, y=0)
+
+        # This is the about button.
+
+    help = tk.Button(window, text='Help', bd='10', bg='#F9BB46', fg='white',
+                      command=help_window).place(x=303, y=160)
 
     # This method here displays the T equations.
     def t0():
@@ -587,14 +579,17 @@ def main_window():
     GUI interface at the same time.
     """
 
+    opened = False
+
     def Read_Structures_Button():
+        global opened
         """
             Note: xlsx files are not accepted. Can only take CSV files or else the code will break.
             XLSX files do not abide by UTF-8 formatting and is a pain to get it to work. So to save everyone
             time just only use a CSV file format!!!!!!!!!! Excel has the ability to save it to CSV format. To find out 
             how to save it to that format, just google it. This is the end of my rant. Happy Coding!
         """
-
+        opened = True
         x = askopenfilename()
         y = askopenfilename()
         DataObject.test.equilibrium_file = x
@@ -612,7 +607,7 @@ def main_window():
     # cores['values'] = (multiprocessing.cpu_count())
 
     # This places a lot of things in the GUI
-    cores.place(x=105, y=50)
+    cores.place(x=450, y=50)
     cores.current()
     vales2 = 80
     N1.place(x=40, y=100, width=100)

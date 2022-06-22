@@ -11,9 +11,9 @@ from util.DataObject import OutputData
 def eckartTranslation(dataObj):
     equil = dataObj.getEquilMolecule()
     pes = dataObj.getPES()
-    N1 = dataObj.getN1()
-    N2 = dataObj.getN2()
-    N3 = dataObj.getN3()
+    N1 = dataObj.getN(1)
+    N2 = dataObj.getN(2)
+    N3 = dataObj.getN(3)
     m = equil.getM()
     M = 0.0
     for i in range(3):
@@ -42,9 +42,9 @@ def eckartTranslation(dataObj):
 def eckartRotation(dataObj):
     equil = dataObj.getEquilMolecule()
     pes = dataObj.getPES()
-    N1 = dataObj.getN1()
-    N2 = dataObj.getN2()
-    N3 = dataObj.getN3()
+    N1 = dataObj.getN(1)
+    N2 = dataObj.getN(2)
+    N3 = dataObj.getN(3)
     m = equil.getM()
     xeq = equil.getX()
     yeq = equil.getY()
@@ -74,7 +74,7 @@ def passToCalc(dataObj):
     # print("Got an object.")
     # print(dataObj)
 
-    N = [dataObj.N1, dataObj.N2, dataObj.N3]
+    N = dataObj.N
 
     print("Imposing Eckart conditions")
     eckartTranslation(dataObj)

@@ -23,7 +23,7 @@ from tkinter import filedialog as fd
 import csv
 
 # import self
-
+opened = False
 from util import pyfghutil, DataObject
 import math
 
@@ -455,7 +455,7 @@ def main_window():
             elif float(holder.L3) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
-            elif not opened:
+            elif holder.value_holder == False:
                 messagebox.showerror("PyFGH", "Data is missing! Click The Read Structures Button and Add Your Equilibrium and Potential Energies Files!!!")
             # This runs the model window when the user hits calculate.
             else:
@@ -579,7 +579,7 @@ def main_window():
     GUI interface at the same time.
     """
 
-    opened = False
+
 
     def Read_Structures_Button():
         global opened
@@ -589,7 +589,7 @@ def main_window():
             time just only use a CSV file format!!!!!!!!!! Excel has the ability to save it to CSV format. To find out 
             how to save it to that format, just google it. This is the end of my rant. Happy Coding!
         """
-        opened = True
+
         x = askopenfilename()
         y = askopenfilename()
         DataObject.test.equilibrium_file = x

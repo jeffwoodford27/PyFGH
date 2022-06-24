@@ -2,6 +2,7 @@ import numpy as np
 from util import pyfghutil
 import math
 import multiprocessing as mp
+from scipy.fft import ifft
 
 #A function to calculate the BMatrix
 # B(j,l) = ((4*pi)/(L*N) * sum(p=1,n)(p*sin(2*pi*p*(l-j)/N))
@@ -10,7 +11,21 @@ import multiprocessing as mp
 # NValue = N = number of points in the dimension
 # Each dimension has its own set of B matrices
 
-def bmatrixgen(NValue, LValue):
+def bmatrixgen(N,L):
+    n = (N-1)//2
+    B = np.zeros((N,N),dtype=float)
+    a = np.zeros(N,dtype=complex)
+    for i in range(N):
+        a[i] = 2*np.pi*(1j)*(i-n)/L
+    aifft = ifft(a,n=N)
+    for k in range(N):
+        aifft[k] = aifft[k] * np.exp(-2 * np.pi * (1j) * n * k / N)
+    for j in range(N):
+        for t in range(N):
+            B[j,t] = np.real(aifft[(N+j-t)%N])
+    return B
+
+def bmatrixgen_old(NValue, LValue):
     n = int((NValue - 1)/2)
     b_matrix = np.zeros((NValue, NValue), float)
     for j in range(NValue):
@@ -28,7 +43,21 @@ def bmatrixgen(NValue, LValue):
 # NValue = N = number of points in the dimension
 # Each dimension has its own set of C matrices
 
-def cmatrixgen(NValue, LValue):
+def cmatrixgen(N,L):
+    n = (N - 1) // 2
+    C = np.zeros((N, N), dtype=float)
+    a = np.zeros(N, dtype=complex)
+    for i in range(N):
+        a[i] = -4 * np.pi * np.pi * (i-n) * (i-n) / (L*L)
+    aifft = ifft(a, n=N)
+    for k in range(N):
+        aifft[k] = aifft[k] * np.exp(-2 * np.pi * (1j) * n * k / N)
+    for j in range(N):
+        for t in range(N):
+            C[j, t] = np.real(aifft[(N+j-t)%N])
+    return C
+
+def cmatrixgen_old(NValue, LValue):
     #Generate the CMatrix
     c_matrix_local = np.zeros((NValue, NValue), float)
     #Calculate the similar values shared between x,y differences to improve efficiency

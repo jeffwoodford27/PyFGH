@@ -1,5 +1,4 @@
 import numpy as np
-import math
 from scipy.fft import ifft
 import time
 
@@ -14,10 +13,6 @@ class InputData:
         self.D = D
         self.N = np.zeros(D)
         self.L = np.zeros(D)
-
-    """
-    The following methods are setters. These values get set in test1.py
-    """
 
     def setCores(self, cores):
         self.ncore = cores
@@ -59,10 +54,10 @@ def calcCmatrix(N,L):
     C = np.zeros((N, N), dtype=float)
     a = np.zeros(N, dtype=complex)
     for i in range(N):
-        a[i] = -4 * math.pi * math.pi * (i-n) * (i-n) / (L*L)
+        a[i] = -4 * np.pi * np.pi * (i-n) * (i-n) / (L*L)
     aifft = ifft(a, n=N)
     for k in range(N):
-        aifft[k] = aifft[k] * np.exp(-2 * math.pi * (1j) * n * k / N)
+        aifft[k] = aifft[k] * np.exp(-2 * np.pi * (1j) * n * k / N)
 #    print(aifft)
     for j in range(N):
         for t in range(N):

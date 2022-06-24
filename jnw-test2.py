@@ -1,11 +1,8 @@
 import numpy as np
 from scipy.fft import ifft
-import math
 import time
 
 #This file has an improved method for calculating the B and C matrices, using Inverse FFT's.
-
-
 
 def bmatrixgen(NValue, LValue):
     n = int((NValue - 1) / 2)
@@ -13,8 +10,8 @@ def bmatrixgen(NValue, LValue):
     for j in range(NValue):
         for l in range(NValue):
             for p in range(1, n + 1):
-                b_matrix[j][l] += float(p) * math.sin(2 * math.pi * float(p) * float(l - j) / float(NValue))
-            b_matrix[j][l] *= (4.0 * math.pi) / (LValue * float(NValue))
+                b_matrix[j][l] += float(p) * np.sin(2 * np.pi * float(p) * float(l - j) / float(NValue))
+            b_matrix[j][l] *= (4.0 * np.pi) / (LValue * float(NValue))
 
     return (b_matrix)
 
@@ -23,10 +20,10 @@ def Bnew(N,L):
     B = np.zeros((N,N),dtype=float)
     a = np.zeros(N,dtype=complex)
     for i in range(N):
-        a[i] = 2*math.pi*(1j)*(i-n)/L
+        a[i] = 2*np.pi*(1j)*(i-n)/L
     aifft = ifft(a,n=N)
     for k in range(N):
-        aifft[k] = aifft[k] * np.exp(-2 * math.pi * (1j) * n * k / N)
+        aifft[k] = aifft[k] * np.exp(-2 * np.pi * (1j) * n * k / N)
 #    print(aifft)
     for j in range(N):
         for t in range(N):
@@ -40,8 +37,8 @@ def cmatrixgen(NValue, LValue):
     difc_matrix = np.zeros((NValue, 1), float)
     for a in range(NValue):
         for b in range(int((NValue-1)/2)):
-            difc_matrix[a] += (((b+1)*(b+1))*math.cos(((b+1)*2*math.pi*a)/ NValue))
-        difc_matrix[a] *= (-8.0*(math.pi*math.pi)/(float(NValue)*(float(LValue)*float(LValue))))
+            difc_matrix[a] += (((b+1)*(b+1))*np.cos(((b+1)*2*np.pi*a)/ NValue))
+        difc_matrix[a] *= (-8.0*(np.pi*np.pi)/(float(NValue)*(float(LValue)*float(LValue))))
     #Push the difc_matrix values to their respective c_matrix spots
     for y in range(NValue):
         for x in range(NValue):
@@ -54,10 +51,10 @@ def Cnew(N,L):
     C = np.zeros((N, N), dtype=float)
     a = np.zeros(N, dtype=complex)
     for i in range(N):
-        a[i] = -4 * math.pi * math.pi * (i-n) * (i-n) / (L*L)
+        a[i] = -4 * np.pi * np.pi * (i-n) * (i-n) / (L*L)
     aifft = ifft(a, n=N)
     for k in range(N):
-        aifft[k] = aifft[k] * np.exp(-2 * math.pi * (1j) * n * k / N)
+        aifft[k] = aifft[k] * np.exp(-2 * np.pi * (1j) * n * k / N)
     print(aifft)
     for j in range(N):
         for t in range(N):
@@ -69,7 +66,7 @@ L = 10
 n = (N-1) // 2
 a = np.zeros(N,dtype=complex)
 for i in range(N):
-    a[i] = 2*math.pi*(1j)*(-n*i)/L
+    a[i] = 2*np.pi*(1j)*(-n*i)/L
 
 #print(a)
 

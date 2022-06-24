@@ -150,6 +150,22 @@ class PotentialEnergySurface:
         self.pts.append(pt)
         return
 
+def PointToIndex(D,N,pt):
+    idx = np.zeros(D,dtype=int)
+    p = pt
+    for j in range(D):
+        idx[j] = p % N[j]
+        p = p // N[j]
+    return idx
+
+def AlphaAndBetaToCounter(alpha, beta, D, N):
+    alphaidx = PointToIndex(D, N, alpha)
+    betaidx = PointToIndex(D, N, beta)
+    counter = np.zeros(D * 2, dtype=int)
+    for j in range(D):
+        counter[2 * j] = betaidx[D - j - 1]
+        counter[2 * j + 1] = alphaidx[D - j - 1]
+    return counter
 
 def AlphaCalc(D, counterarray, NValues):
     output = 0
@@ -159,35 +175,6 @@ def AlphaCalc(D, counterarray, NValues):
         else:
             output += counterarray[(a * 2) + 1] * (np.prod(NValues[:(D - 1) - a]))
     return output
-
-
-def AlphaAndBetaToCounter(alpha, beta, D, NValues):
-    counter = np.zeros((D * 2, 1), int)
-    # I am uncertain about the ability to modify the input parameters,
-    # for now, I will create duplicate variables
-    modalpha = alpha
-    modbeta = beta
-    # alpha first
-    for x in range(D):
-        # print("Current modalpha is: "+str(modalpha))
-        if (not x + 1 == D):
-            npprod = np.prod(NValues[:D - (x + 1)])
-
-            manytimesalpha = modalpha // (npprod)
-            modalpha -= manytimesalpha * (npprod)
-            manytimesbeta = modbeta // (npprod)
-            modbeta -= manytimesbeta * (npprod)
-        else:
-            manytimesalpha = modalpha // 1
-            modalpha -= manytimesalpha
-            manytimesbeta = modbeta // 1
-            modbeta -= manytimesbeta
-        # Set Values
-        counter[(x * 2) + 1] = manytimesalpha
-        counter[(x * 2)] = manytimesbeta
-
-    return counter
-
 
 def BetaCalc(D, counterarray, NValues):
     output = 0

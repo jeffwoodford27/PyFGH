@@ -30,6 +30,7 @@ class test:
 class InputData:
 
     def __init__(self):
+        self.D = 3
         self.name_of_file = 0
         self.cores_amount = 1
         self.N1 = 0
@@ -84,7 +85,7 @@ class InputData:
         return
 
     def setN1(self, N1):
-        self.N1 = N1
+        self.N1 = int(N1)
         return
 
     def setL1(self, L1):
@@ -92,7 +93,7 @@ class InputData:
         return
 
     def setN2(self, N2):
-        self.N2 = N2
+        self.N2 = int(N2)
         return
 
     def setL2(self, L2):
@@ -100,7 +101,7 @@ class InputData:
         return
 
     def setN3(self, N3):
-        self.N3 = N3
+        self.N3 = int(N3)
         return
 
     def setL3(self, L3):
@@ -150,6 +151,9 @@ class InputData:
     def setPES(self,pes):
         self.PES = pes
         return
+
+    def getD(self):
+        return self.D
 
     def getN1(self):
         return self.N1

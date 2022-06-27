@@ -1,6 +1,7 @@
 import csv
 import math
 import os
+import numpy as np
 from util import pyfghutil, DataObject
 
 Q1 = []
@@ -173,7 +174,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     """
 
     def hi():
-        holder = DataObject.InputData()
+        holder = DataObject.InputData(3)
         r = holder.potential_energy_file
         #print(r)
         hola = open(DataObject.test.potential_energy_file)
@@ -263,8 +264,9 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     EquilMolecule.setZ(Z)
     EquilMolecule.setA(A)
     EquilMolecule.setM(m)
-    EquilMolecule.setX(xlist)
-    EquilMolecule.setY(ylist)
+    EquilMolecule.setx(xlist)
+    EquilMolecule.sety(ylist)
+    EquilMolecule.setz(np.zeros(3,dtype=float))
 
     #print("This is from the molecule gui: ", EquilMolecule.Z)
     getNs()

@@ -11,9 +11,9 @@ from util.DataObject import OutputData
 def eckartTranslation(dataObj):
     equil = dataObj.getEquilMolecule()
     pes = dataObj.getPES()
-    N1 = dataObj.getN(1)
-    N2 = dataObj.getN(2)
-    N3 = dataObj.getN(3)
+    N1 = dataObj.getN1()
+    N2 = dataObj.getN2()
+    N3 = dataObj.getN3()
     m = equil.getM()
     M = 0.0
     for i in range(3):
@@ -23,8 +23,8 @@ def eckartTranslation(dataObj):
         for j in range(N2):
             for k in range(N3):
                 xcm = ycm = 0.0
-                x = pes.getPointByN(i, j, k).getX()
-                y = pes.getPointByN(i, j, k).getY()
+                x = pes.getPointByN(i, j, k).getXlist()
+                y = pes.getPointByN(i, j, k).getYlist()
                 for p in range(3):
                     xcm += m[p]*x[p]
                     ycm += m[p]*y[p]
@@ -42,17 +42,17 @@ def eckartTranslation(dataObj):
 def eckartRotation(dataObj):
     equil = dataObj.getEquilMolecule()
     pes = dataObj.getPES()
-    N1 = dataObj.getN(1)
-    N2 = dataObj.getN(2)
-    N3 = dataObj.getN(3)
+    N1 = dataObj.getN1()
+    N2 = dataObj.getN2()
+    N3 = dataObj.getN3()
     m = equil.getM()
-    xeq = equil.getX()
-    yeq = equil.getY()
+    xeq = equil.getXlist()
+    yeq = equil.getYlist()
     for i in range(N1):
         for j in range(N2):
             for k in range(N3):
-                x = pes.getPointByN(i, j, k).getX()
-                y = pes.getPointByN(i, j, k).getY()
+                x = pes.getPointByN(i, j, k).getXlist()
+                y = pes.getPointByN(i, j, k).getYlist()
                 numer = denom = 0.0
                 for p in range(3):
                     numer += m[p]*(x[p]*yeq[p] - y[p]*xeq[p])
@@ -74,14 +74,18 @@ def passToCalc(dataObj):
     # print("Got an object.")
     # print(dataObj)
 
-    N = dataObj.N
+    D = dataObj.getD()
+    N = np.zeros(D,dtype=int)
+    N[0] = dataObj.getN1()
+    N[1] = dataObj.getN2()
+    N[2] = dataObj.getN3()
 
     print("Imposing Eckart conditions")
     eckartTranslation(dataObj)
     eckartRotation(dataObj)
 
     print("Creating G Matrix")
-    GMat = Gmatrix.calcGMatrix(N, dataObj.PES, dataObj.EquilMolecule)
+    GMat = Gmatrix.calcGMatrix(D, N, dataObj.PES, dataObj.EquilMolecule)
     print("Done with G Matrix")
     print("Creating V Matrix")
     VMat = Vmatrix.VMatrixCalc(dataObj)

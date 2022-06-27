@@ -1,5 +1,20 @@
 import numpy as np
 
+def IndexToPoint(D,N,idx):
+    pt = idx[0]
+    for j in range(1,D):
+        pt = pt * N[j]
+        pt = pt + idx[j]
+    return pt
+
+def PointToIndex(D,N,pt):
+    idx = np.zeros(D,dtype=int)
+    p = pt
+    for j in range(D-1,-1,-1):
+        idx[j] = p % N[j]
+        p = p // N[j]
+    return idx
+
 # The Molecule class.  Defines a chemical molecule.
 # Z = a list of length 3 of atomic numbers of the atoms.
 # A = a list of length 3 of mass numbers of the atoms.
@@ -9,8 +24,10 @@ import numpy as np
 
 class Molecule:
     def __init__(self):
+        self.Nat = 3
         self.x = []
         self.y = []
+        self.z = []
         self.A = []
         self.Z = []
         self.m = []
@@ -19,6 +36,9 @@ class Molecule:
     def setAtomicNumber(self, Z):
         self.Z = Z
         return
+
+    def getNatom(self):
+        return self.Nat
 
     def getZ(self):
         return self.Z
@@ -34,18 +54,22 @@ class Molecule:
     def getM(self):
         return self.m
 
-    def getX(self):
+    def getXlist(self):
         return self.x
 
-    def getY(self):
+    def getYlist(self):
         return self.y
 
-    def setX(self, x):
+    def setx(self, x):
         self.x = x
         return
 
-    def setY(self, y):
+    def sety(self, y):
         self.y = y
+        return
+
+    def setz(self, z):
+        self.z = z
         return
 
     def setA(self, A):
@@ -85,14 +109,48 @@ class PESpoint:
     def getq3(self):
         return self.q[2]
 
-    def getX(self):
+    def getq(self,n):
+        if (n == 1):
+            return self.getq1()
+        elif (n == 2):
+            return self.getq2()
+        elif (n == 3):
+            return self.getq3()
+
+    def getX(self,n):
+        return self.x[n-1]
+
+    def getXlist(self):
         return self.x
 
-    def getY(self):
+    def getY(self,n):
+        return self.y[n-1]
+
+    def getYlist(self):
         return self.y
 
-    def getZ(self):
-        return self.z
+    def getZ(self,n):
+        return self.z[n-1]
+
+    def getCoord(self,c):
+        if (c == 0):
+            return self.getX(1)
+        elif (c == 1):
+            return self.getY(1)
+        elif (c == 2):
+            return self.getZ(1)
+        elif (c == 3):
+            return self.getX(2)
+        elif (c == 4):
+            return self.getY(2)
+        elif (c == 5):
+            return self.getZ(2)
+        elif (c == 6):
+            return self.getX(3)
+        elif (c == 7):
+            return self.getY(3)
+        elif (c == 8):
+            return self.getZ(3)
 
     def setN(self, n):
         self.n = n
@@ -138,6 +196,9 @@ class PotentialEnergySurface:
         m = v + self.N[2] * (u + self.N[1] * t)
         return self.pts[m]
 
+    def getPointByIdx(self, idx):
+        return self.getPointByN(idx[0],idx[1],idx[2])
+
     def setNpts(self, Npts):
         self.Npts = Npts
         return
@@ -149,14 +210,6 @@ class PotentialEnergySurface:
     def appendPESpt(self, pt):
         self.pts.append(pt)
         return
-
-def PointToIndex(D,N,pt):
-    idx = np.zeros(D,dtype=int)
-    p = pt
-    for j in range(D):
-        idx[j] = p % N[j]
-        p = p // N[j]
-    return idx
 
 def AlphaAndBetaToCounter(alpha, beta, D, N):
     alphaidx = PointToIndex(D, N, alpha)

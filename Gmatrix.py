@@ -2,13 +2,91 @@ import scipy
 from scipy import interpolate
 from scipy import linalg
 import numpy as np
+from util import pyfghutil
 
 def compute_derivative (x, y):
     spl = scipy.interpolate.splrep(x,y,s=0)
     yprime = scipy.interpolate.splev(x,spl,der=1)
     return yprime
 
-def calcGMatrix(N,pes,equil):
+def calcGMatrix(D, N, pes, equil):
+
+    Nat = equil.getNatom()
+    Npts = np.prod(N)
+    print(type(N[0]))
+
+    dxdq = np.zeros((3*Nat,D,Npts),dtype=float)
+    dxdqcalc = np.zeros((3 * Nat, D, Npts), dtype=int)
+
+    for n in range(Npts):
+        for d in range(D-1, -1, -1):
+            for c in range(3*Nat):
+                if (dxdqcalc[c,d,n] == 0):
+#                    print ("for point " + str(n) + " in dimension " + str(d))
+                    x = np.zeros(N[d], dtype=float)
+                    y = np.zeros(N[d], dtype=float)
+                    for i in range(N[d]):
+                        pt = n + i * np.prod(N[d + 1:])
+                        idx = pyfghutil.PointToIndex(D, N, pt)
+                        x[i] = pes.getPointByIdx(idx).getq(d + 1)
+                        y[i] = pes.getPointByIdx(idx).getCoord(c)
+#                    print(x, y)
+                    dy = compute_derivative(x, y)
+                    for i in range(N[d]):
+                        pt = n + i * np.prod(N[d + 1:])
+                        dxdq[c, d, pt] = dy[i]
+                        dxdqcalc[c, d, pt] = 1
+
+                    if (d == 2):
+                        idx = pyfghutil.PointToIndex(D, N, n)
+                        for i in range(D):
+                            if (i != d):
+                                print("q" + str(i + 1) + "=" + str(pes.getPointByIdx(idx).getq(i + 1)))
+                        for i in range(D):
+                            if (i == d):
+                                print("q" + str(i + 1) + ": " + str(x))
+                                print("x" + str(c + 1) + ": " + str(y))
+            else:
+                pass
+    #            print("skip point " + str(n) + " for dimension " + str(d))
+
+    Gmatrix = np.zeros([N[0],N[1],N[2],3,3],dtype=float)
+    m = equil.getM()
+    m1 = m[0]
+    m2 = m[1]
+    m3 = m[2]
+
+    for p in range(Npts):
+        G = np.zeros([3,3],float)
+        G[0][0] = m1 * (dxdq[0][0][p] * dxdq[0][0][p] + dxdq[1][0][p] * dxdq[1][0][p]) \
+                + m2 * (dxdq[3][0][p] * dxdq[3][0][p] + dxdq[4][0][p] * dxdq[4][0][p]) \
+                + m3 * (dxdq[6][0][p] * dxdq[6][0][p] + dxdq[7][0][p] * dxdq[7][0][p])
+        G[0][1] = m1 * (dxdq[0][0][p] * dxdq[0][1][p] + dxdq[1][0][p] * dxdq[1][1][p]) \
+                + m2 * (dxdq[3][0][p] * dxdq[3][1][p] + dxdq[4][0][p] * dxdq[4][1][p]) \
+                + m3 * (dxdq[6][0][p] * dxdq[6][1][p] + dxdq[7][0][p] * dxdq[7][1][p])
+        G[0][2] = m1 * (dxdq[0][0][p] * dxdq[0][2][p] + dxdq[1][0][p] * dxdq[1][2][p]) \
+                + m2 * (dxdq[3][0][p] * dxdq[3][2][p] + dxdq[4][0][p] * dxdq[4][2][p]) \
+                + m3 * (dxdq[6][0][p] * dxdq[6][2][p] + dxdq[7][0][p] * dxdq[7][2][p])
+        G[1][1] = m1 * (dxdq[0][1][p] * dxdq[0][1][p] + dxdq[1][1][p] * dxdq[1][1][p]) \
+                + m2 * (dxdq[3][1][p] * dxdq[3][1][p] + dxdq[4][1][p] * dxdq[4][1][p]) \
+                + m3 * (dxdq[6][1][p] * dxdq[6][1][p] + dxdq[7][1][p] * dxdq[7][1][p])
+        G[1][2] = m1 * (dxdq[0][1][p] * dxdq[0][2][p] + dxdq[1][1][p] * dxdq[1][2][p]) \
+                + m2 * (dxdq[3][1][p] * dxdq[3][2][p] + dxdq[4][1][p] * dxdq[4][2][p]) \
+                + m3 * (dxdq[6][1][p] * dxdq[6][2][p] + dxdq[7][1][p] * dxdq[7][2][p])
+        G[2][2] = m1 * (dxdq[0][2][p] * dxdq[0][2][p] + dxdq[1][2][p] * dxdq[1][2][p]) \
+                + m2 * (dxdq[3][2][p] * dxdq[3][2][p] + dxdq[4][2][p] * dxdq[4][2][p]) \
+                + m3 * (dxdq[6][2][p] * dxdq[6][2][p] + dxdq[7][2][p] * dxdq[7][2][p])
+        G[1][0] = G[0][1]
+        G[2][0] = G[0][2]
+        G[2][1] = G[1][2]
+        Ginv = scipy.linalg.inv(G)
+        idx = pyfghutil.PointToIndex(D,N,p)
+        for r in range(3):
+            for s in range(3):
+                Gmatrix[idx[0]][idx[1]][idx[2]][r][s] = Ginv[r][s]
+    return Gmatrix
+
+def calcGMatrix_Old(D, N, pes, equil):
     dx1dq1 = np.zeros([N[0],N[1],N[2]])
     dy1dq1 = np.zeros([N[0],N[1],N[2]])
     dx2dq1 = np.zeros([N[0],N[1],N[2]])

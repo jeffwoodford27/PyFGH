@@ -132,6 +132,9 @@ class PESpoint:
     def getZ(self,n):
         return self.z[n-1]
 
+    def getZlist(self):
+        return self.z
+
     def getCoord(self,c):
         if (c == 0):
             return self.getX(1)

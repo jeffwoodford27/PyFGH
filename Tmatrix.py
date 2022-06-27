@@ -1,6 +1,5 @@
 import numpy as np
 from util import pyfghutil
-import math
 import multiprocessing as mp
 from scipy.fft import ifft
 
@@ -31,9 +30,9 @@ def bmatrixgen_old(NValue, LValue):
     for j in range(NValue):
         for l in range(NValue):
             for p in range(1, n+1):
-                b_matrix[j][l] += float(p)*math.sin(2*math.pi*float(p)*float(l-j)/float(NValue))
-            b_matrix[j][l] *= (4.0*math.pi)/(LValue*float(NValue))
-    
+                b_matrix[j][l] += float(p)*np.sin(2*np.pi*float(p)*float(l-j)/float(NValue))
+            b_matrix[j][l] *= (4.0*np.pi)/(LValue*float(NValue))
+
     return(b_matrix)
 
 #A function to calculate the CMatrix
@@ -64,8 +63,8 @@ def cmatrixgen_old(NValue, LValue):
     difc_matrix = np.zeros((NValue, 1), float)
     for a in range(NValue):
         for b in range(int((NValue-1)/2)):
-            difc_matrix[a] += (((b+1)*(b+1))*math.cos(((b+1)*2*math.pi*a)/ NValue))
-        difc_matrix[a] *= (-8.0*(math.pi*math.pi)/(float(NValue)*(float(LValue)*float(LValue))))
+            difc_matrix[a] += (((b+1)*(b+1))*np.cos(((b+1)*2*np.pi*a)/ NValue))
+        difc_matrix[a] *= (-8.0*(np.pi*np.pi)/(float(NValue)*(float(LValue)*float(LValue))))
     #Push the difc_matrix values to their respective c_matrix spots
     for y in range(NValue):
         for x in range(NValue):
@@ -86,7 +85,7 @@ def Tab(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray, approxima
             return float(1)
         else:
             return float(0)
-    
+
     total = 0.0
     if(approximation == 4):
         for T in range(d):
@@ -116,7 +115,7 @@ def Tab(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray, approxima
                     if(dimensionCounterArray[Ccounter*2] == dimensionCounterArray[(Ccounter*2)+1]):
                         Deltacounter += 1
             if(Deltacounter == d-1):
-                total += float((GMat[C][C])) * (c_matrix_insert[C][dimensionCounterArray[(C*2)+1], dimensionCounterArray[C*2]])              
+                total += float((GMat[C][C])) * (c_matrix_insert[C][dimensionCounterArray[(C*2)+1], dimensionCounterArray[C*2]])
         #Perform all of the "B" calculations second
         for B in range(d):
             if(dimensionCounterArray[B*2] == dimensionCounterArray[(B*2)+1]):
@@ -155,7 +154,7 @@ def Tab(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray, approxima
         for p in range(NValue[2]):
             sums += b_matrix_insert[0][l,p]*b_matrix_insert[0][p,v]*GMat[j][k][p][2][2]
         total += -0.5*sums*delta(j,t)*delta(k,u)
-        
+
         total += -0.5*(b_matrix_insert[2][j,t]*b_matrix_insert[1][k,u]*GMat[t][k][l][0][1]) * delta(v,l)
         total += -0.5*(b_matrix_insert[2][j,t]*b_matrix_insert[0][l,v]*GMat[t][k][l][0][2]) * delta(k,u)
         total += -0.5*(b_matrix_insert[1][k,u]*b_matrix_insert[2][j,t]*GMat[j][u][l][1][0]) * delta(v,l)
@@ -167,9 +166,9 @@ def Tab(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray, approxima
 
     else:
         print("This current approximation is incorrect or not supported: "+str(approximation))
-        exit()                
+        exit()
 
-    return(total)        
+    return(total)
 
 # A function that splits the Tmatrix calculation into blocks to be calculated in parallel.
 # Each block uses the Tab function above to calculate individual matrix elements.
@@ -217,11 +216,11 @@ def TMatrixCalc(dataObject, GMatrix):
 
     #Create the TMatrix and the TFlagMatrix
     #The alpha and beta values are used to create the TMatrix in the correct position
-    tmatrix = np.zeros((np.prod(NValue), np.prod(NValue)), float)
+    tmatrix = np.zeros((np.prod(NValue), np.prod(NValue)), dtype=float)
     tflag = np.zeros((np.prod(NValue), np.prod(NValue)), int)
     alpha = 0
     beta = 0
-    
+
     #Create the C_Matrix
     c_matrix = []
     for x in reversed(range(len(NValue))):
@@ -258,17 +257,16 @@ def TMatrixCalc(dataObject, GMatrix):
     blocks = p.starmap(TBlockCalc, paramz)
 #    print("Pool's done T")
     p.close()
-    
+
     precalc = 0
     for i in range(len(blockCoords)):
         block = blocks[i]
         x = blockCoords[i][0]
         y = blockCoords[i][1]
         tmatrix[(0+NValue[precalc]*x):(NValue[precalc]+NValue[precalc]*x), (0+NValue[precalc]*y):(NValue[precalc]+NValue[precalc]*y)] = block
-    
-    
+
     return tmatrix
-    
-    
+
+
 
 

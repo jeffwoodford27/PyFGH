@@ -48,7 +48,7 @@ class Molecule:
         return
 
     def getAtomicNoList(self):
-        return Z
+        return self.Z
 
     def setMassNoList(self,A):
         self.A = A
@@ -202,6 +202,9 @@ class PotentialEnergySurface:
 
     def getPointByIdx(self, idx):
         return self.getPointByN(idx[0],idx[1],idx[2])
+
+    def getPointByPt(self, pt):
+        return self.pts[pt]
 
     def setNpts(self, Npts):
         self.Npts = Npts

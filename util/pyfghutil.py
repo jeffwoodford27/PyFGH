@@ -82,7 +82,7 @@ class Molecule:
         self.z = z
         return
 
-    def getZlist(self):
+    def getZList(self):
         return self.z
 
 # A class to define a point on the potential energy surface.

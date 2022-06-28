@@ -397,8 +397,10 @@ def main_window():
         if holder.value_holder:
             save_file_prompt()
             eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
-                                                    holder.N2, holder.L2, holder.N3,
-                                                    holder.L3)
+                                                    holder.N2, holder.L2,
+                                                    holder.N3, holder.L3,
+                                                    holder.equilibrium_file,
+                                                    holder.potential_energy_file)
             holder.setEquilMolecule(eq)
             holder.setPES(pes)
 
@@ -592,8 +594,10 @@ def main_window():
 
         x = askopenfilename()
         y = askopenfilename()
-        DataObject.test.equilibrium_file = x
-        DataObject.test.potential_energy_file = y
+#        DataObject.test.equilibrium_file = x
+#        DataObject.test.potential_energy_file = y
+        holder.setequilibrium_file(x)
+        holder.setpotential_energy(y)
         holder.setvalue_holder(True)
 
     # This is a button called Read Structures

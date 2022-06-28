@@ -32,14 +32,14 @@ When selecting the files must select first and then select enter N and L values!
 """
 
 
-def molecule_testing(N1, L1, N2, L2, N3, L3):
+def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
     #print(DataObject.test.equilibrium_file)
     N1_1 = N1
     N2_1 = N2
     N3_1 = N3
     #print(N1_1)
-    # print(holder_file.equilibrium_file)
-    with open(DataObject.test.equilibrium_file) as f:
+#    with open(DataObject.test.equilibrium_file) as f:
+    with open(eqfile) as f:
         for row in f:
             #print(row)
             list2.append(row.split(',')[0])  # Li
@@ -103,9 +103,11 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
             #print("amu to atomic ", m)
 
     def getNs():
-        file = open(DataObject.test.potential_energy_file)
+#        file = open(DataObject.test.potential_energy_file)
+        file = open(pesfile)
         reader = csv.reader(file)
         lines = len(list(reader))
+        f.close()
         totalN_2 = N1_1 * N2_1 * N3_1
         if lines == totalN_2:
             #print("The lines of waterpot-data equals the total of all N vales")
@@ -148,6 +150,8 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
             raise Exception("Atom is not unique")
             #throw an error
 
+        return
+
             # First atom is assumed to be the central atom
 
     xlist = [float(x) for x in x_coordinates]
@@ -174,19 +178,22 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     """
 
     def hi():
-        holder = DataObject.InputData(3)
+        holder = DataObject.InputData()
         r = holder.potential_energy_file
         #print(r)
-        hola = open(DataObject.test.potential_energy_file)
-        for hello in hola:
-            potx1.append(hello.split(',')[3])
-            potx2.append(hello.split(',')[5])
-            potx3.append(hello.split(',')[7])
+#        hola = open(DataObject.test.potential_energy_file)
+#        hola = open(pesfile)
+        with open(pesfile) as hola:
+            for hello in hola:
+                potx1.append(hello.split(',')[3])
+                potx2.append(hello.split(',')[5])
+                potx3.append(hello.split(',')[7])
 
-            poty1.append(hello.split(',')[4])
-            poty2.append(hello.split(',')[6])
-            poty3.append(hello.split(',')[8])
-            energy.append(hello.split(',')[9])
+                poty1.append(hello.split(',')[4])
+                poty2.append(hello.split(',')[6])
+                poty3.append(hello.split(',')[8])
+                energy.append(hello.split(',')[9])
+        return
 
     hi()
 
@@ -231,6 +238,8 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
         else:
             #print("Atom is not unique")
             raise Exception("Atom is not unique")
+
+        return
 
             # First atom is assumed to be the central atom
 
@@ -286,7 +295,8 @@ def molecule_testing(N1, L1, N2, L2, N3, L3):
     deltaQ1 = L1_2 / float(N1_2)
     deltaQ2 = L2_2 / float(N2_2)
     deltaQ3 = L3_2 / float(N3_2)
-    with open(DataObject.test.potential_energy_file) as a:
+#    with open(DataObject.test.potential_energy_file) as a:
+    with open(pesfile) as a:
         for x in a:
             Q1.append(float(x.split(',')[0]))
             Q2.append(float(x.split(',')[1]))

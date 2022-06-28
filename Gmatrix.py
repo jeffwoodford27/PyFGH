@@ -37,15 +37,15 @@ def calcGMatrix(D, N, pes, equil):
                         dxdq[c, d, pt] = dy[i]
                         dxdqcalc[c, d, pt] = 1
 
-                    if (d == 2):
-                        idx = pyfghutil.PointToIndex(D, N, n)
-                        for i in range(D):
-                            if (i != d):
-                                print("q" + str(i + 1) + "=" + str(pes.getPointByIdx(idx).getq(i + 1)))
-                        for i in range(D):
-                            if (i == d):
-                                print("q" + str(i + 1) + ": " + str(x))
-                                print("x" + str(c + 1) + ": " + str(y))
+#                    if (d == 2):
+#                        idx = pyfghutil.PointToIndex(D, N, n)
+#                        for i in range(D):
+#                            if (i != d):
+#                                print("q" + str(i + 1) + "=" + str(pes.getPointByIdx(idx).getq(i + 1)))
+#                        for i in range(D):
+#                            if (i == d):
+#                                print("q" + str(i + 1) + ": " + str(x))
+#                                print("x" + str(c + 1) + ": " + str(y))
             else:
                 pass
     #            print("skip point " + str(n) + " for dimension " + str(d))

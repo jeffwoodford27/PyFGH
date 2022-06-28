@@ -14,7 +14,7 @@ def eckartTranslation(dataObj):
     N1 = dataObj.getN1()
     N2 = dataObj.getN2()
     N3 = dataObj.getN3()
-    m = equil.getM()
+    m = equil.getMassList()
     M = 0.0
     for i in range(3):
         M += m[i]
@@ -23,8 +23,8 @@ def eckartTranslation(dataObj):
         for j in range(N2):
             for k in range(N3):
                 xcm = ycm = 0.0
-                x = pes.getPointByN(i, j, k).getXlist()
-                y = pes.getPointByN(i, j, k).getYlist()
+                x = pes.getPointByN(i, j, k).getXList()
+                y = pes.getPointByN(i, j, k).getYList()
                 for p in range(3):
                     xcm += m[p]*x[p]
                     ycm += m[p]*y[p]
@@ -35,8 +35,8 @@ def eckartTranslation(dataObj):
                 for p in range(3):
                     xnew[p] = x[p] - xcm
                     ynew[p] = y[p] - ycm
-                pes.getPointByN(i,j,k).setX(xnew)
-                pes.getPointByN(i,j,k).setY(ynew)
+                pes.getPointByN(i,j,k).setXList(xnew)
+                pes.getPointByN(i,j,k).setYList(ynew)
     return
 
 def eckartRotation(dataObj):
@@ -45,14 +45,14 @@ def eckartRotation(dataObj):
     N1 = dataObj.getN1()
     N2 = dataObj.getN2()
     N3 = dataObj.getN3()
-    m = equil.getM()
-    xeq = equil.getXlist()
-    yeq = equil.getYlist()
+    m = equil.getMassList()
+    xeq = equil.getXList()
+    yeq = equil.getYList()
     for i in range(N1):
         for j in range(N2):
             for k in range(N3):
-                x = pes.getPointByN(i, j, k).getXlist()
-                y = pes.getPointByN(i, j, k).getYlist()
+                x = pes.getPointByN(i, j, k).getXList()
+                y = pes.getPointByN(i, j, k).getYList()
                 numer = denom = 0.0
                 for p in range(3):
                     numer += m[p]*(x[p]*yeq[p] - y[p]*xeq[p])
@@ -63,8 +63,8 @@ def eckartRotation(dataObj):
                 for p in range(3):
                     xnew[p] = x[p]*math.cos(theta) - y[p]*math.sin(theta)
                     ynew[p] = x[p]*math.sin(theta) + y[p]*math.cos(theta)
-                pes.getPointByN(i,j,k).setX(xnew)
-                pes.getPointByN(i,j,k).setY(ynew)
+                pes.getPointByN(i,j,k).setXList(xnew)
+                pes.getPointByN(i,j,k).setYList(ynew)
     return
 
 def main():

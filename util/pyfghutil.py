@@ -33,56 +33,57 @@ class Molecule:
         self.m = []
         # self.m = MassLookup[self.s + "-" + str(self.A)] * 1822.89
 
-    def setAtomicNumber(self, Z):
-        self.Z = Z
-        return
 
     def getNatom(self):
         return self.Nat
 
-    def getZ(self):
-        return self.Z
 
     """
     def getS(self):
         return self.S
     """
 
-    def getA(self):
-        return self.A
-
-    def getM(self):
-        return self.m
-
-    def getXlist(self):
-        return self.x
-
-    def getYlist(self):
-        return self.y
-
-    def setx(self, x):
-        self.x = x
-        return
-
-    def sety(self, y):
-        self.y = y
-        return
-
-    def setz(self, z):
-        self.z = z
-        return
-
-    def setA(self, A):
-        self.A = A
-        return
-
-    def setZ(self, Z):
+    def setAtomicNoList(self,Z):
         self.Z = Z
         return
 
-    def setM(self, m):
+    def getAtomicNoList(self):
+        return Z
+
+    def setMassNoList(self,A):
+        self.A = A
+        return
+
+    def getMassNoList(self):
+        return self.A
+
+    def setMassList(self, m):
         self.m = m
         return
+
+    def getMassList(self):
+        return self.m
+
+    def setXList(self,x):
+        self.x = x
+        return
+
+    def getXList(self):
+        return self.x
+
+    def setYList(self, y):
+        self.y = y
+        return
+
+    def getYList(self):
+        return self.y
+
+    def setZList(self, z):
+        self.z = z
+        return
+
+    def getZlist(self):
+        return self.z
 
 # A class to define a point on the potential energy surface.
 # n = the number of the grid point (indexed from 0)
@@ -120,19 +121,19 @@ class PESpoint:
     def getX(self,n):
         return self.x[n-1]
 
-    def getXlist(self):
+    def getXList(self):
         return self.x
 
     def getY(self,n):
         return self.y[n-1]
 
-    def getYlist(self):
+    def getYList(self):
         return self.y
 
     def getZ(self,n):
         return self.z[n-1]
 
-    def getZlist(self):
+    def getZList(self):
         return self.z
 
     def getCoord(self,c):
@@ -159,19 +160,19 @@ class PESpoint:
         self.n = n
         return
 
-    def setQ(self, q):
+    def setQList(self, q):
         self.q = q
         return
 
-    def setX(self, x):
+    def setXList(self, x):
         self.x = x
         return
 
-    def setY(self, y):
+    def setYList(self, y):
         self.y = y
         return
 
-    def setZ(self, z):
+    def setZList(self, z):
         self.z = z
         return
 

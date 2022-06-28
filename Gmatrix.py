@@ -13,7 +13,6 @@ def calcGMatrix(D, N, pes, equil):
 
     Nat = equil.getNatom()
     Npts = np.prod(N)
-    print(type(N[0]))
 
     dxdq = np.zeros((3*Nat,D,Npts),dtype=float)
     dxdqcalc = np.zeros((3 * Nat, D, Npts), dtype=int)
@@ -51,7 +50,7 @@ def calcGMatrix(D, N, pes, equil):
     #            print("skip point " + str(n) + " for dimension " + str(d))
 
     Gmatrix = np.zeros([N[0],N[1],N[2],3,3],dtype=float)
-    m = equil.getM()
+    m = equil.getMassList()
     m1 = m[0]
     m2 = m[1]
     m3 = m[2]

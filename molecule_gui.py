@@ -270,12 +270,12 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
     calculations(x1, y1, z1, x2, y2, z2, xx2, yy2, zz2, xx3, yy3, zz3)
 
     EquilMolecule = pyfghutil.Molecule()
-    EquilMolecule.setZ(Z)
-    EquilMolecule.setA(A)
-    EquilMolecule.setM(m)
-    EquilMolecule.setx(xlist)
-    EquilMolecule.sety(ylist)
-    EquilMolecule.setz(np.zeros(3,dtype=float))
+    EquilMolecule.setAtomicNoList(Z)
+    EquilMolecule.setMassNoList(A)
+    EquilMolecule.setMassList(m)
+    EquilMolecule.setXList(xlist)
+    EquilMolecule.setYList(ylist)
+    EquilMolecule.setZList(np.zeros(3,dtype=float))
 
     #print("This is from the molecule gui: ", EquilMolecule.Z)
     getNs()
@@ -326,10 +326,10 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
 
                 pt = pyfghutil.PESpoint()
                 pt.setN(n)
-                pt.setQ([q1,q2,q3])
-                pt.setX([potxlist1[n],potxlist2[n],potxlist3[n]])
-                pt.setY([potylist1[n], potylist2[n], potylist3[n]])
-                pt.setZ([0, 0, 0])
+                pt.setQList([q1, q2, q3])
+                pt.setXList([potxlist1[n],potxlist2[n],potxlist3[n]])
+                pt.setYList([potylist1[n], potylist2[n], potylist3[n]])
+                pt.setZList([0, 0, 0])
                 pt.setEnergy(potenergy[n])
                 pes.appendPESpt(pt)
                 n += 1

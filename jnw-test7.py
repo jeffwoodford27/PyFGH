@@ -57,6 +57,33 @@ def RotateToPA(mol):
     I[2,1] = I[1,2]
     return I
 
+def eckartRotationCheck(equil, mol):
+    Nat = equil.getNatom()
+    m = equil.getMassList()
+    xe = equil.getXList()
+    ye = equil.getYList()
+    ze = equil.getZList()
+    x = mol.getXList()
+    y = mol.getYList()
+    z = mol.getZList()
+
+    xd = np.zeros(Nat,dtype=float)
+    yd = np.zeros(Nat,dtype=float)
+    zd = np.zeros(Nat,dtype=float)
+
+    for j in range(Nat):
+        xd[j] = x[j] - xe[j]
+        yd[j] = y[j] - ye[j]
+        zd[j] = z[j] - ze[j]
+
+    eckartcheck = np.zeros(3,dtype=float)
+    for j in range(Nat):
+        eckartcheck[0] += m[j]*(yd[j]*ze[j] - zd[j]*ye[j])
+        eckartcheck[1] += m[j]*(xd[j]*ze[j] - zd[j]*xe[j])
+        eckartcheck[2] += m[j]*(xd[j]*ye[j] - yd[j]*xe[j])
+
+    return eckartcheck
+
 
 def eckartTranslation(dataObj):
     equil = dataObj.getEquilMolecule()
@@ -173,46 +200,160 @@ with open(inp.potential_energy_file, newline='') as csvfile:
         n = n + 1
 
 TranslateToCOM(equil)
-print("equil:" + str(RotateToPA(equil)))
 
-p = 0
-pespt = pes.getPointByPt(p)
-mol = pyfghutil.Molecule()
-mol.setXList(pespt.getXList())
-mol.setYList(pespt.getYList())
-mol.setZList(pespt.getZList())
-mol.setMassList(equil.getMassList())
-mol.setAtomicNoList(equil.getAtomicNoList())
-mol.setMassNoList(equil.getMassNoList())
+xe = equil.getXList()
+ye = equil.getYList()
+ze = equil.getZList()
 
-print(mol.getXList())
-print(mol.getYList())
-print(mol.getZList())
+print(xe)
+print(ye)
+print(ze)
 
-TranslateToCOM(mol)
+Npt = 10
+newmol = []
+for p in range(Npt):
+    print("p")
+    print(p)
+    pespt = pes.getPointByPt(p)
+    mol = pyfghutil.Molecule()
+    mol.setXList(pespt.getXList())
+    mol.setYList(pespt.getYList())
+    mol.setZList(pespt.getZList())
+    mol.setMassList(equil.getMassList())
+    mol.setAtomicNoList(equil.getAtomicNoList())
+    mol.setMassNoList(equil.getMassNoList())
 
-print(mol.getXList())
-print(mol.getYList())
-print(mol.getZList())
+    TranslateToCOM(mol)
 
-I = RotateToPA(mol)
-print(I)
+    x = mol.getXList()
+    y = mol.getYList()
+    z = mol.getZList()
 
-eval,evec = linalg.eig(I)
-print(eval)
-print(evec)
+    A = np.zeros((3,3),dtype=float)
+    for i in range(Nat):
+        A[0,0] += m[i]*x[i]*xe[i]
+        A[0,1] += m[i]*x[i]*ye[i]
+        A[0,2] += m[i]*x[i]*ze[i]
+        A[1,0] += m[i]*y[i]*xe[i]
+        A[1,1] += m[i]*y[i]*ye[i]
+        A[1,2] += m[i]*y[i]*ze[i]
+        A[2,0] += m[i]*z[i]*xe[i]
+        A[2,1] += m[i]*z[i]*ye[i]
+        A[2,2] += m[i]*z[i]*ze[i]
 
-x = mol.getXList()
-y = mol.getYList()
-z = mol.getZList()
-xr = np.zeros(Nat, dtype=float)
-yr = np.zeros(Nat, dtype=float)
-zr = np.zeros(Nat, dtype=float)
-for j in range(Nat):
-    xr[j] = x[j]*evec[0][0]+y[j]*evec[1][0]+z[j]*evec[2][0]
-    yr[j] = x[j]*evec[0][1]+y[j]*evec[1][1]+z[j]*evec[2][1]
-    zr[j] = x[j]*evec[0][2]+y[j]*evec[1][2]+z[j]*evec[2][2]
-mol.setXList(xr)
-mol.setYList(yr)
-mol.setZList(zr)
-Inew = RotateToPA(mol)
+    A1 = np.matmul(A.T,A)
+    A2 = np.matmul(A,A.T)
+
+    eval1,evec1 = linalg.eig(A1)
+    eval2,evec2 = linalg.eig(A2)
+
+    eval1 = np.real(eval1)
+    eval2 = np.real(eval2)
+    evec1 = evec1.T
+    evec2 = evec2.T
+
+    sortidx1 = eval1.argsort()
+    sortidx2 = eval2.argsort()
+    eval1sort = np.zeros(3,dtype=float)
+    eval2sort = np.zeros(3,dtype=float)
+    evec1sort = np.zeros((3,3),dtype=float)
+    evec2sort = np.zeros((3,3),dtype=float)
+    for i in range(3):
+        eval1sort[i] = eval1[sortidx1[i]]
+        eval2sort[i] = eval2[sortidx2[i]]
+        for j in range(3):
+            evec1sort[i,j] = evec1[sortidx1[i],j]
+            evec2sort[i,j] = evec2[sortidx2[i],j]
+
+#print("eval1sort")
+#print(eval1sort)
+#print("evec1sort")
+#print(evec1sort)
+#print("eval2sort")
+#print(eval2sort)
+#print("evec2sort")
+#print(evec2sort)
+
+
+    for i in range(3):
+        f = np.zeros(3,dtype=float)
+        ev = np.zeros(3,dtype=float)
+        for j in range(3):
+            ev[j] = evec1[i,j]
+        f[0] = (A1[0,0]-eval1[i])*ev[0] + A1[0,1]*ev[1] + A1[0,2]*ev[2]
+        f[1] = A1[1,0]*ev[0] + (A1[1,1]-eval1[i])*ev[1] + A1[1,2]*ev[2]
+        f[2] = A1[2,0]*ev[0] + A1[2,1]*ev[1] + (A1[2,2]-eval1[i])*ev[2]
+#        print(str(i+1))
+#        print(eval1[i])
+#        print(ev)
+#        print(f)
+
+#    print("dot products")
+#    for i in range(3):
+#        print(np.dot(evec1sort[i],evec2sort[i]))
+
+ #   print("cross products")
+ #   print(np.cross(evec1sort[0], evec1sort[1]))
+ #   print(evec1sort[2])
+    cp1 = np.cross(evec1sort[0],evec1sort[1])
+ #   print(np.dot(cp1,evec1sort[2]))
+
+#    print(np.cross(evec2sort[0], evec2sort[1]))
+#    print(evec2sort[2])
+    cp2 = np.cross(evec2sort[0],evec2sort[1])
+#    print(np.dot(cp2,evec2sort[2]))
+
+    if (np.dot(cp1,evec1sort[2]) < 0):
+        evec1sort[2] *= -1.0
+        print("changed sign for p = "+str(p))
+
+    if (np.dot(cp2,evec2sort[2]) < 0):
+        evec2sort[2] *= -1.0
+        print("changed sign for p = "+str(p))
+
+    T = np.zeros((3,3),dtype=float)
+    for i in range(3):
+        for j in range(3):
+            for k in range(3):
+                T[i,j] += evec1sort[k,i]*evec2sort[k,j]
+
+#    print("T")
+#    print(T)
+#    print(linalg.det(T))
+
+    xr = np.zeros(Nat, dtype=float)
+    yr = np.zeros(Nat, dtype=float)
+    zr = np.zeros(Nat, dtype=float)
+
+    for j in range(Nat):
+        xr[j] = T[0,0]*x[j] + T[0,1]*y[j] + T[0,2]*z[j]
+        yr[j] = T[1,0]*x[j] + T[1,1]*y[j] + T[1,2]*z[j]
+        zr[j] = T[2,0]*x[j] + T[2,1]*y[j] + T[2,2]*z[j]
+
+    mol.setXList(xr)
+    mol.setYList(yr)
+    mol.setZList(zr)
+
+#    print("eckart test")
+#    print(eckartRotationCheck(equil,mol))
+
+#    print("rotated molecule")
+#    print(mol.getXList())
+#    print(mol.getYList())
+#    print(mol.getZList())
+
+    newmol.append(mol)
+
+    print("\n")
+
+xe = equil.getXList()
+ye = equil.getYList()
+ze = equil.getZList()
+print(xe)
+print(ye)
+print(ze)
+
+for i in range(Npt):
+    print(newmol[i].getXList())
+    print(newmol[i].getYList())
+    print(newmol[i].getZList())

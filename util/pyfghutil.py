@@ -101,6 +101,9 @@ class PESpoint:
         self.z = []
         self.en = 0
 
+    def getN(self):
+        return self.n
+
     def getq1(self):
         return self.q[0]
 
@@ -117,6 +120,9 @@ class PESpoint:
             return self.getq2()
         elif (n == 3):
             return self.getq3()
+
+    def getQList(self):
+        return self.q
 
     def getX(self,n):
         return self.x[n-1]
@@ -196,12 +202,20 @@ class PotentialEnergySurface:
         self.Npts = 0
         self.pts = []
 
+#    def getPointByN(self, t, u, v):
+#        m = v + self.N[2] * (u + self.N[1] * t)
+#        return self.pts[m]
+
     def getPointByN(self, t, u, v):
-        m = v + self.N[2] * (u + self.N[1] * t)
-        return self.pts[m]
+        idx = [t,u,v]
+        return self.getPointByIdx(idx)
+
+#    def getPointByIdx(self, idx):
+#        return self.getPointByN(idx[0],idx[1],idx[2])
 
     def getPointByIdx(self, idx):
-        return self.getPointByN(idx[0],idx[1],idx[2])
+        pt = IndexToPoint(len(self.N), self.N, idx)
+        return self.getPointByPt(pt)
 
     def getPointByPt(self, pt):
         return self.pts[pt]
@@ -213,6 +227,9 @@ class PotentialEnergySurface:
     def setN (self, N):
         self.N = N
         return
+
+    def getNpts(self):
+        return self.Npts
     
     def appendPESpt(self, pt):
         self.pts.append(pt)

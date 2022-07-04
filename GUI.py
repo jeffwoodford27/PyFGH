@@ -403,7 +403,7 @@ def main_window():
     """
     def NInputBox():
         window = tk.Tk()
-        x = 2
+        x = int (dimensions.get())
 
         style = Style()
         window.title('PyFGH')
@@ -433,13 +433,13 @@ def main_window():
             YInputBox()
             window.destroy()
 
-        yvalue = 2
+        yvalue = int(dimensions.get())
         enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
                           command=enter_button).place(x=110, y=(yvalue * 45 + 20))
 
     def YInputBox():
         window = tk.Tk()
-        yvalue = 2
+        yvalue = int(dimensions2.get())
 
         style = Style()
         window.title('PyFGH')
@@ -467,8 +467,9 @@ def main_window():
 
         def enter_button():
             window.destroy()
+            test()
 
-        yvalue = 2
+        yvalue = int(dimensions2.get())
         enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
                           command=enter_button).place(x=110, y=(yvalue * 45 + 20))
 
@@ -586,7 +587,7 @@ def main_window():
                 #model_prompt(holder_model)
                 """
                 NInputBox()
-                #test()
+
 
 
 

@@ -429,12 +429,13 @@ def main_window():
             x1.place(x=100, y=(40 + fireflies), width=100)
             fireflies += 40
 
-        # def enter_button():
-        #     print()
-        #
-        # yvalue = 2
-        # enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
-        #                   command=enter_button).place(x=110, y=(yvalue * 45 + 20))
+        def enter_button():
+            YInputBox()
+            window.destroy()
+
+        yvalue = 2
+        enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
+                          command=enter_button).place(x=110, y=(yvalue * 45 + 20))
 
     def YInputBox():
         window = tk.Tk()
@@ -464,12 +465,12 @@ def main_window():
             x1.place(x=100, y=(40 + fireflies), width=100)
             fireflies += 40
 
-    # def enter_button():
-    #     print()
-    #
-    # yvalue = 2
-    # enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
-    #                   command=enter_button).place(x=110, y=(yvalue * 45 + 20))
+        def enter_button():
+            window.destroy()
+
+        yvalue = 2
+        enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
+                          command=enter_button).place(x=110, y=(yvalue * 45 + 20))
 
 
     def test():
@@ -560,8 +561,8 @@ def main_window():
             elif float(holder.L3) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
-            elif holder.value_holder == False:
-                messagebox.showerror("PyFGH", "Data is missing! Click The Read Structures Button and Add Your Equilibrium and Potential Energies Files!!!")
+            # elif holder.value_holder == False:
+            #     messagebox.showerror("PyFGH", "Data is missing! Click The Read Structures Button and Add Your Equilibrium and Potential Energies Files!!!")
             # This runs the model window when the user hits calculate.
             else:
                 """
@@ -585,8 +586,7 @@ def main_window():
                 #model_prompt(holder_model)
                 """
                 NInputBox()
-                YInputBox()
-                test()
+                #test()
 
 
 

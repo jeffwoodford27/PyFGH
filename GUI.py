@@ -80,6 +80,35 @@ def main_window():
     # definition for calculating core counts.
     # Label
 
+    ttk.Label(window, text="Dimensions for N:", font=("Times New Roman", 15)).place(x=25, y=47)
+    d = tk.StringVar()
+    N1text = ttk.Combobox(window, width=15, textvariable=d)
+
+    dimensions = [1,2,3,4,5,6,7,8,9,10]
+
+    n10 = tk.StringVar()
+    dimensions = ttk.Combobox(window, values=dimensions, width=10, textvariable=n10)
+
+    # Entry
+    N10 = ttk.Entry(window, font=("Times New Roman", 10))
+    c10 = tk.StringVar()
+    N10box = ttk.Combobox(window, textvariable=c10)
+
+    ttk.Label(window, text="Dimensions for L:", font=("Times New Roman", 15)).place(x=605, y=47)
+    d2 = tk.StringVar()
+    N12text = ttk.Combobox(window, width=15, textvariable=d)
+
+    dimensions2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+    n12 = tk.StringVar()
+    dimensions2 = ttk.Combobox(window, values=dimensions2, width=10, textvariable=n12)
+
+    # Entry
+    N12 = ttk.Entry(window, font=("Times New Roman", 10))
+    c12 = tk.StringVar()
+    N120box = ttk.Combobox(window, textvariable=c12)
+
+
     # Label
     ttk.Label(window, text="N\u2081:", font=("Times New Roman", 15)).place(x=10, y=98)
     d = tk.StringVar()
@@ -372,6 +401,78 @@ def main_window():
     This method gets called when the GUI is terminated. This saves the values from the input to the DataObject file.
     This also checks for validation rules also for the values that were inputted.
     """
+    def NInputBox():
+        window = tk.Tk()
+        x = int (dimensions.get())
+
+        style = Style()
+        window.title('PyFGH')
+        box_len_str = '300x' + str(x * 55 + 70)
+        window.geometry(box_len_str)
+        # window.geometry('300x450')
+        # Label
+
+        fireflies = 0
+        for number in range(x):
+            ttk.Label(window, text="Input Values For N:", font=("Times New Roman", 15)).place(x=60, y=10)
+            d = tk.StringVar()
+            N1text = ttk.Combobox(window, width=15, textvariable=d)
+
+            x1 = ttk.Entry(window, font=("Times New Roman", 10))
+            c = tk.StringVar()
+            N1box = ttk.Combobox(window, textvariable=c)
+
+            ttk.Label(window, text=number + 1, font=("Times New Roman", 15)).place(x=80, y=(40 + fireflies))
+            d = tk.StringVar()
+            N1text = ttk.Combobox(window, width=15, textvariable=d)
+
+            x1.place(x=100, y=(40 + fireflies), width=100)
+            fireflies += 40
+
+        def enter_button():
+            YInputBox()
+            window.destroy()
+
+        yvalue = int(dimensions.get())
+        enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
+                          command=enter_button).place(x=110, y=(yvalue * 45 + 20))
+
+    def YInputBox():
+        window = tk.Tk()
+        yvalue = int(dimensions2.get())
+
+        style = Style()
+        window.title('PyFGH')
+        box_len_str = '300x' + str(yvalue * 55 + 70)
+        window.geometry(box_len_str)
+        # window.geometry('300x450')
+        # Label
+
+        fireflies = 0
+        for number in range(yvalue):
+            ttk.Label(window, text="Input Values For Y:", font=("Times New Roman", 15)).place(x=60, y=10)
+            d = tk.StringVar()
+            N1text = ttk.Combobox(window, width=15, textvariable=d)
+
+            x1 = ttk.Entry(window, font=("Times New Roman", 10))
+            c = tk.StringVar()
+            N1box = ttk.Combobox(window, textvariable=c)
+
+            ttk.Label(window, text=number + 1, font=("Times New Roman", 15)).place(x=80, y=(40 + fireflies))
+            d = tk.StringVar()
+            N1text = ttk.Combobox(window, width=15, textvariable=d)
+
+            x1.place(x=100, y=(40 + fireflies), width=100)
+            fireflies += 40
+
+        def enter_button():
+            window.destroy()
+            test()
+
+        yvalue = int(dimensions2.get())
+        enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
+                          command=enter_button).place(x=110, y=(yvalue * 45 + 20))
+
 
     def test():
         """
@@ -395,6 +496,7 @@ def main_window():
                 save_file_prompt()
         """
         if holder.value_holder:
+
             save_file_prompt()
             eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
                                                     holder.N2, holder.L2,
@@ -405,7 +507,10 @@ def main_window():
             holder.setPES(pes)
 
         else:
+
             save_file_prompt()
+
+
 
     def output():
         try:
@@ -457,8 +562,8 @@ def main_window():
             elif float(holder.L3) < 0:
                 messagebox.showerror("PyFGH", "L must be positive!!!")
                 clear_data()
-            elif holder.value_holder == False:
-                messagebox.showerror("PyFGH", "Data is missing! Click The Read Structures Button and Add Your Equilibrium and Potential Energies Files!!!")
+            # elif holder.value_holder == False:
+            #     messagebox.showerror("PyFGH", "Data is missing! Click The Read Structures Button and Add Your Equilibrium and Potential Energies Files!!!")
             # This runs the model window when the user hits calculate.
             else:
                 """
@@ -469,7 +574,20 @@ def main_window():
                 function that will build the GUI parameter box depending on the dimensions and parameters of each 
                 unique model.
                 """
-                test()
+                """
+                import inspect
+                holder_model = []
+                value = 3
+                for key, className in inspect.getmembers(model_objects):
+                    for i in range(3):
+                        if holder.v[i] == key:
+                            holder_model.append(className())
+
+                print(holder_model)
+                #model_prompt(holder_model)
+                """
+                NInputBox()
+
 
 
 
@@ -614,6 +732,8 @@ def main_window():
     cores.place(x=450, y=50)
     cores.current()
     vales2 = 80
+    dimensions.place(x=180, y=50)
+    dimensions2.place(x=760, y=50)
     N1.place(x=40, y=100, width=100)
     L1.place(x=185, y=100, width=100)
     N2.place(x=340, y=100, width=100)

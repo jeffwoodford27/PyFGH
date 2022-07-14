@@ -54,7 +54,7 @@ def readEqfile(eqfile):
                     y.append(float(row[3]))
                     z.append(float(row[4]))
                 except IndexError:
-                    raise ValidationError('Missing Data on Line {0}'.format(Nat))
+                    raise ValidationError('In Equil File: Missing Data on Line {0}'.format(Nat))
                 Nat = Nat + 1
 
     except FileNotFoundError:
@@ -93,58 +93,112 @@ def readPESfile(pesfile, equil, D, N):
 
     pes = pyfghutil.PotentialEnergySurface()
     pes.setN(N)
-    with open(pesfile, newline='') as f:
-        reader = csv.reader(f)
+    try:
+        with open(pesfile, newline='') as f:
+            reader = csv.reader(f)
 
-        n = 0
-        for row in reader:
-            pespt = pyfghutil.PESpoint()
-            pespt.setN(n)
+            n = 0
+            for row in reader:
+                pespt = pyfghutil.PESpoint()
+                pespt.setN(n)
 
-            q = np.zeros(D, dtype=float)
-            q[0] = float(row[0])
-            q[1] = float(row[1])
-            q[2] = float(row[2])
-            pespt.setQList(q)
-
-            x = np.zeros(Nat, dtype=float)
-            y = np.zeros(Nat, dtype=float)
-            z = np.zeros(Nat, dtype=float)
-
-            for i in range(Nat):
-                x[i] = float(row[3+3*i])
-                y[i] = float(row[4+3*i])
-                z[i] = float(row[5+3*i])
-            pespt.setXList(x)
-            pespt.setYList(y)
-            pespt.setZList(z)
-
-            pespt.getMolecule().setNatom(Nat)
-            pespt.getMolecule().setSymbolList(equil.getSymbolList())
-            pespt.getMolecule().setAtomicNumberList(equil.getAtomicNumberList())
-            pespt.getMolecule().setMassNumberList(equil.getMassNumberList())
-            pespt.getMolecule().setMassList(equil.getMassList())
-
-            pespt.setEnergy(float(row[3+3*Nat]))
-
-            pes.appendPESpt(pespt)
-            n = n + 1
+                try:
+                    q = np.zeros(D, dtype=float)
+                    for i in range(D):
+                        q[i] = float(row[i])
 
 
+                    x = np.zeros(Nat, dtype=float)
+                    y = np.zeros(Nat, dtype=float)
+                    z = np.zeros(Nat, dtype=float)
 
-    pass
+                    for i in range(Nat):
+                        x[i] = float(row[D+3*i])
+                        y[i] = float(row[D+3*i+1])
+                        z[i] = float(row[D+3*i+2])
+
+                    en = float(row[D+3*Nat])
+                except IndexError:
+                    raise ValidationError("In PES file: Missing data on line {0}".format(n+1))
+
+                pespt.setQList(q)
+                pespt.setXList(x)
+                pespt.setYList(y)
+                pespt.setZList(z)
+                pespt.getMolecule().setNatom(Nat)
+                pespt.getMolecule().setSymbolList(equil.getSymbolList())
+                pespt.getMolecule().setAtomicNumberList(equil.getAtomicNumberList())
+                pespt.getMolecule().setMassNumberList(equil.getMassNumberList())
+                pespt.getMolecule().setMassList(equil.getMassList())
+                pespt.setEnergy(en)
+                pes.appendPESpt(pespt)
+                n = n + 1
+    except FileNotFoundError:
+        raise
+
+    if (Npts != n):
+        raise ValidationError("Error: Expecting {0} lines in PES file, received {1}".format(Npts,n))
+
+    return pes
+
+def closeContactTest(mol, no, dist_cutoff):
+    Nat = mol.getNatom(mol)
+    x = mol.getXList(mol)
+    y = mol.getYList(mol)
+    z = mol.getZList(mol)
+    for i in range(Nat):
+        for j in range(i+1,Nat):
+            d = np.sqrt((x[j]-x[i])*(x[j]-x[i]) + (y[j]-y[i])*(y[j]-y[i]) + (z[j]-z[i])*(z[j]-z[i]))
+            if (d < dist_cutoff):
+                if (no < 0):
+                    raise ValidationError("Error: In equil structure, distance between atom {0} and atom {1} is less than the cutoff distance of {2}".format(i+1,j+1,dist_cutoff))
+                else:
+                    raise ValidationError("Error: In PES point {0}, distance between atom {1} and atom {2} is less than the cutoff distance of {3}".format(no+1,i+1,j+1,dist_cutoff))
+
+    return
 
 
-def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
-    L = [L1, L2, L3]
-    N = [N1, N2, N3]
+
+
+def molecule_testing_v1(D, N, L, eqfile, pesfile):
+    Npts = np.prod(N)
 
     equil = readEqfile(eqfile)
+    pes = readPESfile(pesfile, equil, D, N)
 
-#    validateEquil(equil)
+    dist_cutoff = 0.10
+    closeContactTest(equil, -1, dist_cutoff)
 
-#    pes = readPesfile(pesfile, equil, N,L)
+    for i in range(Npts):
+        closeContactTest(pes.getPointByPt(i).getMolecule(), i, dist_cutoff)
 
+    holder = DataObject.InputData()
+    holder.setD(D)
+    holder.setNList(N)
+    holder.setLList(L)
+    holder.setEquilMolecule(equil)
+    holder.setPES(pes)
+
+    return holder
+
+def molecule_testing_v2(holder):
+    D = holder.getD()
+    N = holder.getNList()
+    Npts = np.prod(N)
+
+    equil = readEqfile(holder.getEquilFile())
+    pes = readPESfile(holder.getPESFile(), equil, D, N)
+
+    dist_cutoff = 0.10
+    closeContactTest(equil, -1, dist_cutoff)
+
+    for i in range(Npts):
+        closeContactTest(pes.getPointByPt(i).getMolecule(), i, dist_cutoff)
+
+    holder.setEquilMolecule(equil)
+    holder.setPES(pes)
+
+    return
 
 def molecule_testing_old(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
     #print(DataObject.test.equilibrium_file)

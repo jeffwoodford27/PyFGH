@@ -39,10 +39,7 @@ This is the main method.
 
 
 def main_window():
-
     holder = DataObject.InputData()
-
-
 
     def close_window():
         global running
@@ -83,11 +80,11 @@ def main_window():
     # definition for calculating core counts.
     # Label
 
-    ttk.Label(window, text="Dimensions for N:", font=("Times New Roman", 15)).place(x=25, y=47)
+    ttk.Label(window, text="Dimensions:", font=("Times New Roman", 15)).place(x=25, y=47)
     d = tk.StringVar()
     N1text = ttk.Combobox(window, width=15, textvariable=d)
 
-    dimensions = [1,2,3,4,5,6,7,8,9,10]
+    dimensions = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     n10 = tk.StringVar()
     dimensions = ttk.Combobox(window, values=dimensions, width=10, textvariable=n10)
@@ -97,14 +94,9 @@ def main_window():
     c10 = tk.StringVar()
     N10box = ttk.Combobox(window, textvariable=c10)
 
-    ttk.Label(window, text="Dimensions for L:", font=("Times New Roman", 15)).place(x=605, y=47)
-    d2 = tk.StringVar()
-    N12text = ttk.Combobox(window, width=15, textvariable=d)
 
-    dimensions2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-    n12 = tk.StringVar()
-    dimensions2 = ttk.Combobox(window, values=dimensions2, width=10, textvariable=n12)
+
 
     # Entry
     N12 = ttk.Entry(window, font=("Times New Roman", 10))
@@ -118,8 +110,8 @@ def main_window():
     holderL = 0
     isopenedN = holderN
     isopenedL = holderL
-    def actionN():
 
+    def actionN():
 
         global isopenedN
         if isopenedN == 0:
@@ -134,13 +126,18 @@ def main_window():
             # window.geometry('300x450')
             # Label
 
+
+            x1 = [None] * x
+
+
             fireflies = 0
+
             for number in range(x):
-                ttk.Label(window, text="Input Values For N:", font=("Times New Roman", 15)).place(x=60, y=10)
+                ttk.Label(window, text="Values For Dimensions:", font=("Times New Roman", 15)).place(x=60, y=10)
                 d = tk.StringVar()
                 N1text = ttk.Combobox(window, width=15, textvariable=d)
 
-                x1 = ttk.Entry(window, font=("Times New Roman", 10))
+                x1[number] = ttk.Entry(window, font=("Times New Roman", 10))
                 c = tk.StringVar()
                 N1box = ttk.Combobox(window, textvariable=c)
 
@@ -148,12 +145,18 @@ def main_window():
                 d = tk.StringVar()
                 N1text = ttk.Combobox(window, width=15, textvariable=d)
 
-                x1.place(x=100, y=(40 + fireflies), width=100)
+                x1[number].place(x=100, y=(40 + fireflies), width=100)
                 fireflies += 40
 
-            def enter_button():
 
+            def enter_button():
+                x = int(dimensions.get())
+                values = []
+                for y in range(x):
+                    values.append(x1[y].get())
                 window.destroy()
+                holder.dimensionvalues = values
+                print(holder.dimensionvalues)
 
             yvalue = int(dimensions.get())
             enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
@@ -162,61 +165,58 @@ def main_window():
         else:
             messagebox.showerror("PyFGH", "The Vales For N Have Already Been Assigned!!!")
 
-
-    l= []
-
-    def actionl():
-        global isopenedL, enter_button, window
-        if isopenedL == 0:
-            isopenedL += 1
-            window = tk.Tk()
-            x = int(dimensions2.get())
-
-            style = Style()
-            window.title('PyFGH')
-            box_len_str = '300x' + str(x * 55 + 70)
-            window.geometry(box_len_str)
-            # window.geometry('300x450')
-            # Label
-
-            fireflies = 0
-            for number in range(x):
-                ttk.Label(window, text="Input Values For L:", font=("Times New Roman", 15)).place(x=60, y=10)
-                d = tk.StringVar()
-                N1text = ttk.Combobox(window, width=15, textvariable=d)
-
-                x1 = ttk.Entry(window, font=("Times New Roman", 10))
-                c = tk.StringVar()
-                N1box = ttk.Combobox(window, textvariable=c)
-
-                ttk.Label(window, text=number + 1, font=("Times New Roman", 15)).place(x=80, y=(40 + fireflies))
-                d = tk.StringVar()
-                N1text = ttk.Combobox(window, width=15, textvariable=d)
-
-                x1.place(x=100, y=(40 + fireflies), width=100)
-
-                fireflies += 40
-
-            def enter_button():
-                print(x1.get)
-
-                window.destroy()
-
-            yvalue = int(dimensions2.get())
-            enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
-                              command=enter_button).place(x=110, y=(yvalue * 45 + 20))
-
-        else:
-            messagebox.showerror("PyFGH", "The Vales For L Have Already Been Assigned!!!")
-
-
-
-
-    nbutton = tk.Button(window, text='Get N Values', bd='10', bg='gray', fg='white',
-                           command=actionN).place(x=303, y=90)
-    lbutton = tk.Button(window, text='Get L Values', bd='10', bg='gray', fg='white',
-                           command=actionl).place(x=560, y=90)
-
+    # l= []
+    #
+    # def actionl():
+    #     global isopenedL, enter_button, window
+    #     if isopenedL == 0:
+    #         isopenedL += 1
+    #         window = tk.Tk()
+    #         x = int(dimensions2.get())
+    #
+    #         style = Style()
+    #         window.title('PyFGH')
+    #         box_len_str = '300x' + str(x * 55 + 70)
+    #         window.geometry(box_len_str)
+    #         # window.geometry('300x450')
+    #         # Label
+    #
+    #         fireflies = 0
+    #         for number in range(x):
+    #             ttk.Label(window, text="Input Values For L:", font=("Times New Roman", 15)).place(x=60, y=10)
+    #             d = tk.StringVar()
+    #             N1text = ttk.Combobox(window, width=15, textvariable=d)
+    #
+    #             x1 = ttk.Entry(window, font=("Times New Roman", 10))
+    #             c = tk.StringVar()
+    #             N1box = ttk.Combobox(window, textvariable=c)
+    #
+    #             ttk.Label(window, text=number + 1, font=("Times New Roman", 15)).place(x=80, y=(40 + fireflies))
+    #             d = tk.StringVar()
+    #             N1text = ttk.Combobox(window, width=15, textvariable=d)
+    #
+    #             x1.place(x=100, y=(40 + fireflies), width=100)
+    #
+    #             fireflies += 40
+    #
+    #         def enter_button():
+    #             print(x1.get)
+    #
+    #             window.destroy()
+    #
+    #         yvalue = int(dimensions2.get())
+    #         enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
+    #                           command=enter_button).place(x=110, y=(yvalue * 45 + 20))
+    #
+    #     else:
+    #         messagebox.showerror("PyFGH", "The Vales For L Have Already Been Assigned!!!")
+    #
+    #
+    #
+    # nbutton = tk.Button(window, text='Get N Values', bd='10', bg='gray', fg='white',
+    #                        command=actionN).place(x=303, y=90)
+    lbutton = tk.Button(window, text='Get Values', bd='10', bg='gray', fg='white',
+                        command=actionN).place(x=425, y=90)
 
     # # Label
     # ttk.Label(window, text="N\u2081:", font=("Times New Roman", 15)).place(x=10, y=98)
@@ -295,7 +295,6 @@ def main_window():
     SSH_box["values"] = ('Yes', 'No')
     SSH_box.place(x=125, y=173)
     """
-
 
     # This method clears all of the data in the GUI
     def clear_data():
@@ -502,10 +501,6 @@ def main_window():
     This also checks for validation rules also for the values that were inputted.
     """
 
-
-
-
-
     def test():
         """
         if holder.value_holder:
@@ -529,7 +524,7 @@ def main_window():
         """
         if holder.value_holder:
 
-            save_file_prompt()
+            save_file_prompt()  # TODO Change this to work for All Dimensions
             eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
                                                     holder.N2, holder.L2,
                                                     holder.N3, holder.L3,
@@ -541,8 +536,6 @@ def main_window():
         else:
 
             save_file_prompt()
-
-
 
     def output():
         try:
@@ -674,7 +667,7 @@ def main_window():
         # This is the about button.
 
     help = tk.Button(window, text='Help', bd='10', bg='#F9BB46', fg='white',
-                      command=help_window).place(x=303, y=150)
+                     command=help_window).place(x=303, y=150)
 
     # This method here displays the T equations.
     def t0():
@@ -731,8 +724,6 @@ def main_window():
     GUI interface at the same time.
     """
 
-
-
     def Read_Structures_Button():
         global opened
         """
@@ -744,8 +735,8 @@ def main_window():
 
         x = askopenfilename()
         y = askopenfilename()
-#        DataObject.test.equilibrium_file = x
-#        DataObject.test.potential_energy_file = y
+        #        DataObject.test.equilibrium_file = x
+        #        DataObject.test.potential_energy_file = y
         holder.setequilibrium_file(x)
         holder.setpotential_energy(y)
         holder.setvalue_holder(True)
@@ -765,7 +756,7 @@ def main_window():
     cores.current()
     vales2 = 80
     dimensions.place(x=180, y=50)
-    dimensions2.place(x=760, y=50)
+
     # N1.place(x=40, y=100, width=100)
     # L1.place(x=185, y=100, width=100)
     # N2.place(x=340, y=100, width=100)

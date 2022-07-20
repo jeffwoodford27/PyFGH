@@ -95,9 +95,6 @@ def main_window():
     N10box = ttk.Combobox(window, textvariable=c10)
 
 
-
-
-
     # Entry
     N12 = ttk.Entry(window, font=("Times New Roman", 10))
     c12 = tk.StringVar()
@@ -121,7 +118,7 @@ def main_window():
 
             style = Style()
             window.title('PyFGH')
-            box_len_str = '300x' + str(x * 55 + 70)
+            box_len_str = '300x' + str((x * 55 + 70)+70)
             window.geometry(box_len_str)
             # window.geometry('300x450')
             # Label
@@ -129,11 +126,13 @@ def main_window():
 
             x1 = [None] * x
 
+            x2 = [None] * x
+
 
             fireflies = 0
 
             for number in range(x):
-                ttk.Label(window, text="Values For Dimensions:", font=("Times New Roman", 15)).place(x=60, y=10)
+                ttk.Label(window, text="Values:", font=("Times New Roman", 15)).place(x=60, y=10)
                 d = tk.StringVar()
                 N1text = ttk.Combobox(window, width=15, textvariable=d)
 
@@ -148,19 +147,44 @@ def main_window():
                 x1[number].place(x=100, y=(40 + fireflies), width=100)
                 fireflies += 40
 
+            for number in range(x):
+                ttk.Label(window, text="", font=("Times New Roman", 15)).place(x=60, y=10)
+                d = tk.StringVar()
+                N1text = ttk.Combobox(window, width=15, textvariable=d)
+
+                x2[number] = ttk.Entry(window, font=("Times New Roman", 10))
+                c = tk.StringVar()
+                N1box = ttk.Combobox(window, textvariable=c)
+
+                ttk.Label(window, text=number + 1, font=("Times New Roman", 15)).place(x=80, y=(40 + fireflies))
+                d = tk.StringVar()
+                N1text = ttk.Combobox(window, width=15, textvariable=d)
+
+                x2[number].place(x=100, y=(40 + fireflies), width=100)
+                fireflies += 40
+
+
+            # Make a section for N and L.
+            # If it is 3 dimension there must be 3 boxes for N and 3 boxs for L so a total of 6.
 
             def enter_button():
                 x = int(dimensions.get())
-                values = []
+                valuesN = []
+                valuesL = []
                 for y in range(x):
-                    values.append(x1[y].get())
+                    valuesN.append(x1[y].get())
+
+                for i in range(x):
+                    valuesL.append(x2[i].get())
+
                 window.destroy()
-                holder.dimensionvalues = values
-                print(holder.dimensionvalues)
+                holder.dimensionvaluesN = valuesN
+                holder.dimensionvaluesL = valuesL
+                print(holder.dimensionvaluesN)
 
             yvalue = int(dimensions.get())
             enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
-                              command=enter_button).place(x=110, y=(yvalue * 45 + 20))
+                              command=enter_button).place(x=110, y=(yvalue * 45 + 20)+80)
 
         else:
             messagebox.showerror("PyFGH", "The Vales For N Have Already Been Assigned!!!")

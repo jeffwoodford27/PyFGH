@@ -128,7 +128,6 @@ def main_window():
 
             x2 = [None] * x
 
-
             fireflies = 0
 
             for number in range(x):
@@ -181,6 +180,7 @@ def main_window():
                 holder.dimensionvaluesN = valuesN
                 holder.dimensionvaluesL = valuesL
                 print(holder.dimensionvaluesN)
+                print(holder.dimensionvaluesL)
 
             yvalue = int(dimensions.get())
             enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',

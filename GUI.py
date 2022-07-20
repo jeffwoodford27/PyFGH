@@ -111,10 +111,10 @@ def main_window():
     def actionN():
 
         global isopenedN
-        if isopenedN == 0:
-            isopenedN += 1
+        if (holder.getNlist() == None and holder.getLlist() == None):
             window = tk.Tk()
             x = int(dimensions.get())
+            holder.setD(x)
 
             style = Style()
             window.title('PyFGH')
@@ -177,10 +177,13 @@ def main_window():
                     valuesL.append(x2[i].get())
 
                 window.destroy()
-                holder.dimensionvaluesN = valuesN
-                holder.dimensionvaluesL = valuesL
-                print(holder.dimensionvaluesN)
-                print(holder.dimensionvaluesL)
+
+                holder.setNlist(valuesN)
+                holder.setLlist(valuesL)
+
+                print(holder.getNlist())
+                print(holder.getLlist())
+                print(holder.getD())
 
             yvalue = int(dimensions.get())
             enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',

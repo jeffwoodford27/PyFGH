@@ -33,12 +33,8 @@ class InputData:
         self.D = 3
         self.name_of_file = 0
         self.cores_amount = 1
-        self.N1 = 0
-        self.L1 = 0
-        self.N2 = 0
-        self.L2 = 0
-        self.N3 = 0
-        self.L3 = 0
+        self.N = None
+        self.L = None
         self.file_name = 0
         self.message = 0
         self.sum = 0
@@ -49,8 +45,6 @@ class InputData:
         self.equilibrium_file = 0
         self.potential_energy_file = 0
         self.value_holder = 0
-        self.dimensionvaluesN = []
-        self.dimensionvaluesL = []
         self.EquilMolecule = 0
         self.PES = 0
 
@@ -85,28 +79,16 @@ class InputData:
         self.Hmat = Hmat
         return
 
-    def setN1(self, N1):
-        self.N1 = int(N1)
+    def setD(self,D):
+        self.D = D
         return
 
-    def setL1(self, L1):
-        self.L1 = L1
+    def setNlist(self,N):
+        self.N = N
         return
 
-    def setN2(self, N2):
-        self.N2 = int(N2)
-        return
-
-    def setL2(self, L2):
-        self.L2 = L2
-        return
-
-    def setN3(self, N3):
-        self.N3 = int(N3)
-        return
-
-    def setL3(self, L3):
-        self.L3 = L3
+    def setLlist(self,L):
+        self.L = L
         return
 
     def setFileName(self, file_name):
@@ -156,23 +138,11 @@ class InputData:
     def getD(self):
         return self.D
 
-    def getN1(self):
-        return self.N1
+    def getNlist(self):
+        return self.N
 
-    def getN2(self):
-        return self.N2
-
-    def getN3(self):
-        return self.N3
-
-    def getL1(self):
-        return self.L1
-
-    def getL2(self):
-        return self.L2
-
-    def getL3(self):
-        return self.L3
+    def getLlist(self):
+        return self.L
 
     def getEquilMolecule(self):
         return self.EquilMolecule

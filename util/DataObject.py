@@ -49,7 +49,8 @@ class InputData:
         self.equilibrium_file = 0
         self.potential_energy_file = 0
         self.value_holder = 0
-
+        self.dimensionvaluesN = []
+        self.dimensionvaluesL = []
         self.EquilMolecule = 0
         self.PES = 0
 

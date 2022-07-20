@@ -118,7 +118,7 @@ def main_window():
 
             style = Style()
             window.title('PyFGH')
-            box_len_str = '300x' + str((x * 55 + 70)+70)
+            box_len_str = '300x' + str((x * 95 + 70))
             window.geometry(box_len_str)
             # window.geometry('300x450')
             # Label
@@ -184,7 +184,7 @@ def main_window():
 
             yvalue = int(dimensions.get())
             enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
-                              command=enter_button).place(x=110, y=(yvalue * 45 + 20)+80)
+                              command=enter_button).place(x=110, y=(yvalue * 85 + 20))
 
         else:
             messagebox.showerror("PyFGH", "The Vales For N Have Already Been Assigned!!!")

@@ -139,7 +139,7 @@ def main_window():
                 c = tk.StringVar()
                 N1box = ttk.Combobox(window, textvariable=c)
 
-                ttk.Label(window, text=number + 1, font=("Times New Roman", 15)).place(x=80, y=(40 + fireflies))
+                ttk.Label(window, text=("N" ) +  str(number + 1) + ":", font=("Times New Roman", 15)).place(x=60, y=(40 + fireflies))
                 d = tk.StringVar()
                 N1text = ttk.Combobox(window, width=15, textvariable=d)
 
@@ -155,7 +155,7 @@ def main_window():
                 c = tk.StringVar()
                 N1box = ttk.Combobox(window, textvariable=c)
 
-                ttk.Label(window, text=number + 1, font=("Times New Roman", 15)).place(x=80, y=(40 + fireflies))
+                ttk.Label(window, text=("L" ) +  str(number + 1) + ":", font=("Times New Roman", 15)).place(x=60, y=(40 + fireflies))
                 d = tk.StringVar()
                 N1text = ttk.Combobox(window, width=15, textvariable=d)
 

@@ -47,6 +47,7 @@ class InputData:
         self.value_holder = 0
         self.EquilMolecule = 0
         self.PES = 0
+        self.error = 0
 
 
 
@@ -54,7 +55,9 @@ class InputData:
     The following methods are setters. These values get set in test1.py
     """
 
-
+    def seterror(self, error):
+        self.error = error
+        return
     def setvalue_holder(self, value_holder):
         self.value_holder = value_holder
         return
@@ -149,6 +152,9 @@ class InputData:
 
     def getPES(self):
         return self.PES
+
+    def getError(self):
+        return self.error
 
 #TODO take the values in Eignevalues and Eigenvectos and write them to a CSV file in main on line 104.
 class OutputData:

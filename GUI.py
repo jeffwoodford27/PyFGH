@@ -108,6 +108,14 @@ def main_window():
     isopenedN = holderN
     isopenedL = holderL
 
+
+    def clearNdimensions():
+        holder.setNlist(None)
+
+
+    def clearLdimensions():
+        holder.setLlist(None)
+
     def actionN():
 
         global isopenedN
@@ -185,12 +193,33 @@ def main_window():
                 print(holder.getLlist())
                 print(holder.getD())
 
+
+                for x in holder.getNlist():
+                    if int(x) % 2 == 0:
+                        messagebox.showerror("PyFGH", "N must be odd!!!")
+                        holder.setNlist(None)
+                        holder.setLlist(None)
+                        actionN()
+
+                    if int(x) < 0:
+                        messagebox.showerror("PyFGH", "N must be positive!!!")
+                        holder.setNlist(None)
+                        holder.setLlist(None)
+                        actionN()
+
+                # for x in holder.getLlist():
+                #     if int(x) < 0:
+                #         messagebox.showerror("PyFGH", "L must be positive!!!")
+                #         clearLdimensions()
+
+
             yvalue = int(dimensions.get())
             enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
                               command=enter_button).place(x=110, y=(yvalue * 85 + 20))
 
         else:
             messagebox.showerror("PyFGH", "The Vales For N Have Already Been Assigned!!!")
+
 
     # l= []
     #

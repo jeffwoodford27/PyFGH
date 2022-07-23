@@ -207,6 +207,13 @@ def main_window():
                         holder.setLlist(None)
                         actionN()
 
+                if holder.getLlist() != None:
+                    for x in holder.getLlist():
+                        if int(x) < 0:
+                            messagebox.showerror("PyFGH", "L must be positive!!!")
+                            holder.setNlist(None)
+                            holder.setLlist(None)
+                            actionN()
                 # for x in holder.getLlist():
                 #     if int(x) < 0:
                 #         messagebox.showerror("PyFGH", "L must be positive!!!")

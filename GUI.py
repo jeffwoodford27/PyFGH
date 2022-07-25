@@ -178,11 +178,17 @@ def main_window():
                 x = int(dimensions.get())
                 valuesN = []
                 valuesL = []
-                for y in range(x):
-                    valuesN.append(x1[y].get())
+                try:
+                    for y in range(x):
+                        valuesN.append(int(x1[y].get()))
 
-                for i in range(x):
-                    valuesL.append(x2[i].get())
+                    for i in range(x):
+                        valuesL.append(float(x2[i].get()))
+                except ValueError:
+                    messagebox.showerror("PyFGH", "Must include only number values!!!")
+                    holder.setNlist(None)
+                    holder.setLlist(None)
+                    actionN()
 
                 window.destroy()
 
@@ -195,21 +201,15 @@ def main_window():
 
 
                 for x in holder.getNlist():
-                    if int(x) % 2 == 0:
-                        messagebox.showerror("PyFGH", "N must be odd!!!")
-                        holder.setNlist(None)
-                        holder.setLlist(None)
-                        actionN()
-
-                    if int(x) < 0:
-                        messagebox.showerror("PyFGH", "N must be positive!!!")
+                    if x % 2 == 0 or x < 5:
+                        messagebox.showerror("PyFGH", "N must be odd, positive integer greater to or equal to 5!!!")
                         holder.setNlist(None)
                         holder.setLlist(None)
                         actionN()
 
                 if holder.getLlist() != None:
                     for x in holder.getLlist():
-                        if int(x) < 0:
+                        if x < 0:
                             messagebox.showerror("PyFGH", "L must be positive!!!")
                             holder.setNlist(None)
                             holder.setLlist(None)

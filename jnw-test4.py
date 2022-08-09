@@ -4,6 +4,7 @@ from scipy import interpolate
 from util import pyfghutil
 from util import DataObject
 import csv
+import time
 
 # This testing file has an improved method for calculating the G matrix.
 # The PointToIdxs feature should be harmonized with that in test1.
@@ -42,6 +43,98 @@ def calcderiv(D, N, q, f):
                 pass
 #            print("skip point " + str(n) + " for dimension " + str(d))
     return dfdq
+
+def calcGMatrix(D, N, pes, equil):
+    Nat = equil.getNatom()
+    Npts = np.prod(N)
+
+    dxdq = np.zeros((3*Nat,D,Npts),dtype=float)
+    dxdqcalc = np.zeros((3 * Nat, D, Npts), dtype=int)
+
+    for n in range(Npts):
+        for d in range(D-1, -1, -1):
+            for c in range(3*Nat):
+                if (dxdqcalc[c,d,n] == 0):
+#                    print ("for point " + str(n) + " in dimension " + str(d))
+                    x = np.zeros(N[d], dtype=float)
+                    y = np.zeros(N[d], dtype=float)
+                    for i in range(N[d]):
+                        pt = n + i * np.prod(N[d + 1:])
+                        idx = pyfghutil.PointToIndex(D, N, pt)
+                        x[i] = pes.getPointByIdx(idx).getq(d + 1)
+                        y[i] = pes.getPointByIdx(idx).getCoord(c)
+#                    print(x, y)
+                    dy = compute_derivative(x, y)
+                    for i in range(N[d]):
+                        pt = n + i * np.prod(N[d + 1:])
+                        dxdq[c, d, pt] = dy[i]
+                        dxdqcalc[c, d, pt] = 1
+
+#                    if (d == 2):
+#                        idx = pyfghutil.PointToIndex(D, N, n)
+#                        for i in range(D):
+#                            if (i != d):
+#                                print("q" + str(i + 1) + "=" + str(pes.getPointByIdx(idx).getq(i + 1)))
+#                        for i in range(D):
+#                            if (i == d):
+#                                print("q" + str(i + 1) + ": " + str(x))
+#                                print("x" + str(c + 1) + ": " + str(y))
+            else:
+                pass
+    #            print("skip point " + str(n) + " for dimension " + str(d))
+
+    Gmatrix = np.zeros([Npts,3,3],dtype=float)
+    m = equil.getMassList()
+
+    for p in range(Npts):
+        G = np.zeros([3,3],float)
+        for r in range(3):
+            for s in range(r,3):
+                for j in range(Nat):
+                    for k in range(3):
+                        G[r][s] += m[j] * dxdq[3*j+k][r][p] * dxdq[3*j+k][s][p]
+
+        for r in range(3):
+            for s in range(r+1,3):
+                G[s][r] = G[r][s]
+
+        Ginv = scipy.linalg.inv(G)
+        for r in range(3):
+            for s in range(3):
+                Gmatrix[p][r][s] = Ginv[r][s]
+    return Gmatrix
+
+
+'''        
+        G[0][0] = m1 * (dxdq[0][0][p] * dxdq[0][0][p] + dxdq[1][0][p] * dxdq[1][0][p]) \
+                + m2 * (dxdq[3][0][p] * dxdq[3][0][p] + dxdq[4][0][p] * dxdq[4][0][p]) \
+                + m3 * (dxdq[6][0][p] * dxdq[6][0][p] + dxdq[7][0][p] * dxdq[7][0][p])
+        G[0][1] = m1 * (dxdq[0][0][p] * dxdq[0][1][p] + dxdq[1][0][p] * dxdq[1][1][p]) \
+                + m2 * (dxdq[3][0][p] * dxdq[3][1][p] + dxdq[4][0][p] * dxdq[4][1][p]) \
+                + m3 * (dxdq[6][0][p] * dxdq[6][1][p] + dxdq[7][0][p] * dxdq[7][1][p])
+        G[0][2] = m1 * (dxdq[0][0][p] * dxdq[0][2][p] + dxdq[1][0][p] * dxdq[1][2][p]) \
+                + m2 * (dxdq[3][0][p] * dxdq[3][2][p] + dxdq[4][0][p] * dxdq[4][2][p]) \
+                + m3 * (dxdq[6][0][p] * dxdq[6][2][p] + dxdq[7][0][p] * dxdq[7][2][p])
+        G[1][1] = m1 * (dxdq[0][1][p] * dxdq[0][1][p] + dxdq[1][1][p] * dxdq[1][1][p]) \
+                + m2 * (dxdq[3][1][p] * dxdq[3][1][p] + dxdq[4][1][p] * dxdq[4][1][p]) \
+                + m3 * (dxdq[6][1][p] * dxdq[6][1][p] + dxdq[7][1][p] * dxdq[7][1][p])
+        G[1][2] = m1 * (dxdq[0][1][p] * dxdq[0][2][p] + dxdq[1][1][p] * dxdq[1][2][p]) \
+                + m2 * (dxdq[3][1][p] * dxdq[3][2][p] + dxdq[4][1][p] * dxdq[4][2][p]) \
+                + m3 * (dxdq[6][1][p] * dxdq[6][2][p] + dxdq[7][1][p] * dxdq[7][2][p])
+        G[2][2] = m1 * (dxdq[0][2][p] * dxdq[0][2][p] + dxdq[1][2][p] * dxdq[1][2][p]) \
+                + m2 * (dxdq[3][2][p] * dxdq[3][2][p] + dxdq[4][2][p] * dxdq[4][2][p]) \
+                + m3 * (dxdq[6][2][p] * dxdq[6][2][p] + dxdq[7][2][p] * dxdq[7][2][p])
+        G[1][0] = G[0][1]
+        G[2][0] = G[0][2]
+        G[2][1] = G[1][2]
+        Ginv = scipy.linalg.inv(G)
+        idx = pyfghutil.PointToIndex(D,N,p)
+        for r in range(3):
+            for s in range(3):
+                Gmatrix[idx[0]][idx[1]][idx[2]][r][s] = Ginv[r][s]
+
+'''
+
 
 def calcGMatrix_Old(D, N, pes, equil):
     dx1dq1 = np.zeros([N[0],N[1],N[2]])
@@ -198,18 +291,19 @@ def calcGMatrix_Old(D, N, pes, equil):
     return Gmatrix
 
 D = 3
-inp = DataObject.InputData(D)
-inp.setN1(11)
-inp.setN2(11)
-inp.setN3(11)
-inp.setL1(1.1)
-inp.setL2(1.1)
-inp.setL3(1.65)
+inp = DataObject.InputData()
+inp.setD(D)
+N = np.zeros(D,dtype=int)
+N[0] = 11
+N[1] = 11
+N[2] = 11
+inp.setNlist(N)
+inp.setLlist([1.1,1.1,1.65])
 inp.setequilibrium_file("./testing files/water-equil.csv")
 inp.setpotential_energy("./testing files/water-potential.csv")
 
 Nat = 3
-equil = pyfghutil.Molecule(Nat)
+equil = pyfghutil.Molecule()
 with open(inp.equilibrium_file, newline='') as csvfile:
     eqfile = csv.reader(csvfile)
     A = np.empty(Nat, dtype=int)
@@ -232,17 +326,14 @@ with open(inp.equilibrium_file, newline='') as csvfile:
         m[n] = pyfghutil.MassLookup.get(nucl) * 1822.89
         n = n + 1
 
-equil.setx(x)
-equil.sety(y)
-equil.setz(z)
-equil.setZ(Z)
-equil.setA(A)
-equil.setM(m)
+equil.setXList(x)
+equil.setYList(y)
+equil.setZList(z)
+equil.setAtomicNoList(Z)
+equil.setMassNoList(A)
+equil.setMassList(m)
 
-N = np.zeros(D,dtype=int)
-N[0] = inp.getN1()
-N[1] = inp.getN2()
-N[2] = inp.getN3()
+N = inp.getNlist()
 
 pes = pyfghutil.PotentialEnergySurface()
 pes.setN(N)
@@ -258,7 +349,7 @@ with open(inp.potential_energy_file, newline='') as csvfile:
         q[0] = float(row[0])
         q[1] = float(row[1])
         q[2] = float(row[2])
-        pespt.setQ(q)
+        pespt.setQList(q)
 
         x = np.zeros(Nat, dtype=float)
         y = np.zeros(Nat, dtype=float)
@@ -270,19 +361,15 @@ with open(inp.potential_energy_file, newline='') as csvfile:
         y[1] = float(row[6])
         x[2] = float(row[7])
         y[2] = float(row[8])
-        pespt.setX(x)
-        pespt.setY(y)
-        pespt.setZ(z)
+        pespt.setXList(x)
+        pespt.setYList(y)
+        pespt.setZList(z)
 
         pespt.setEnergy(float(row[9]))
 
         pes.appendPESpt(pespt)
         n = n + 1
 
-N = np.zeros(D,dtype=int)
-N[0] = inp.getN1()
-N[1] = inp.getN2()
-N[2] = inp.getN3()
 Npts = np.prod(N)
 
 
@@ -295,6 +382,7 @@ Npts = np.prod(N)
 #for d in range(D):
 #    x.append(np.zeros(N[d],dtype=float))
 
+'''
 dfdq = []
 dfdqcalc = []
 for d in range(D):
@@ -314,11 +402,22 @@ for n in range(Npts):
 
             for i in range(N[d]):
                 dfdqcalc[d][n + i * np.prod(N[d + 1:])] = 1
-            if (d == 2):
-                print(x)
-                print(y)
+'''
+Gold = calcGMatrix_Old(D, N, pes, equil)
+t0 = time.perf_counter()
+G = calcGMatrix(D, N, pes, equil)
+t1 = time.perf_counter()
+print(t1-t0)
 
-calcGMatrix_Old(D, N, pes, equil)
+chisq = 0
+for p in range(Npts):
+    idx = pyfghutil.PointToIndex(D,N,p)
+    for r in range(3):
+        for s in range(3):
+            chisq = chisq + (G[p][r][s]-Gold[idx[0]][idx[1]][idx[2]][r][s])*(G[p][r][s]-Gold[idx[0]][idx[1]][idx[2]][r][s])
+
+chisq = np.sqrt(chisq)
+print(chisq)
 
 
 #dfdq = compute_derivative(q,x)

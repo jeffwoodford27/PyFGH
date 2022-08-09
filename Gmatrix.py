@@ -49,41 +49,26 @@ def calcGMatrix(D, N, pes, equil):
                 pass
     #            print("skip point " + str(n) + " for dimension " + str(d))
 
-    Gmatrix = np.zeros([N[0],N[1],N[2],3,3],dtype=float)
+    Gmatrix = np.zeros([Npts,3,3],dtype=float)
     m = equil.getMassList()
-    m1 = m[0]
-    m2 = m[1]
-    m3 = m[2]
 
     for p in range(Npts):
         G = np.zeros([3,3],float)
-        G[0][0] = m1 * (dxdq[0][0][p] * dxdq[0][0][p] + dxdq[1][0][p] * dxdq[1][0][p]) \
-                + m2 * (dxdq[3][0][p] * dxdq[3][0][p] + dxdq[4][0][p] * dxdq[4][0][p]) \
-                + m3 * (dxdq[6][0][p] * dxdq[6][0][p] + dxdq[7][0][p] * dxdq[7][0][p])
-        G[0][1] = m1 * (dxdq[0][0][p] * dxdq[0][1][p] + dxdq[1][0][p] * dxdq[1][1][p]) \
-                + m2 * (dxdq[3][0][p] * dxdq[3][1][p] + dxdq[4][0][p] * dxdq[4][1][p]) \
-                + m3 * (dxdq[6][0][p] * dxdq[6][1][p] + dxdq[7][0][p] * dxdq[7][1][p])
-        G[0][2] = m1 * (dxdq[0][0][p] * dxdq[0][2][p] + dxdq[1][0][p] * dxdq[1][2][p]) \
-                + m2 * (dxdq[3][0][p] * dxdq[3][2][p] + dxdq[4][0][p] * dxdq[4][2][p]) \
-                + m3 * (dxdq[6][0][p] * dxdq[6][2][p] + dxdq[7][0][p] * dxdq[7][2][p])
-        G[1][1] = m1 * (dxdq[0][1][p] * dxdq[0][1][p] + dxdq[1][1][p] * dxdq[1][1][p]) \
-                + m2 * (dxdq[3][1][p] * dxdq[3][1][p] + dxdq[4][1][p] * dxdq[4][1][p]) \
-                + m3 * (dxdq[6][1][p] * dxdq[6][1][p] + dxdq[7][1][p] * dxdq[7][1][p])
-        G[1][2] = m1 * (dxdq[0][1][p] * dxdq[0][2][p] + dxdq[1][1][p] * dxdq[1][2][p]) \
-                + m2 * (dxdq[3][1][p] * dxdq[3][2][p] + dxdq[4][1][p] * dxdq[4][2][p]) \
-                + m3 * (dxdq[6][1][p] * dxdq[6][2][p] + dxdq[7][1][p] * dxdq[7][2][p])
-        G[2][2] = m1 * (dxdq[0][2][p] * dxdq[0][2][p] + dxdq[1][2][p] * dxdq[1][2][p]) \
-                + m2 * (dxdq[3][2][p] * dxdq[3][2][p] + dxdq[4][2][p] * dxdq[4][2][p]) \
-                + m3 * (dxdq[6][2][p] * dxdq[6][2][p] + dxdq[7][2][p] * dxdq[7][2][p])
-        G[1][0] = G[0][1]
-        G[2][0] = G[0][2]
-        G[2][1] = G[1][2]
+        for r in range(3):
+            for s in range(r,3):
+                for j in range(Nat):
+                    for k in range(3):
+                        G[r][s] += m[j] * dxdq[3*j+k][r][p] * dxdq[3*j+k][s][p]
+        for r in range(3):
+            for s in range(r+1,3):
+                G[s][r] = G[r][s]
+
         Ginv = scipy.linalg.inv(G)
-        idx = pyfghutil.PointToIndex(D,N,p)
         for r in range(3):
             for s in range(3):
-                Gmatrix[idx[0]][idx[1]][idx[2]][r][s] = Ginv[r][s]
+                Gmatrix[p][r][s] = Ginv[r][s]
     return Gmatrix
+
 
 def calcGMatrix_Old(D, N, pes, equil):
     dx1dq1 = np.zeros([N[0],N[1],N[2]])

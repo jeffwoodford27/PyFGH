@@ -142,27 +142,36 @@ def Tab(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray, approxima
         #So BMatrix[0] would be B1, but it's actually B3
         sums = 0.0
         for p in range(NValue[0]):
-            sums += b_matrix_insert[2][j,p]*b_matrix_insert[2][p,t]*GMat[p][k][l][0][0]
+            pt = pyfghutil.IndexToPoint(d,NValue,[p,k,l])
+            sums += b_matrix_insert[2][j,p]*b_matrix_insert[2][p,t]*GMat[pt][0][0]
+#            sums += b_matrix_insert[2][j, p] * b_matrix_insert[2][p, t] * GMat[p][k][l][0][0]
         total += -0.5*sums * delta(k,u) * delta(l,v)
 
         sums = 0.0
         for p in range(NValue[1]):
-            sums += b_matrix_insert[1][k,p]*b_matrix_insert[1][p,u]*GMat[j][p][l][1][1]
+            pt = pyfghutil.IndexToPoint(d,NValue,[j,p,l])
+            sums += b_matrix_insert[1][k,p]*b_matrix_insert[1][p,u]*GMat[pt][1][1]
+#            sums += b_matrix_insert[1][k,p]*b_matrix_insert[1][p,u]*GMat[j][p][l][1][1]
         total += -0.5*sums*delta(j,t) * delta(l,v)
 
         sums = 0.0
         for p in range(NValue[2]):
-            sums += b_matrix_insert[0][l,p]*b_matrix_insert[0][p,v]*GMat[j][k][p][2][2]
+            pt = pyfghutil.IndexToPoint(d,NValue,[j,k,p])
+            sums += b_matrix_insert[0][l,p]*b_matrix_insert[0][p,v]*GMat[pt][2][2]
+#            sums += b_matrix_insert[0][l, p] * b_matrix_insert[0][p, v] * GMat[j][k][p][2][2]
         total += -0.5*sums*delta(j,t)*delta(k,u)
 
-        total += -0.5*(b_matrix_insert[2][j,t]*b_matrix_insert[1][k,u]*GMat[t][k][l][0][1]) * delta(v,l)
-        total += -0.5*(b_matrix_insert[2][j,t]*b_matrix_insert[0][l,v]*GMat[t][k][l][0][2]) * delta(k,u)
-        total += -0.5*(b_matrix_insert[1][k,u]*b_matrix_insert[2][j,t]*GMat[j][u][l][1][0]) * delta(v,l)
-        total += -0.5*(b_matrix_insert[1][k,u]*b_matrix_insert[0][l,v]*GMat[j][u][l][1][2]) * delta(j,t)
-        total += -0.5*(b_matrix_insert[0][l,v]*b_matrix_insert[2][j,t]*GMat[j][k][v][2][0]) * delta(k,u)
-        total += -0.5*(b_matrix_insert[0][l,v]*b_matrix_insert[1][k,u]*GMat[j][k][v][2][1]) * delta(j,t)
+        pt = pyfghutil.IndexToPoint(d,NValue,[t,k,l])
+        total += -0.5*(b_matrix_insert[2][j,t]*b_matrix_insert[1][k,u]*GMat[pt][0][1]) * delta(v,l)
+        total += -0.5*(b_matrix_insert[2][j,t]*b_matrix_insert[0][l,v]*GMat[pt][0][2]) * delta(k,u)
 
+        pt = pyfghutil.IndexToPoint(d,NValue,[j,u,l])
+        total += -0.5*(b_matrix_insert[1][k,u]*b_matrix_insert[2][j,t]*GMat[pt][1][0]) * delta(v,l)
+        total += -0.5*(b_matrix_insert[1][k,u]*b_matrix_insert[0][l,v]*GMat[pt][1][2]) * delta(j,t)
 
+        pt = pyfghutil.IndexToPoint(d,NValue,[j,k,v])
+        total += -0.5*(b_matrix_insert[0][l,v]*b_matrix_insert[2][j,t]*GMat[pt][2][0]) * delta(k,u)
+        total += -0.5*(b_matrix_insert[0][l,v]*b_matrix_insert[1][k,u]*GMat[pt][2][1]) * delta(j,t)
 
     else:
         print("This current approximation is incorrect or not supported: "+str(approximation))
@@ -197,19 +206,10 @@ def TBlockCalc(dimensions, NValue, LValue, mu, c_matrix, approximation, blockX, 
 #The function to calculate a TMatrix using the dataObject class from input
 def TMatrixCalc(dataObject, GMatrix):
     #Establish variables needed
-    NValue = []
-    LValue = []
-    if(int(dataObject.N1) > 0):
-        NValue.append(int(dataObject.N1))
-        LValue.append(float(dataObject.L1))
-    if(int(dataObject.N2) > 0):
-        NValue.append(int(dataObject.N2))
-        LValue.append(float(dataObject.L2))
-    if(int(dataObject.N3) > 0):
-        NValue.append(int(dataObject.N3))
-        LValue.append(float(dataObject.L3))
-    D = len(NValue)
-    pes = dataObject.PES
+    NValue = dataObject.getNlist()
+    LValue = dataObject.getLlist()
+    D = dataObject.getD()
+
     dimensionCounterArray = np.zeros(D*2, int)
     mu = []
     Tapprox = 2

@@ -144,20 +144,11 @@ def VBlockCalc(dimensions, NValue, LValue, pes, blockX, blockY):
 #The function to calculate a VMatrix using the DataObject class input
 def VMatrixCalc(dataObject):
     #Establish variables needed
-    NValue = []
-    LValue = []
-    if(int(dataObject.N1) > 0):
-        NValue.append(int(dataObject.N1))
-        LValue.append(float(dataObject.L1))
-    if(int(dataObject.N2) > 0):
-        NValue.append(int(dataObject.N2))
-        LValue.append(float(dataObject.L2))
-    if(int(dataObject.N3) > 0):
-        NValue.append(int(dataObject.N3))
-        LValue.append(float(dataObject.L3))
+    NValue = dataObject.getNlist()
+    LValue = dataObject.getLlist()
 
-    dimensions = len(NValue)
-    pes = dataObject.PES
+    dimensions = dataObject.getD()
+    pes = dataObject.getPES()
 
     dimensionCounterArray = np.zeros((dimensions*2,1), int)
 

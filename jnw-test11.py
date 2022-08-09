@@ -4,6 +4,8 @@ import os
 import numpy as np
 from util import pyfghutil, DataObject
 
+# Proposed replacement for molecule_gui
+
 Q1 = []
 Q2 = []
 Q3 = []
@@ -120,6 +122,7 @@ def readPESfile(pesfile, equil, D, N):
                     en = float(row[D+3*Nat])
                 except IndexError:
                     raise ValidationError("In PES file: Missing data on line {0}".format(n+1))
+                    os._exit(0)
 
                 pespt.setQList(q)
                 pespt.setXList(x)

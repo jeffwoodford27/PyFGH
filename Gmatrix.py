@@ -49,23 +49,23 @@ def calcGMatrix(D, N, pes, equil):
                 pass
     #            print("skip point " + str(n) + " for dimension " + str(d))
 
-    Gmatrix = np.zeros([Npts,3,3],dtype=float)
+    Gmatrix = np.zeros([Npts,D,D],dtype=float)
     m = equil.getMassList()
 
     for p in range(Npts):
-        G = np.zeros([3,3],float)
-        for r in range(3):
-            for s in range(r,3):
+        G = np.zeros([D,D],dtype=float)
+        for r in range(D):
+            for s in range(r,D):
                 for j in range(Nat):
                     for k in range(3):
                         G[r][s] += m[j] * dxdq[3*j+k][r][p] * dxdq[3*j+k][s][p]
-        for r in range(3):
-            for s in range(r+1,3):
+        for r in range(D):
+            for s in range(r+1,D):
                 G[s][r] = G[r][s]
 
         Ginv = scipy.linalg.inv(G)
-        for r in range(3):
-            for s in range(3):
+        for r in range(D):
+            for s in range(D):
                 Gmatrix[p][r][s] = Ginv[r][s]
     return Gmatrix
 

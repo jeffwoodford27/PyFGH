@@ -49,6 +49,9 @@ class InputData:
         self.PES = 0
         self.error = 0
 
+        self.num_eigenvalues = 10
+        self.eigenvalue_flag = True
+
 
 
     """
@@ -138,14 +141,28 @@ class InputData:
         self.PES = pes
         return
 
+    def setNumberOfEigenvalues(self, num):
+        self.num_eigenvalues = num
+        return
+
+    def setEigenvalueMethod(self, eigenmethod):
+        self.eigenvalue_flag = eigenmethod
+        return
+
     def getD(self):
         return self.D
 
     def getNlist(self):
         return self.N
 
+    def getN(self,j):
+        return self.N[j]
+
     def getLlist(self):
         return self.L
+
+    def getL(self,j):
+        return self.L[j]
 
     def getEquilMolecule(self):
         return self.EquilMolecule
@@ -156,9 +173,17 @@ class InputData:
     def getError(self):
         return self.error
 
+    def getNumberOfEigenvalues(self):
+        return self.num_eigenvalues
+
+    def getEigenvalueMethod(self):
+        return self.eigenvalue_flag
+
+
 #TODO take the values in Eignevalues and Eigenvectos and write them to a CSV file in main on line 104.
 class OutputData:
     def __init__(self):
+        self.num_eigenvalues = 0
         self.eigenvalues = []
         self.eigenvectors = []
 
@@ -170,9 +195,16 @@ class OutputData:
         self.eigenvectors = evectors
         return
 
+    def setNumberOfEigenvalues(self, num):
+        self.num_eigenvalues = num
+        return
+
     def getEigenvalues(self):
         return self.eigenvalues
 
     def getEigenvectors(self):
         return self.eigenvectors
+
+    def getNumberOfEigenvalues(self):
+        return self.num_eigenvalues
 

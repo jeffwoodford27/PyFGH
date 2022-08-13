@@ -5,9 +5,11 @@ import Tmatrix
 import Gmatrix
 import numpy as np
 from scipy import linalg
+from scipy.sparse import linalg as sparse_linalg
 import math
 from util.DataObject import OutputData
 from util import pyfghutil
+import time
 
 def eckartTranslation(D,N,equil,pes):
     Nat = equil.getNatom()
@@ -182,9 +184,8 @@ def passToCalc(dataObj):
 
     D = dataObj.getD()
     N = np.zeros(D,dtype=int)
-    N[0] = dataObj.getN1()
-    N[1] = dataObj.getN2()
-    N[2] = dataObj.getN3()
+    for i in range(D):
+        N[i] = dataObj.getN(i)
 
     equil = dataObj.getEquilMolecule()
     pes = dataObj.getPES()
@@ -194,21 +195,48 @@ def passToCalc(dataObj):
     eckartRotation(D, N, equil, pes)
 
     print("Creating G Matrix")
+    t0 = time.perf_counter()
     GMat = Gmatrix.calcGMatrix(D, N, dataObj.PES, dataObj.EquilMolecule)
-    print("Done with G Matrix")
+    t1 = time.perf_counter()
+    print("Done with G Matrix time = {0}".format(t1-t0))
+
+    t0 = time.perf_counter()
     print("Creating V Matrix")
     VMat = Vmatrix.VMatrixCalc(dataObj)
-    print("Done with V Matrix")
+    t1 = time.perf_counter()
+    print("Done with V Matrix time = {0}".format(t1-t0))
+
+    t0 = time.perf_counter()
     print("Creating T Matrix")
     TMat = Tmatrix.TMatrixCalc(dataObj, GMat)
-    print("Done with T Matrix")
-    HMat = VMat + TMat
+    t1 = time.perf_counter()
+    print("Done with T Matrix time = {0}".format(t1-t0))
 
     print("Calculating eigenvalues")
-    eigenval, eigenvec = linalg.eigh(HMat)
-    eigenval = eigenval * 219474.6
+    Neigen = dataObj.getNumberOfEigenvalues()
+    EigenSparseMethod = dataObj.getEigenvalueMethod()
+    Npts = np.prod(N)
+
+    HMat = VMat + TMat
+
+    if (EigenSparseMethod):
+        NIter = 10*Npts
+        try:
+            eigenval, eigenvec = sparse_linalg.eigsh(HMat, k=Neigen, which='SM', tol=1.0e-6, maxiter=NIter)
+        except sparse_linalg.ArpackNoConvergence as error_obj:
+            eigenval = error_obj.eigenvalues
+            eigenvec = error_obj.eigenvectors
+            Neigen = np.size(eigenval)
+            print("could not find {0} eigenvalues in {1} iterations, found {2} instead.".format(dataObj.getNumberOfEigenvalues(),NIter, Neigen))
+            print()
+    else:
+        HMat = HMat.toarray("C")
+        eigenval, eigenvec = linalg.eigh(HMat)
+
+    eigenval = eigenval * 219474.6  # conversion from hartree to cm-1
 
     ResultObj = OutputData()
+    ResultObj.setNumberOfEigenvalues(Neigen)
     ResultObj.setEigenvalues(eigenval)
     ResultObj.setEigenvectors(eigenvec)
 

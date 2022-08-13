@@ -2,6 +2,7 @@ import numpy as np
 from util import pyfghutil
 import multiprocessing as mp
 from scipy.fft import ifft
+from scipy.sparse import lil_matrix
 
 #A function to calculate the BMatrix
 # B(j,l) = ((4*pi)/(L*N) * sum(p=1,n)(p*sin(2*pi*p*(l-j)/N))
@@ -76,7 +77,41 @@ def cmatrixgen_old(NValue, LValue):
 # Right now, only "approximation 2" is tested.  The other approximations will be for a
 # future release.
 
-def Tab(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray, approximation, b_matrix_insert, GMat):
+def Tab(D, N, alpha, beta, B, G):
+    total = 0.0
+
+    idx_a = pyfghutil.PointToIndex(D, N, alpha)
+    idx_b = pyfghutil.PointToIndex(D, N, beta)
+
+    for r in range(D):
+        for s in range(D):
+            deltacounter = True
+            j = 0
+            while (deltacounter and (j < D)):
+                if ((r != j) and (s != j)):
+                    if (idx_a[j] != idx_b[j]):
+                        deltacounter = False
+                j = j + 1
+
+            if (deltacounter):
+                idx = np.copy(idx_a)
+                if (r == s):
+                    val = 0.0
+                    for p in range(N[r]):
+                        idx[r] = p
+                        pt = pyfghutil.IndexToPoint(D, N, idx)
+                        val += B[r][idx_a[r], p] * B[r][p, idx_b[r]] * G[pt][r][r]
+                else:
+                    idx[s] = idx_b[s]
+                    pt = pyfghutil.IndexToPoint(D, N, idx)
+                    val = B[r][idx_a[r], idx_b[r]] * B[s][idx_a[s], idx_b[s]] * G[pt][r][s]
+
+                total += val
+
+    return (-0.5 * total)
+
+
+def Tab_old(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray, approximation, b_matrix_insert, GMat):
     #Deltacounter is used to makes sure that the value being calculated is in the diagonal of the matrix
     Deltacounter = 0
     #Total is return value
@@ -182,7 +217,7 @@ def Tab(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray, approxima
 # A function that splits the Tmatrix calculation into blocks to be calculated in parallel.
 # Each block uses the Tab function above to calculate individual matrix elements.
 
-def TBlockCalc(dimensions, NValue, LValue, mu, c_matrix, approximation, blockX, blockY, b_matrix, gmatrix):
+def TBlockCalc(dimensions, NValue, blockX, blockY, b_matrix, gmatrix):
     #Blocks will be 0 index
     blockHolder = np.zeros((NValue[0], NValue[0]), float)
     #The 0Start variables will always be 0 at the beginning to act as loop variables that correspond to the blockHolder size
@@ -190,14 +225,7 @@ def TBlockCalc(dimensions, NValue, LValue, mu, c_matrix, approximation, blockX, 
     beta0start = 0
     for alpha in range(0+NValue[0]*blockX, NValue[0]+NValue[0]*blockX):
         for beta in range(0+NValue[0]*blockY, NValue[0]+NValue[0]*blockY):
-            counter = pyfghutil.AlphaAndBetaToCounter(alpha, beta, dimensions, NValue)
-            if(approximation > 2):
-                counter1 = int(counter[0])
-                counter2 = int(counter[2])
-                counter3 = int(counter[4])
-                blockHolder[alpha0start, beta0start] = Tab(dimensions, NValue, LValue, mu, c_matrix, counter, approximation, b_matrix, gmatrix[counter1][counter2][counter3])
-            else:
-                blockHolder[alpha0start, beta0start] = Tab(dimensions, NValue, LValue, mu, c_matrix, counter, approximation, b_matrix, gmatrix)
+            blockHolder[alpha0start, beta0start] = Tab(dimensions, NValue, alpha, beta, b_matrix, gmatrix)
             beta0start += 1
         alpha0start += 1
         beta0start = 0
@@ -210,29 +238,20 @@ def TMatrixCalc(dataObject, GMatrix):
     LValue = dataObject.getLlist()
     D = dataObject.getD()
 
-    dimensionCounterArray = np.zeros(D*2, int)
-    mu = []
-    Tapprox = 2
-
     #Create the TMatrix and the TFlagMatrix
     #The alpha and beta values are used to create the TMatrix in the correct position
-    tmatrix = np.zeros((np.prod(NValue), np.prod(NValue)), dtype=float)
-    tflag = np.zeros((np.prod(NValue), np.prod(NValue)), int)
-    alpha = 0
-    beta = 0
+    Npts = np.prod(NValue)
+    tmatrix = lil_matrix((Npts,Npts), dtype=float)
 
     #Create the C_Matrix
-    c_matrix = []
-    for x in reversed(range(len(NValue))):
-        c_matrix.append(cmatrixgen(NValue[x], LValue[x]))
+#    c_matrix = []
+#    for x in reversed(range(len(NValue))):
+#        c_matrix.append(cmatrixgen(NValue[x], LValue[x]))
 
-    #Create the B_Matrix if necessary
-    if(Tapprox < 4):
-        b_matrix = []
-        for x in reversed(range(len(NValue))):
-            b_matrix.append(bmatrixgen(NValue[x], LValue[x]))
-    else:
-        b_matrix = None
+    #Create the B_Matrix
+    b_matrix = []
+    for x in range(D):
+        b_matrix.append(bmatrixgen(NValue[x], LValue[x]))
 
     blockCoords = []
     blocks = []
@@ -242,15 +261,8 @@ def TMatrixCalc(dataObject, GMatrix):
     for x in range(repeatamount):
         for y in range(repeatamount):
             blockCoords.append((x,y))
-    if(Tapprox == 4):
-        for coords in blockCoords:
-            paramz.append((D, NValue, LValue, mu, c_matrix, Tapprox, coords[0], coords[1], None, GMatrix))
-    elif(Tapprox < 4):
-        for coords in blockCoords:
-            paramz.append((D, NValue, LValue, mu, c_matrix, Tapprox, coords[0], coords[1], b_matrix, GMatrix))
-    else:
-        #Occurs when invalid or unsupported T Approximation is used
-        pass
+    for coords in blockCoords:
+        paramz.append((D, NValue, coords[0], coords[1], b_matrix, GMatrix))
     #Pool and run
     p = mp.Pool(dataObject.cores_amount)
 #    print("Pool go T")

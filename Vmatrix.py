@@ -2,6 +2,7 @@
 import numpy as np
 from util import pyfghutil
 import multiprocessing as mp
+from scipy.sparse import lil_matrix
 
 class NBlock:
     def __init__(self, D, NValues):
@@ -108,25 +109,50 @@ class NBlock:
 
 
 
+def Vab(D, N, pes, alpha, beta):
+    if (alpha == beta):
+        return pes.getPointByPt(alpha).getEnergy()
+
+    idx_a = pyfghutil.PointToIndex(D, N, alpha)
+    idx_b = pyfghutil.PointToIndex(D, N, beta)
+
+    deltacounter = True
+    j = 0
+    while (deltacounter and (j < D)):
+        if (idx_a[j] != idx_b[j]):
+            deltacounter = False
+        j = j + 1
+
+    if (deltacounter):
+        return pes.getPointByIdx(idx_a).getEnergy()
+    else:
+        return 0.0
 
 #A function to calculate the invidivdual values for the VMatrix
-def Vab(d, NValue, LValue, deltax, pes, dimensionCounterArray):
+#def Vab_old(d, NValue, LValue, deltax, pes, dimensionCounterArray):
+def Vab_old(d, NValue, LValue, deltax, pes, alpha, beta):
+    idx_a = pyfghutil.PointToIndex(d, NValue, alpha)
+    idx_b = pyfghutil.PointToIndex(d, NValue, beta)
+
     #Deltacounter is used to makes sure that the value being calculated is in the diagonal of the matrix
     Deltacounter = 0
     #Total is the value returned for the calculation
     total = 0.0
     for Vcounter in range(d):
         #Add 1 to deltacounter if the corrosponding x and y values for the dimension equals each other
-        if(dimensionCounterArray[Vcounter*2] == dimensionCounterArray[(Vcounter*2)+1]):
+#        if(dimensionCounterArray[Vcounter*2] == dimensionCounterArray[(Vcounter*2)+1]):
+#            Deltacounter += 1
+        if idx_a[Vcounter] == idx_b[Vcounter]:
             Deltacounter += 1
     #If the deltacounter amount equals the amount of dimensions, perform a summation for the formula
     #Otherwise, the total will remain 0.0
     if (Deltacounter == d):
-        total += pes.getPointByN(int(dimensionCounterArray[1]),int(dimensionCounterArray[3]),int(dimensionCounterArray[5])).getEnergy()
+#        total += pes.getPointByN(int(dimensionCounterArray[1]),int(dimensionCounterArray[3]),int(dimensionCounterArray[5])).getEnergy()
+        total += pes.getPointByIdx(idx_a).getEnergy()
 
     return(total)
 
-def VBlockCalc(dimensions, NValue, LValue, pes, blockX, blockY):
+def VBlockCalc(dimensions, NValue, pes, blockX, blockY):
     #Blocks will be 0 index
     blockHolder = np.zeros((NValue[0], NValue[0]), float)
     #The 0Start variables will always be 0 at the beginning to act as loop variables that correspond to the blockHolder size
@@ -134,8 +160,7 @@ def VBlockCalc(dimensions, NValue, LValue, pes, blockX, blockY):
     beta0start = 0
     for alpha in range(0+NValue[0]*blockX, NValue[0]+NValue[0]*blockX):
         for beta in range(0+NValue[0]*blockY, NValue[0]+NValue[0]*blockY):
-            counter = pyfghutil.AlphaAndBetaToCounter(alpha, beta, dimensions, NValue)
-            blockHolder[alpha0start, beta0start] = (Vab(dimensions, NValue, LValue, 0, pes, counter))
+            blockHolder[alpha0start, beta0start] = (Vab(dimensions, NValue, pes, alpha, beta))
             beta0start += 1
         alpha0start += 1
         beta0start = 0
@@ -145,21 +170,18 @@ def VBlockCalc(dimensions, NValue, LValue, pes, blockX, blockY):
 def VMatrixCalc(dataObject):
     #Establish variables needed
     NValue = dataObject.getNlist()
-    LValue = dataObject.getLlist()
 
     dimensions = dataObject.getD()
     pes = dataObject.getPES()
 
-    dimensionCounterArray = np.zeros((dimensions*2,1), int)
-
     #Create the VMatrix
     #The alpha and beta values are used to create the VMatrix in the correct position
-    vmatrix = np.zeros((np.prod(NValue), np.prod(NValue)), float)
+    Npts = np.prod(NValue)
+    vmatrix = lil_matrix((Npts,Npts), dtype=float)
 
     #NBlock Class System
     NBlocks = NBlock(dimensions, NValue)
     NBlocks.difSetup()
-
 
     #Calculate by blocks:
     #Don't optimize for now. Just calculate blocks as needed.
@@ -174,7 +196,7 @@ def VMatrixCalc(dataObject):
             blockCoords.append((x,y))
     optBlockCoords = NBlocks.coordGen()
     for coords in optBlockCoords:
-        paramz.append((dimensions, NValue, LValue, pes, coords[0], coords[1]))
+        paramz.append((dimensions, NValue, pes, coords[0], coords[1]))
 
     #Pool and run
     p = mp.Pool(dataObject.cores_amount)

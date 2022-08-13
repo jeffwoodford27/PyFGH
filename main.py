@@ -31,8 +31,8 @@ def datamuncher(q):
     print("L3: ", holder1.L3)
     """
 
-    data = [holder1.equilibrium_file, holder1.N1, holder1.L1, holder1.N2,
-            holder1.L2, holder1.N3, holder1.L3]
+    data = [holder1.equilibrium_file, holder1.getN(0), holder1.getL(0), holder1.getN(1),
+            holder1.getL(1), holder1.getN(2), holder1.getL(2)]
 
     save_path = "./resources/"
     file_name = "DataList.txt"
@@ -63,50 +63,56 @@ def datagrabber():
 
     ResultObj = q.get()  # an object of type OutputData
 
-    wfnorder = np.argsort(ResultObj.eigenvalues)
-    Npts = holder.N1*holder.N2*holder.N3
+    eigvals = ResultObj.getEigenvalues()
+    eigvecs = ResultObj.getEigenvectors()
+    Neig = ResultObj.getNumberOfEigenvalues()
+
+    wfnorder = np.argsort(eigvals)
+    N = holder.getNlist()
+    L = holder.getLlist()
+    Npts = np.prod(N)
 
     with open("./output files/Eigenvalues.csv", 'w', newline='', encoding='UTF8') as f:
         writer = csv.writer(f)
-        for i in range(Npts):
-            val = ResultObj.eigenvalues[wfnorder[i]]-ResultObj.eigenvalues[wfnorder[0]]
+        for i in range(Neig):
+            val = eigvals[wfnorder[i]]-eigvals[wfnorder[0]]
             writer.writerow([val])
 
-    for i in range(1,11):
-        val = ResultObj.eigenvalues[wfnorder[i]]-ResultObj.eigenvalues[wfnorder[0]]
+    for i in range(1,Neig):
+        val = eigvals[wfnorder[i]]-eigvals[wfnorder[0]]
         print(val)
 
-    wfn = np.zeros([Npts, holder.N1, holder.N2, holder.N3], float)
+    wfn = np.zeros([Neig, N[0], N[1], N[2]], float)
 
-    for p in range(Npts):
+    for p in range(Neig):
         for alpha in range(Npts):
-            l = np.mod(alpha, holder.N3)
-            f = int(alpha / holder.N3)
-            k = np.mod(f, holder.N2)
-            f2 = int(f / holder.N2)
-            j = np.mod(f2, holder.N1)
+            l = np.mod(alpha, N[2])
+            f = int(alpha / N[2])
+            k = np.mod(f, N[1])
+            f2 = int(f / N[1])
+            j = np.mod(f2, N[0])
 
-            wfn[p][j][k][l] = ResultObj.eigenvectors[alpha][wfnorder[p]]
+            wfn[p][j][k][l] = eigvecs[alpha][wfnorder[p]]
 
-    dq1 = holder.L1/float(holder.N1)
-    dq2 = holder.L2/float(holder.N2)
-    dq3 = holder.L3/float(holder.N3)
+    dq1 = L[0]/float(N[0])
+    dq2 = L[1]/float(N[1])
+    dq3 = L[2]/float(N[2])
 
-    for p in range(0,21):
+    for p in range(Neig):
         filename = "./output files/Eigenvector-" + str(p) + ".csv"
         with open(filename, 'w', newline='',encoding='UTF8') as f:
             writer = csv.writer(f)
 
-            for n in range(holder.N1*holder.N2*holder.N3):
-                l = np.mod(n, holder.N3)
-                f = int(n / holder.N3)
-                k = np.mod(f, holder.N2)
-                f2 = int(f / holder.N2)
-                j = np.mod(f2, holder.N1)
+            for n in range(Npts):
+                l = np.mod(n, N[2])
+                f = int(n / N[2])
+                k = np.mod(f, N[1])
+                f2 = int(f / N[1])
+                j = np.mod(f2, N[0])
 
-                q1 = dq1 * float(j - int(holder.N1/2))
-                q2 = dq2 * float(k - int(holder.N2/2))
-                q3 = dq3 * float(l - int(holder.N3/2))
+                q1 = dq1 * float(j - int(N[0]/2))
+                q2 = dq2 * float(k - int(N[1]/2))
+                q3 = dq3 * float(l - int(N[2]/2))
                 writer.writerow([q1,q2,q3,wfn[p][j][k][l]])
 
     return

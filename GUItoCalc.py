@@ -20,7 +20,7 @@ def eckartTranslation(D,N,equil,pes):
         M += m[i]
 
     for p in range(Npts):
-        idx = pyfghutil.PointToIndex(D,N,p)
+        idx = pyfghutil.PointToIndex(N,p)
         mol = pes.getPointByIdx(idx)
         xcm = ycm = zcm = 0.0
         x = mol.getXList()
@@ -82,7 +82,7 @@ def eckartRotation(D,N,equil,pes):
     ye = equil.getYList()
     ze = equil.getZList()
     for p in range(Npts):
-        idx = pyfghutil.PointToIndex(D,N,p)
+        idx = pyfghutil.PointToIndex(N,p)
         mol = pes.getPointByIdx(idx)
         x = mol.getXList()
         y = mol.getYList()

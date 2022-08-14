@@ -1,19 +1,10 @@
 import numpy as np
 
-def IndexToPoint(D,N,idx):
-    pt = idx[0]
-    for j in range(1,D):
-        pt = pt * N[j]
-        pt = pt + idx[j]
-    return pt
+def IndexToPoint(N,idx):
+    return np.ravel_multi_index(idx,tuple(N))
 
-def PointToIndex(D,N,pt):
-    idx = np.zeros(D,dtype=int)
-    p = pt
-    for j in range(D-1,-1,-1):
-        idx[j] = p % N[j]
-        p = p // N[j]
-    return idx
+def PointToIndex(N,pt):
+    return list(np.unravel_index(pt,tuple(N)))
 
 # The Molecule class.  Defines a chemical molecule.
 # Z = a list of length 3 of atomic numbers of the atoms.
@@ -214,7 +205,7 @@ class PotentialEnergySurface:
 #        return self.getPointByN(idx[0],idx[1],idx[2])
 
     def getPointByIdx(self, idx):
-        pt = IndexToPoint(len(self.N), self.N, idx)
+        pt = IndexToPoint(self.N, idx)
         return self.getPointByPt(pt)
 
     def getPointByPt(self, pt):

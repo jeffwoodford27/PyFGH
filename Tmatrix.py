@@ -80,8 +80,8 @@ def cmatrixgen_old(NValue, LValue):
 def Tab(D, N, alpha, beta, B, G):
     total = 0.0
 
-    idx_a = pyfghutil.PointToIndex(D, N, alpha)
-    idx_b = pyfghutil.PointToIndex(D, N, beta)
+    idx_a = pyfghutil.PointToIndex(N, alpha)
+    idx_b = pyfghutil.PointToIndex(N, beta)
 
     for r in range(D):
         for s in range(D):
@@ -99,11 +99,11 @@ def Tab(D, N, alpha, beta, B, G):
                     val = 0.0
                     for p in range(N[r]):
                         idx[r] = p
-                        pt = pyfghutil.IndexToPoint(D, N, idx)
+                        pt = pyfghutil.IndexToPoint(N, idx)
                         val += B[r][idx_a[r], p] * B[r][p, idx_b[r]] * G[pt][r][r]
                 else:
                     idx[s] = idx_b[s]
-                    pt = pyfghutil.IndexToPoint(D, N, idx)
+                    pt = pyfghutil.IndexToPoint(N, idx)
                     val = B[r][idx_a[r], idx_b[r]] * B[s][idx_a[s], idx_b[s]] * G[pt][r][s]
 
                 total += val
@@ -177,34 +177,34 @@ def Tab_old(d, NValue, LValue, mu, c_matrix_insert, dimensionCounterArray, appro
         #So BMatrix[0] would be B1, but it's actually B3
         sums = 0.0
         for p in range(NValue[0]):
-            pt = pyfghutil.IndexToPoint(d,NValue,[p,k,l])
+            pt = pyfghutil.IndexToPoint(NValue,[p,k,l])
             sums += b_matrix_insert[2][j,p]*b_matrix_insert[2][p,t]*GMat[pt][0][0]
 #            sums += b_matrix_insert[2][j, p] * b_matrix_insert[2][p, t] * GMat[p][k][l][0][0]
         total += -0.5*sums * delta(k,u) * delta(l,v)
 
         sums = 0.0
         for p in range(NValue[1]):
-            pt = pyfghutil.IndexToPoint(d,NValue,[j,p,l])
+            pt = pyfghutil.IndexToPoint(NValue,[j,p,l])
             sums += b_matrix_insert[1][k,p]*b_matrix_insert[1][p,u]*GMat[pt][1][1]
 #            sums += b_matrix_insert[1][k,p]*b_matrix_insert[1][p,u]*GMat[j][p][l][1][1]
         total += -0.5*sums*delta(j,t) * delta(l,v)
 
         sums = 0.0
         for p in range(NValue[2]):
-            pt = pyfghutil.IndexToPoint(d,NValue,[j,k,p])
+            pt = pyfghutil.IndexToPoint(NValue,[j,k,p])
             sums += b_matrix_insert[0][l,p]*b_matrix_insert[0][p,v]*GMat[pt][2][2]
 #            sums += b_matrix_insert[0][l, p] * b_matrix_insert[0][p, v] * GMat[j][k][p][2][2]
         total += -0.5*sums*delta(j,t)*delta(k,u)
 
-        pt = pyfghutil.IndexToPoint(d,NValue,[t,k,l])
+        pt = pyfghutil.IndexToPoint(NValue,[t,k,l])
         total += -0.5*(b_matrix_insert[2][j,t]*b_matrix_insert[1][k,u]*GMat[pt][0][1]) * delta(v,l)
         total += -0.5*(b_matrix_insert[2][j,t]*b_matrix_insert[0][l,v]*GMat[pt][0][2]) * delta(k,u)
 
-        pt = pyfghutil.IndexToPoint(d,NValue,[j,u,l])
+        pt = pyfghutil.IndexToPoint(NValue,[j,u,l])
         total += -0.5*(b_matrix_insert[1][k,u]*b_matrix_insert[2][j,t]*GMat[pt][1][0]) * delta(v,l)
         total += -0.5*(b_matrix_insert[1][k,u]*b_matrix_insert[0][l,v]*GMat[pt][1][2]) * delta(j,t)
 
-        pt = pyfghutil.IndexToPoint(d,NValue,[j,k,v])
+        pt = pyfghutil.IndexToPoint(NValue,[j,k,v])
         total += -0.5*(b_matrix_insert[0][l,v]*b_matrix_insert[2][j,t]*GMat[pt][2][0]) * delta(k,u)
         total += -0.5*(b_matrix_insert[0][l,v]*b_matrix_insert[1][k,u]*GMat[pt][2][1]) * delta(j,t)
 

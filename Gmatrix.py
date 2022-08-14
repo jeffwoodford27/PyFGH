@@ -26,7 +26,7 @@ def calcGMatrix(D, N, pes, equil):
                     y = np.zeros(N[d], dtype=float)
                     for i in range(N[d]):
                         pt = n + i * np.prod(N[d + 1:])
-                        idx = pyfghutil.PointToIndex(D, N, pt)
+                        idx = pyfghutil.PointToIndex(N, pt)
                         x[i] = pes.getPointByIdx(idx).getq(d + 1)
                         y[i] = pes.getPointByIdx(idx).getCoord(c)
 #                    print(x, y)

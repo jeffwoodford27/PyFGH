@@ -113,8 +113,8 @@ def Vab(D, N, pes, alpha, beta):
     if (alpha == beta):
         return pes.getPointByPt(alpha).getEnergy()
 
-    idx_a = pyfghutil.PointToIndex(D, N, alpha)
-    idx_b = pyfghutil.PointToIndex(D, N, beta)
+    idx_a = pyfghutil.PointToIndex(N, alpha)
+    idx_b = pyfghutil.PointToIndex(N, beta)
 
     deltacounter = True
     j = 0
@@ -131,8 +131,8 @@ def Vab(D, N, pes, alpha, beta):
 #A function to calculate the invidivdual values for the VMatrix
 #def Vab_old(d, NValue, LValue, deltax, pes, dimensionCounterArray):
 def Vab_old(d, NValue, LValue, deltax, pes, alpha, beta):
-    idx_a = pyfghutil.PointToIndex(d, NValue, alpha)
-    idx_b = pyfghutil.PointToIndex(d, NValue, beta)
+    idx_a = pyfghutil.PointToIndex(NValue, alpha)
+    idx_b = pyfghutil.PointToIndex(NValue, beta)
 
     #Deltacounter is used to makes sure that the value being calculated is in the diagonal of the matrix
     Deltacounter = 0

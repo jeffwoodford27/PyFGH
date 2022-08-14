@@ -52,6 +52,15 @@ class InputData:
         self.num_eigenvalues = 10
         self.eigenvalue_flag = True
 
+        self.Vmethod = 0
+
+        self.mu = None
+        self.k = None
+        self.De = None
+        self.a = None
+
+        self.psi4method = None
+
 
 
     """
@@ -149,6 +158,30 @@ class InputData:
         self.eigenvalue_flag = eigenmethod
         return
 
+    def setVmethod(self,vmethod):
+        self.Vmethod = vmethod
+        return
+
+    def setMuList(self,mu):
+        self.mu = mu
+        return
+
+    def setKlist(self,k):
+        self.k = k
+        return
+
+    def setAlist(self, a):
+        self.a = a
+        return
+
+    def setDeList(self,De):
+        self.De = De
+        return
+
+    def setPsi4Method(self,method):
+        self.psi4method = method
+        return
+
     def getD(self):
         return self.D
 
@@ -178,6 +211,24 @@ class InputData:
 
     def getEigenvalueMethod(self):
         return self.eigenvalue_flag
+
+    def getVmethod(self):
+        return self.Vmethod
+
+    def getMuList(self):
+        return self.mu
+
+    def getKlist(self):
+        return self.k
+
+    def getAlist(self):
+        return self.a
+
+    def getDeList(self):
+        return self.De
+
+    def getPsi4Method(self):
+        return self.psi4method
 
 
 #TODO take the values in Eignevalues and Eigenvectos and write them to a CSV file in main on line 104.

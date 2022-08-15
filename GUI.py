@@ -15,6 +15,7 @@ from util import model_objects
 import numpy as np
 from tkinter import filedialog as fd
 
+#import jnwtest11 as test11
 # TODO take the Atom class and add it to InputData so Nelson can grab it
 # TODO 3 Atom class. Have a list of the three members of the atom class. [Atom1, Atom2, Atom3]
 # TODO [List of all of the molecules] made into a equalibrium class.
@@ -54,7 +55,7 @@ def main_window():
     running = True
     style = Style()
     window.title('PyFGH')
-    window.geometry('910x255')
+    window.geometry('910x210')
 
     # Water molecule icon in the top left conner
     window.iconbitmap(default='icon.ico')
@@ -88,6 +89,34 @@ def main_window():
 
     n10 = tk.StringVar()
     dimensions = ttk.Combobox(window, values=dimensions, width=10, textvariable=n10)
+
+
+    ttk.Label(window, text="Number of Eigenvalues:", font=("Times New Roman", 12)).place(x=620, y=47)
+    d1 = tk.StringVar()
+    N1text = ttk.Combobox(window, width=10, textvariable=d1)
+
+    eigenvalues = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    n11 = tk.StringVar()
+    eigenvalues = ttk.Combobox(window, values=eigenvalues, width=10, textvariable=n11)
+
+    ttk.Label(window, text="Eigenvalue Calculation Method:", font=("Times New Roman", 10)).place(x=22, y=100)
+    d1 = tk.StringVar()
+    N1text = ttk.Combobox(window, width=10, textvariable=d1)
+
+    calculation = ['Sparse Matrix', 'Full Matrix']
+
+    n12 = tk.StringVar()
+    calculation = ttk.Combobox(window, values=calculation, width=10, textvariable=n12)
+
+    ttk.Label(window, text="Potential Energy Calculation Method:", font=("Times New Roman", 8)).place(x=600, y=100)
+    d1 = tk.StringVar()
+    N1text = ttk.Combobox(window, width=12, textvariable=d1)
+
+    calculation2 = ['Read from File', 'Harmonic Oscillator', 'Morse Oscillator','Compute With Psi4']
+
+    n15 = tk.StringVar()
+    calculation2 = ttk.Combobox(window, values=calculation2, width=16, textvariable=n15)
 
     # Entry
     N10 = ttk.Entry(window, font=("Times New Roman", 10))
@@ -588,13 +617,17 @@ def main_window():
         if holder.value_holder:
 
             save_file_prompt()  # TODO Change this to work for All Dimensions
-            eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
-                                                    holder.N2, holder.L2,
-                                                    holder.N3, holder.L3,
-                                                    holder.equilibrium_file,
-                                                    holder.potential_energy_file)
-            holder.setEquilMolecule(eq)
-            holder.setPES(pes)
+            # eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
+            #                                         holder.N2, holder.L2,
+            #                                         holder.N3, holder.L3,
+            #                                         holder.equilibrium_file,
+            #                                         holder.potential_energy_file)
+
+            # TODO change the 1 in getN and getL. Might use a for loop to include all values.
+
+ #           eq, pes = test11.molecule_testing_v1(holder.getD(), holder.getN(1), holder.getL(1), holder.equilibrium_file, holder.potential_energy_file)
+  #          holder.setEquilMolecule(eq)
+  #          holder.setPES(pes)
 
         else:
 
@@ -608,78 +641,8 @@ def main_window():
             Q1 and Q2 can not be the same.
             Fix N so that the user can not enter floating point values.
             """
-
-            # print(DataObject.test.equilibrium_file)
-            # holder.setN1(int(N1.get()))
-            # holder.setN2(int(N2.get()))
-            # holder.setN3(int(N3.get()))
-            # holder.setL1(float(L1.get()))
-            # holder.setL2(float(L2.get()))
-            # holder.setL3(float(L3.get()))
             holder.setcores_amount(max(1, int(cores.get())))
-            # holder.set_remote(SSH_box.get())
-            # print(holder.N1, holder.N2, " holder")
-
-            # print(holder.value_holder)
-
-            if (int(holder.N1)) % 2 == 0:
-                messagebox.showerror("PyFGH", "N must be odd!!!")
-                clear_data()
-            elif (int(holder.N2)) % 2 == 0:
-                messagebox.showerror("PyFGH", "N must be odd!!!")
-                clear_data()
-            elif (int(holder.N3)) % 2 == 0:
-                messagebox.showerror("PyFGH", "N must be odd!!!")
-                clear_data()
-
-            elif int(holder.N1) < 0:
-                messagebox.showerror("PyFGH", "N must be positive!!!")
-                clear_data()
-            elif float(holder.L1) < 0:
-                messagebox.showerror("PyFGH", "L must be positive!!!")
-                clear_data()
-            elif int(holder.N2) < 0:
-                messagebox.showerror("PyFGH", "N must be positive!!!")
-                clear_data()
-            elif float(holder.L2) < 0:
-                messagebox.showerror("PyFGH", "L must be positive!!!")
-                clear_data()
-            elif int(holder.N3) < 0:
-                messagebox.showerror("PyFGH", "N must be positive!!!")
-                clear_data()
-            elif float(holder.L3) < 0:
-                messagebox.showerror("PyFGH", "L must be positive!!!")
-                clear_data()
-            # elif holder.value_holder == False:
-            #     messagebox.showerror("PyFGH", "Data is missing! Click The Read Structures Button and Add Your Equilibrium and Potential Energies Files!!!")
-            # This runs the model window when the user hits calculate.
-            else:
-                """
-                This will loop through the model_objects file. When you select a model in the GUI this will find the 
-                models that you selected. It takes the selected models and it loops in the model_objects file to find the
-                given class that you selected. When it finds the matching class it will pull all of the information from 
-                that class and it will append it to the holder_model list. This list will be sent to the model_prompt 
-                function that will build the GUI parameter box depending on the dimensions and parameters of each 
-                unique model.
-                """
-                """
-                import inspect
-                holder_model = []
-                value = 3
-                for key, className in inspect.getmembers(model_objects):
-                    for i in range(3):
-                        if holder.v[i] == key:
-                            holder_model.append(className())
-
-                print(holder_model)
-                #model_prompt(holder_model)
-                """
-                test()
-
-
-
-
-
+            test()
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")
@@ -805,8 +768,8 @@ def main_window():
         holder.setvalue_holder(True)
 
     # This is a button called Read Structures
-    readbutton = tk.Button(window, text='Read Structures and Energies from File', bd='10', bg='gray', fg='white',
-                           command=Read_Structures_Button).place(x=360, y=200)
+    # readbutton = tk.Button(window, text='Read Structures and Energies from File', bd='10', bg='gray', fg='white',
+    #                        command=Read_Structures_Button).place(x=360, y=200)
     # Disabled the compute button for now
     # compute = tk.Button(window, text='Compute on the fly', bd='10', bg='gray', fg='white',
     #                    command=open_file).place(x=410, y=370)
@@ -819,6 +782,9 @@ def main_window():
     cores.current()
     vales2 = 80
     dimensions.place(x=180, y=50)
+    eigenvalues.place(x=780, y=50)
+    calculation.place(x=200, y=100)
+    calculation2.place(x=780, y=100)
 
     # N1.place(x=40, y=100, width=100)
     # L1.place(x=185, y=100, width=100)

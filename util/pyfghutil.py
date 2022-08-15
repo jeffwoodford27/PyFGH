@@ -73,6 +73,12 @@ class Molecule:
     def getX(self,n):
         return self.x[n-1]
 
+    def getY(self,n):
+        return self.y[n-1]
+
+    def getZ(self,n):
+        return self.z[n-1]
+
     def getXList(self):
         return self.x
 
@@ -112,7 +118,7 @@ class PESpoint:
 #        self.x = []
 #        self.y = []
 #        self.z = []
-        self.mol = None
+        self.mol = Molecule()
         self.en = 0
 
     def setN(self, n):

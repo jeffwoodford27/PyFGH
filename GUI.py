@@ -470,29 +470,8 @@ def main_window():
     """
 
     def test():
-        """
-        if holder.value_holder:
-            if SSH_box.get() == 'Yes':
-                SSH_prompt()
-            else:
-                save_file_prompt()
-                eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
-                                                        holder.N2, holder.L2, holder.N3,
-                                                        holder.L3)
-                holder.setEquilMolecule(eq)
-                holder.setPES(pes)
-
-
-        else:
-            if SSH_box.get() == 'Yes':
-                holder.set_remote(1)
-                SSH_prompt()
-            else:
-                save_file_prompt()
-        """
-        if holder.value_holder:
-
             save_file_prompt()  # TODO Change this to work for All Dimensions
+            print('THis is from the test!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
             # eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
             #                                         holder.N2, holder.L2,
             #                                         holder.N3, holder.L3,
@@ -501,14 +480,10 @@ def main_window():
 
             # TODO change the 1 in getN and getL. Might use a for loop to include all values.
 
-            import jnwtest11
-            eq, pes = jnwtest11.molecule_testing_v1(holder.getD(), holder.getN(1), holder.getL(1), holder.equilibrium_file, holder.potential_energy_file)
+            eq, pes = molecule_gui.molecule_testing(holder.getN(0), holder.getL(0), holder.getN(1), holder.getL(1), holder.getN(2), holder.getL(2), holder.equilibrium_file, holder.potential_energy_file)
             holder.setEquilMolecule(eq)
             holder.setPES(pes)
 
-        else:
-
-            save_file_prompt()
 
     def Read_Structures_Button():
         global opened
@@ -604,7 +579,7 @@ def main_window():
             Fix N so that the user can not enter floating point values.
             """
             holder.setcores_amount(max(1, int(cores.get())))
-            holder.setNumberOfEigenvalues(eigenvalues.get())
+            holder.setNumberOfEigenvalues(int(eigenvalues.get()))
 
             if calculation.get() == "Sparse Matrix":
                 holder.setEigenvalueMethod(True)
@@ -615,46 +590,48 @@ def main_window():
             if calculation2.get() == "Read from File":
                 Read_Structures_Button()
                 test()
-            if calculation2.get() == "Harmonic Oscillator":
-                import inspect
-                holder_model = []
-                import re
-                testing = "Harmonic_Oscillator"
 
-                for key, className in inspect.getmembers(model_objects):
-                    if testing == key:
-                        holder_model.append(className())
-
-                print(holder_model)
-                model_prompt(holder_model)
-                test()
-            if calculation2.get() == "Morse Oscillator":
-                import inspect
-                holder_model = []
-                import re
-                testing = "Morse_Oscillator"
-
-                for key, className in inspect.getmembers(model_objects):
-                    if testing == key:
-                        holder_model.append(className())
-
-                print(holder_model)
-                model_prompt(holder_model)
-                test()
-
-            if calculation2.get() == "Morse Oscillator":
-                import inspect
-                holder_model = []
-                import re
-                testing = "Morse_Oscillator"
-
-                for key, className in inspect.getmembers(model_objects):
-                    if testing == key:
-                        holder_model.append(className())
-
-                print(holder_model)
-                model_prompt(holder_model)
-                test()
+            # if calculation2.get() == "Harmonic Oscillator":
+            #     import inspect
+            #     holder_model = []
+            #     import re
+            #     testing = "Harmonic_Oscillator"
+            #
+            #     for key, className in inspect.getmembers(model_objects):
+            #         if testing == key:
+            #             holder_model.append(className())
+            #
+            #     print(holder_model)
+            #     model_prompt(holder_model)
+            #     test()
+            #
+            # if calculation2.get() == "Morse Oscillator":
+            #     import inspect
+            #     holder_model = []
+            #     import re
+            #     testing = "Morse_Oscillator"
+            #
+            #     for key, className in inspect.getmembers(model_objects):
+            #         if testing == key:
+            #             holder_model.append(className())
+            #
+            #     print(holder_model)
+            #     model_prompt(holder_model)
+            #     test()
+            #
+            # if calculation2.get() == "Morse Oscillator":
+            #     import inspect
+            #     holder_model = []
+            #     import re
+            #     testing = "Morse_Oscillator"
+            #
+            #     for key, className in inspect.getmembers(model_objects):
+            #         if testing == key:
+            #             holder_model.append(className())
+            #
+            #     print(holder_model)
+            #     model_prompt(holder_model)
+            #     test()
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")

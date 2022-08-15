@@ -19,6 +19,7 @@ def PointToIndex(N, pt):
 class Molecule:
     def __init__(self):
         self.Nat = 3
+        self.symbol = []
         self.x = []
         self.y = []
         self.z = []
@@ -27,13 +28,22 @@ class Molecule:
         self.m = []
         # self.m = MassLookup[self.s + "-" + str(self.A)] * 1822.89
 
+    def setNatom(self,Nat):
+        self.Nat = Nat
+        return
+
     def getNatom(self):
         return self.Nat
 
-    """
-    def getS(self):
-        return self.S
-    """
+    def setSymbolList(self, S):
+        self.symbol = S
+        return
+
+    def getSymbolList(self):
+        return self.symbol
+
+    def getSymbol(self,n):
+        return self.symbol[n-1]
 
     def setAtomicNoList(self, Z):
         self.Z = Z
@@ -60,6 +70,9 @@ class Molecule:
         self.x = x
         return
 
+    def getX(self,n):
+        return self.x[n-1]
+
     def getXList(self):
         return self.x
 
@@ -77,6 +90,13 @@ class Molecule:
     def getZList(self):
         return self.z
 
+    def getMassByAtom(self,n):
+        return self.m[n-1]
+
+    def getMassByCoord(self,n):
+        return self.m[n//3]
+
+
 
 # A class to define a point on the potential energy surface.
 # n = the number of the grid point (indexed from 0)
@@ -89,13 +109,22 @@ class PESpoint:
     def __init__(self):
         self.n = 0
         self.q = []
-        self.x = []
-        self.y = []
-        self.z = []
+#        self.x = []
+#        self.y = []
+#        self.z = []
+        self.mol = None
         self.en = 0
+
+    def setN(self, n):
+        self.n = n
+        return
 
     def getN(self):
         return self.n
+
+    def setQList(self, q):
+        self.q = q
+        return
 
     def getq1(self):
         return self.q[0]
@@ -117,63 +146,60 @@ class PESpoint:
     def getQList(self):
         return self.q
 
-    def getX(self, n):
-        return self.x[n - 1]
-
-    def getXList(self):
-        return self.x
-
-    def getY(self, n):
-        return self.y[n - 1]
-
-    def getYList(self):
-        return self.y
-
-    def getZ(self, n):
-        return self.z[n - 1]
-
-    def getZList(self):
-        return self.z
-
-    def getCoord(self, c):
-        if (c == 0):
-            return self.getX(1)
-        elif (c == 1):
-            return self.getY(1)
-        elif (c == 2):
-            return self.getZ(1)
-        elif (c == 3):
-            return self.getX(2)
-        elif (c == 4):
-            return self.getY(2)
-        elif (c == 5):
-            return self.getZ(2)
-        elif (c == 6):
-            return self.getX(3)
-        elif (c == 7):
-            return self.getY(3)
-        elif (c == 8):
-            return self.getZ(3)
-
-    def setN(self, n):
-        self.n = n
+    def setMolecule(self,mol):
+        self.mol = mol
         return
 
-    def setQList(self, q):
-        self.q = q
-        return
+    def getMolecule(self):
+        return(self.mol)
+
 
     def setXList(self, x):
-        self.x = x
+#        self.x = x
+        self.getMolecule().setXList(x)
         return
+
+    def getX(self,n):
+#        return self.x[n-1]
+        return self.getMolecule().getX(n)
+
+    def getXList(self):
+#        return self.x
+        return self.getMolecule().getXList()
 
     def setYList(self, y):
-        self.y = y
+#        self.y = y
+        self.getMolecule().setYList(y)
         return
 
+    def getY(self,n):
+#        return self.y[n-1]
+        return self.getMolecule().getY(n)
+
+    def getYList(self):
+#        return self.y
+        return self.getMolecule().getYList()
+
     def setZList(self, z):
-        self.z = z
+#        self.z = z
+        self.getMolecule().setZList(z)
         return
+
+    def getZ(self,n):
+#        return self.z[n-1]
+        return self.getMolecule().getZ(n)
+
+    def getZList(self):
+#        return self.z
+        return self.getMolecule().getZList()
+
+    def getCoord(self,c):
+        if (c % 3 == 0):
+            return self.getMolecule().getX(c // 3 + 1)
+        elif (c % 3 == 1):
+            return self.getMolecule().getY(c // 3 + 1)
+        elif (c % 3 == 2):
+            return self.getMolecule().getZ(c // 3 + 1)
 
     def setEnergy(self, en):
         self.en = en
@@ -184,7 +210,7 @@ class PESpoint:
 
 
 # A class to define a potential energy surface.
-# N = a list of length 3 containing the number of grid points in each dimension
+# N = a list of length D containing the number of grid points in each dimension
 # Npts = number of points in the PES
 # pts = a list of length Npts of PESpoint objects
 
@@ -195,9 +221,24 @@ class PotentialEnergySurface:
         self.Npts = 0
         self.pts = []
 
-    #    def getPointByN(self, t, u, v):
-    #        m = v + self.N[2] * (u + self.N[1] * t)
-    #        return self.pts[m]
+    def setN (self, N):
+        self.N = N
+        return
+
+    def setNpts(self, Npts):
+        self.Npts = Npts
+        return
+
+    def getNpts(self):
+        return self.Npts
+
+    def appendPESpt(self, pt):
+        self.pts.append(pt)
+        return
+
+#    def getPointByN(self, t, u, v):
+#        m = v + self.N[2] * (u + self.N[1] * t)
+#        return self.pts[m]
 
     def getPointByN(self, t, u, v):
         idx = [t, u, v]
@@ -213,25 +254,11 @@ class PotentialEnergySurface:
     def getPointByPt(self, pt):
         return self.pts[pt]
 
-    def setNpts(self, Npts):
-        self.Npts = Npts
-        return
-
-    def setN(self, N):
-        self.N = N
-        return
-
-    def getNpts(self):
-        return self.Npts
-
-    def appendPESpt(self, pt):
-        self.pts.append(pt)
-        return
 
 
 def AlphaAndBetaToCounter(alpha, beta, D, N):
-    alphaidx = PointToIndex(D, N, alpha)
-    betaidx = PointToIndex(D, N, beta)
+    alphaidx = PointToIndex(N, alpha)
+    betaidx = PointToIndex(N, beta)
     counter = np.zeros(D * 2, dtype=int)
     for j in range(D):
         counter[2 * j] = betaidx[D - j - 1]
@@ -759,3 +786,4 @@ MassLookup = {
     "Og-294": 294.21392
 
 }
+

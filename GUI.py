@@ -55,7 +55,7 @@ def main_window():
     running = True
     style = Style()
     window.title('PyFGH')
-    window.geometry('910x210')
+    window.geometry('910x255')
 
     # Water molecule icon in the top left conner
     window.iconbitmap(default='icon.ico')
@@ -581,16 +581,26 @@ def main_window():
             time just only use a CSV file format!!!!!!!!!! Excel has the ability to save it to CSV format. To find out 
             how to save it to that format, just google it. This is the end of my rant. Happy Coding!
         """
-
-        x = askopenfilename()
         y = askopenfilename()
         #        DataObject.test.equilibrium_file = x
         #        DataObject.test.potential_energy_file = y
-        holder.setequilibrium_file(x)
         holder.setpotential_energy(y)
-        holder.setvalue_holder(True)
+        holder.setvalue_holder(False)
 
-    v = [model_objects.Harmonic_List]
+    def Read_Structures_Button2():
+        global opened
+        """
+            Note: xlsx files are not accepted. Can only take CSV files or else the code will break.
+            XLSX files do not abide by UTF-8 formatting and is a pain to get it to work. So to save everyone
+            time just only use a CSV file format!!!!!!!!!! Excel has the ability to save it to CSV format. To find out 
+            how to save it to that format, just google it. This is the end of my rant. Happy Coding!
+        """
+
+        x = askopenfilename()
+        #        DataObject.test.equilibrium_file = x
+        #        DataObject.test.potential_energy_file = y
+        holder.setequilibrium_file(x)
+        holder.setvalue_holder(False)
 
     def output():
         def model_prompt(potential_model):
@@ -811,8 +821,8 @@ def main_window():
     """
 
     # This is a button called Read Structures
-    # readbutton = tk.Button(window, text='Read Structures and Energies from File', bd='10', bg='gray', fg='white',
-    #                        command=Read_Structures_Button).place(x=360, y=200)
+    readbutton = tk.Button(window, text='Read Equilibrium Structure from File', bd='10', bg='gray', fg='white',
+                           command=Read_Structures_Button2).place(x=360, y=200)
     # Disabled the compute button for now
     # compute = tk.Button(window, text='Compute on the fly', bd='10', bg='gray', fg='white',
     #                    command=open_file).place(x=410, y=370)

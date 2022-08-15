@@ -15,7 +15,7 @@ from util import model_objects
 import numpy as np
 from tkinter import filedialog as fd
 
-#import jnwtest11 as test11
+# import jnwtest11 as test11
 # TODO take the Atom class and add it to InputData so Nelson can grab it
 # TODO 3 Atom class. Have a list of the three members of the atom class. [Atom1, Atom2, Atom3]
 # TODO [List of all of the molecules] made into a equalibrium class.
@@ -90,12 +90,11 @@ def main_window():
     n10 = tk.StringVar()
     dimensions = ttk.Combobox(window, values=dimensions, width=10, textvariable=n10)
 
-
     ttk.Label(window, text="Number of Eigenvalues:", font=("Times New Roman", 12)).place(x=620, y=47)
     d1 = tk.StringVar()
     N1text = ttk.Combobox(window, width=10, textvariable=d1)
 
-    eigenvalues = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    eigenvalues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     n11 = tk.StringVar()
     eigenvalues = ttk.Combobox(window, values=eigenvalues, width=10, textvariable=n11)
@@ -113,7 +112,7 @@ def main_window():
     d1 = tk.StringVar()
     N1text = ttk.Combobox(window, width=12, textvariable=d1)
 
-    calculation2 = ['Read from File', 'Harmonic Oscillator', 'Morse Oscillator','Compute With Psi4']
+    calculation2 = ['Read from File', 'Harmonic Oscillator', 'Morse Oscillator', 'Compute With Psi4']
 
     n15 = tk.StringVar()
     calculation2 = ttk.Combobox(window, values=calculation2, width=16, textvariable=n15)
@@ -122,7 +121,6 @@ def main_window():
     N10 = ttk.Entry(window, font=("Times New Roman", 10))
     c10 = tk.StringVar()
     N10box = ttk.Combobox(window, textvariable=c10)
-
 
     # Entry
     N12 = ttk.Entry(window, font=("Times New Roman", 10))
@@ -137,10 +135,8 @@ def main_window():
     isopenedN = holderN
     isopenedL = holderL
 
-
     def clearNdimensions():
         holder.setNlist(None)
-
 
     def clearLdimensions():
         holder.setLlist(None)
@@ -160,7 +156,6 @@ def main_window():
             # window.geometry('300x450')
             # Label
 
-
             x1 = [None] * x
 
             x2 = [None] * x
@@ -176,7 +171,8 @@ def main_window():
                 c = tk.StringVar()
                 N1box = ttk.Combobox(window, textvariable=c)
 
-                ttk.Label(window, text=("N" ) +  str(number + 1) + ":", font=("Times New Roman", 15)).place(x=60, y=(40 + fireflies))
+                ttk.Label(window, text=("N") + str(number + 1) + ":", font=("Times New Roman", 15)).place(x=60, y=(
+                        40 + fireflies))
                 d = tk.StringVar()
                 N1text = ttk.Combobox(window, width=15, textvariable=d)
 
@@ -192,13 +188,13 @@ def main_window():
                 c = tk.StringVar()
                 N1box = ttk.Combobox(window, textvariable=c)
 
-                ttk.Label(window, text=("L" ) +  str(number + 1) + ":", font=("Times New Roman", 15)).place(x=60, y=(40 + fireflies))
+                ttk.Label(window, text=("L") + str(number + 1) + ":", font=("Times New Roman", 15)).place(x=60, y=(
+                        40 + fireflies))
                 d = tk.StringVar()
                 N1text = ttk.Combobox(window, width=15, textvariable=d)
 
                 x2[number].place(x=100, y=(40 + fireflies), width=100)
                 fireflies += 40
-
 
             # Make a section for N and L.
             # If it is 3 dimension there must be 3 boxes for N and 3 boxs for L so a total of 6.
@@ -228,7 +224,6 @@ def main_window():
                 print(holder.getLlist())
                 print(holder.getD())
 
-
                 for x in holder.getNlist():
                     if x % 2 == 0 or x < 5:
                         messagebox.showerror("PyFGH", "N must be odd, positive integer greater to or equal to 5!!!")
@@ -248,14 +243,12 @@ def main_window():
                 #         messagebox.showerror("PyFGH", "L must be positive!!!")
                 #         clearLdimensions()
 
-
             yvalue = int(dimensions.get())
             enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
                               command=enter_button).place(x=110, y=(yvalue * 85 + 20))
 
         else:
             messagebox.showerror("PyFGH", "The Vales For N Have Already Been Assigned!!!")
-
 
     # l= []
     #
@@ -447,60 +440,7 @@ def main_window():
 
     global model_prompt
 
-    def model_prompt(potential_model):
 
-        window1 = tk.Tk()
-        style = Style()
-        window1.title('PyFGH Parameters')
-        box_length = 103
-        for q in range(3):
-            box_length = box_length + 33 * potential_model[q].nparam
-        box_len_str = '300x' + str(box_length)
-        window1.geometry(box_len_str)
-
-        qvar = np.empty(3, dtype=list)
-        for i in range(3):
-            qvar[i] = []
-        j = 0
-        y = 5
-
-        for q in range(3):
-            qvar[q] = [0] * potential_model[q].nparam
-
-            for qparam in range(potential_model[q].nparam):
-                ttk.Label(window1, text=potential_model[q].label[qparam] + " for Q" + str(q + 1) + ":",
-                          font=("Times New Roman", 15)).place(x=50, y=y)
-                qvar[q][qparam] = ttk.Entry(window1, font=("Times New Roman", 10))
-                qvar[q][qparam].place(x=140, y=y)
-                j += 1
-                y += 35
-
-        def enter_button():
-            for q in range(3):
-                param_list = []
-                for qparam in range(potential_model[q].nparam):
-                    param_list.append(qvar[q][qparam].get())
-                potential_model[q].set_param(param_list)
-
-            for q in range(3):
-                for qparam in range(potential_model[q].nparam):
-                    print(potential_model[q].param[qparam])
-
-            holder.model_data = potential_model
-            # print(type(potential_model))
-            # print(DataObject.holdData.model_data)
-            window1.destroy()
-            """
-            if SSH_box.get() == 'Yes':
-                SSH_prompt()
-            else:
-                save_file_prompt()
-            """
-
-        enter = tk.Button(window1, text='Enter', bd='20', bg='green', fg='white',
-                          command=enter_button).place(x=110, y=y)
-
-        window1.mainloop()
 
     # This is just for testing purposes.
     """
@@ -625,15 +565,88 @@ def main_window():
 
             # TODO change the 1 in getN and getL. Might use a for loop to include all values.
 
- #           eq, pes = test11.molecule_testing_v1(holder.getD(), holder.getN(1), holder.getL(1), holder.equilibrium_file, holder.potential_energy_file)
-  #          holder.setEquilMolecule(eq)
-  #          holder.setPES(pes)
+        #           eq, pes = test11.molecule_testing_v1(holder.getD(), holder.getN(1), holder.getL(1), holder.equilibrium_file, holder.potential_energy_file)
+        #          holder.setEquilMolecule(eq)
+        #          holder.setPES(pes)
 
         else:
 
             save_file_prompt()
 
+    def Read_Structures_Button():
+        global opened
+        """
+            Note: xlsx files are not accepted. Can only take CSV files or else the code will break.
+            XLSX files do not abide by UTF-8 formatting and is a pain to get it to work. So to save everyone
+            time just only use a CSV file format!!!!!!!!!! Excel has the ability to save it to CSV format. To find out 
+            how to save it to that format, just google it. This is the end of my rant. Happy Coding!
+        """
+
+        x = askopenfilename()
+        y = askopenfilename()
+        #        DataObject.test.equilibrium_file = x
+        #        DataObject.test.potential_energy_file = y
+        holder.setequilibrium_file(x)
+        holder.setpotential_energy(y)
+        holder.setvalue_holder(True)
+
+    v = [model_objects.Harmonic_List]
+
     def output():
+        def model_prompt(potential_model):
+
+            window1 = tk.Tk()
+            style = Style()
+            window1.title('PyFGH Parameters')
+            box_length = 103
+            for q in range(1):
+                box_length = box_length + 33 * potential_model[q].nparam
+            box_len_str = '300x' + str(box_length)
+            window1.geometry(box_len_str)
+
+            qvar = np.empty(3, dtype=list)
+            for i in range(3):
+                qvar[i] = []
+            j = 0
+            y = 5
+
+            for q in range(1):
+                qvar[q] = [0] * potential_model[q].nparam
+
+                for qparam in range(potential_model[q].nparam):
+                    ttk.Label(window1, text=potential_model[q].label[qparam] + " for Q" + str(q + 1) + ":",
+                              font=("Times New Roman", 15)).place(x=50, y=y)
+                    qvar[q][qparam] = ttk.Entry(window1, font=("Times New Roman", 10))
+                    qvar[q][qparam].place(x=140, y=y)
+                    j += 1
+                    y += 35
+
+            def enter_button():
+                for q in range(1):
+                    param_list = []
+                    for qparam in range(potential_model[q].nparam):
+                        param_list.append(qvar[q][qparam].get())
+                    potential_model[q].set_param(param_list)
+
+                for q in range(1):
+                    for qparam in range(potential_model[q].nparam):
+                        print(potential_model[q].param[qparam])
+
+                holder.model_data = potential_model
+                # print(type(potential_model))
+                # print(DataObject.holdData.model_data)
+                window1.destroy()
+                """
+                if SSH_box.get() == 'Yes':
+                    SSH_prompt()
+                else:
+                    save_file_prompt()
+                """
+
+            enter = tk.Button(window1, text='Enter', bd='20', bg='green', fg='white',
+                              command=enter_button).place(x=110, y=y)
+
+            window1.mainloop()
         try:
             """
             Added validation rules to my interface. All N values must be positive, odd integers.
@@ -642,13 +655,60 @@ def main_window():
             Fix N so that the user can not enter floating point values.
             """
             holder.setcores_amount(max(1, int(cores.get())))
-            test()
+            holder.setNumberOfEigenvalues(eigenvalues.get())
+
+            if calculation.get() == "Sparse Matrix":
+                holder.setEigenvalueMethod(True)
+
+            elif calculation.get() == "Full Matrix":
+                holder.setEigenvalueMethod(False)
+
+            elif calculation2.get() == "Read from File":
+                Read_Structures_Button()
+            elif calculation2.get() == "Harmonic Oscillator":
+                import inspect
+                holder_model = []
+                import re
+                testing = "Harmonic_Oscillator"
+
+                for key, className in inspect.getmembers(model_objects):
+                    if testing == key:
+                        holder_model.append(className())
+
+                print(holder_model)
+                model_prompt(holder_model)
+            elif calculation2.get() == "Morse Oscillator":
+                import inspect
+                holder_model = []
+                import re
+                testing = "Morse_Oscillator"
+
+                for key, className in inspect.getmembers(model_objects):
+                    if testing == key:
+                        holder_model.append(className())
+
+                print(holder_model)
+                model_prompt(holder_model)
+
+            elif calculation2.get() == "Morse Oscillator":
+                import inspect
+                holder_model = []
+                import re
+                testing = "Morse_Oscillator"
+
+                for key, className in inspect.getmembers(model_objects):
+                    if testing == key:
+                        holder_model.append(className())
+
+                print(holder_model)
+                model_prompt(holder_model)
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")
         except IndexError:  # TODO this is not working properly. After the error restart the interface!
             messagebox.showerror("PyFGH", "Error, Please restart program!!!")
             main_window()
+        test()
 
     # This is the calculate button.
     calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',
@@ -749,23 +809,6 @@ def main_window():
     This is a validation checker for the Read Structures button. You can not read in values and also try to run the 
     GUI interface at the same time.
     """
-
-    def Read_Structures_Button():
-        global opened
-        """
-            Note: xlsx files are not accepted. Can only take CSV files or else the code will break.
-            XLSX files do not abide by UTF-8 formatting and is a pain to get it to work. So to save everyone
-            time just only use a CSV file format!!!!!!!!!! Excel has the ability to save it to CSV format. To find out 
-            how to save it to that format, just google it. This is the end of my rant. Happy Coding!
-        """
-
-        x = askopenfilename()
-        y = askopenfilename()
-        #        DataObject.test.equilibrium_file = x
-        #        DataObject.test.potential_energy_file = y
-        holder.setequilibrium_file(x)
-        holder.setpotential_energy(y)
-        holder.setvalue_holder(True)
 
     # This is a button called Read Structures
     # readbutton = tk.Button(window, text='Read Structures and Energies from File', bd='10', bg='gray', fg='white',

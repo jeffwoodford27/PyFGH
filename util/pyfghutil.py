@@ -1,10 +1,13 @@
 import numpy as np
 
-def IndexToPoint(N,idx):
-    return np.ravel_multi_index(idx,tuple(N))
 
-def PointToIndex(N,pt):
-    return list(np.unravel_index(pt,tuple(N)))
+def IndexToPoint(N, idx):
+    return np.ravel_multi_index(idx, tuple(N))
+
+
+def PointToIndex(N, pt):
+    return list(np.unravel_index(pt, tuple(N)))
+
 
 # The Molecule class.  Defines a chemical molecule.
 # Z = a list of length 3 of atomic numbers of the atoms.
@@ -24,24 +27,22 @@ class Molecule:
         self.m = []
         # self.m = MassLookup[self.s + "-" + str(self.A)] * 1822.89
 
-
     def getNatom(self):
         return self.Nat
-
 
     """
     def getS(self):
         return self.S
     """
 
-    def setAtomicNoList(self,Z):
+    def setAtomicNoList(self, Z):
         self.Z = Z
         return
 
     def getAtomicNoList(self):
         return self.Z
 
-    def setMassNoList(self,A):
+    def setMassNoList(self, A):
         self.A = A
         return
 
@@ -55,7 +56,7 @@ class Molecule:
     def getMassList(self):
         return self.m
 
-    def setXList(self,x):
+    def setXList(self, x):
         self.x = x
         return
 
@@ -75,6 +76,7 @@ class Molecule:
 
     def getZList(self):
         return self.z
+
 
 # A class to define a point on the potential energy surface.
 # n = the number of the grid point (indexed from 0)
@@ -104,7 +106,7 @@ class PESpoint:
     def getq3(self):
         return self.q[2]
 
-    def getq(self,n):
+    def getq(self, n):
         if (n == 1):
             return self.getq1()
         elif (n == 2):
@@ -115,25 +117,25 @@ class PESpoint:
     def getQList(self):
         return self.q
 
-    def getX(self,n):
-        return self.x[n-1]
+    def getX(self, n):
+        return self.x[n - 1]
 
     def getXList(self):
         return self.x
 
-    def getY(self,n):
-        return self.y[n-1]
+    def getY(self, n):
+        return self.y[n - 1]
 
     def getYList(self):
         return self.y
 
-    def getZ(self,n):
-        return self.z[n-1]
+    def getZ(self, n):
+        return self.z[n - 1]
 
     def getZList(self):
         return self.z
 
-    def getCoord(self,c):
+    def getCoord(self, c):
         if (c == 0):
             return self.getX(1)
         elif (c == 1):
@@ -193,16 +195,16 @@ class PotentialEnergySurface:
         self.Npts = 0
         self.pts = []
 
-#    def getPointByN(self, t, u, v):
-#        m = v + self.N[2] * (u + self.N[1] * t)
-#        return self.pts[m]
+    #    def getPointByN(self, t, u, v):
+    #        m = v + self.N[2] * (u + self.N[1] * t)
+    #        return self.pts[m]
 
     def getPointByN(self, t, u, v):
-        idx = [t,u,v]
+        idx = [t, u, v]
         return self.getPointByIdx(idx)
 
-#    def getPointByIdx(self, idx):
-#        return self.getPointByN(idx[0],idx[1],idx[2])
+    #    def getPointByIdx(self, idx):
+    #        return self.getPointByN(idx[0],idx[1],idx[2])
 
     def getPointByIdx(self, idx):
         pt = IndexToPoint(self.N, idx)
@@ -215,16 +217,17 @@ class PotentialEnergySurface:
         self.Npts = Npts
         return
 
-    def setN (self, N):
+    def setN(self, N):
         self.N = N
         return
 
     def getNpts(self):
         return self.Npts
-    
+
     def appendPESpt(self, pt):
         self.pts.append(pt)
         return
+
 
 def AlphaAndBetaToCounter(alpha, beta, D, N):
     alphaidx = PointToIndex(D, N, alpha)
@@ -235,6 +238,7 @@ def AlphaAndBetaToCounter(alpha, beta, D, N):
         counter[2 * j + 1] = alphaidx[D - j - 1]
     return counter
 
+
 def AlphaCalc(D, counterarray, NValues):
     output = 0
     for a in reversed(range(D)):
@@ -243,6 +247,7 @@ def AlphaCalc(D, counterarray, NValues):
         else:
             output += counterarray[(a * 2) + 1] * (np.prod(NValues[:(D - 1) - a]))
     return output
+
 
 def BetaCalc(D, counterarray, NValues):
     output = 0
@@ -754,4 +759,3 @@ MassLookup = {
     "Og-294": 294.21392
 
 }
-

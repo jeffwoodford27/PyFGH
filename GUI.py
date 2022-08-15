@@ -520,7 +520,7 @@ def main_window():
         style = Style()
         window1.title('PyFGH Parameters')
         box_length = 103
-        for q in range(1):
+        for q in range(3):
             box_length = box_length + 33 * potential_model[q].nparam
         box_len_str = '300x' + str(box_length)
         window1.geometry(box_len_str)
@@ -531,7 +531,7 @@ def main_window():
         j = 0
         y = 5
 
-        for q in range(1):
+        for q in range(3):
             qvar[q] = [0] * potential_model[q].nparam
 
             for qparam in range(potential_model[q].nparam):
@@ -543,13 +543,13 @@ def main_window():
                 y += 35
 
         def enter_button():
-            for q in range(1):
+            for q in range(3):
                 param_list = []
                 for qparam in range(potential_model[q].nparam):
                     param_list.append(qvar[q][qparam].get())
                 potential_model[q].set_param(param_list)
 
-            for q in range(1):
+            for q in range(3):
                 for qparam in range(potential_model[q].nparam):
                     print(potential_model[q].param[qparam])
 
@@ -591,47 +591,51 @@ def main_window():
                 Read_Structures_Button()
                 test()
 
-            # if calculation2.get() == "Harmonic Oscillator":
-            #     import inspect
-            #     holder_model = []
-            #     import re
-            #     testing = "Harmonic_Oscillator"
-            #
-            #     for key, className in inspect.getmembers(model_objects):
-            #         if testing == key:
-            #             holder_model.append(className())
-            #
-            #     print(holder_model)
-            #     model_prompt(holder_model)
-            #     test()
-            #
-            # if calculation2.get() == "Morse Oscillator":
-            #     import inspect
-            #     holder_model = []
-            #     import re
-            #     testing = "Morse_Oscillator"
-            #
-            #     for key, className in inspect.getmembers(model_objects):
-            #         if testing == key:
-            #             holder_model.append(className())
-            #
-            #     print(holder_model)
-            #     model_prompt(holder_model)
-            #     test()
-            #
-            # if calculation2.get() == "Morse Oscillator":
-            #     import inspect
-            #     holder_model = []
-            #     import re
-            #     testing = "Morse_Oscillator"
-            #
-            #     for key, className in inspect.getmembers(model_objects):
-            #         if testing == key:
-            #             holder_model.append(className())
-            #
-            #     print(holder_model)
-            #     model_prompt(holder_model)
-            #     test()
+            if calculation2.get() == "Harmonic Oscillator":
+                import inspect
+                holder_model = []
+                import re
+                testing = "Harmonic_Oscillator"
+
+                for i in range(int(dimensions.get())):
+                    for key, className in inspect.getmembers(model_objects):
+                        if testing == key:
+                            holder_model.append(className())
+
+
+                print(holder_model)
+                model_prompt(holder_model)
+                test()
+
+            if calculation2.get() == "Morse Oscillator":
+                import inspect
+                holder_model = []
+                import re
+                testing = "Morse_Oscillator"
+
+                for i in range(int(dimensions.get())):
+                    for key, className in inspect.getmembers(model_objects):
+                        if testing == key:
+                            holder_model.append(className())
+
+                print(holder_model)
+                model_prompt(holder_model)
+                test()
+
+            if calculation2.get() == "Morse Oscillator":
+                import inspect
+                holder_model = []
+                import re
+                testing = "Morse_Oscillator"
+
+                for i in range(int(dimensions.get())):
+                    for key, className in inspect.getmembers(model_objects):
+                        if testing == key:
+                            holder_model.append(className())
+
+                print(holder_model)
+                model_prompt(holder_model)
+                test()
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")

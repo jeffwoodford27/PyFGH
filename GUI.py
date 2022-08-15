@@ -144,7 +144,7 @@ def main_window():
     def actionN():
 
         global isopenedN
-        if (holder.getNlist() == None and holder.getLlist() == None):
+        if holder.getNlist() == None and holder.getLlist() == None:
             window = tk.Tk()
             x = int(dimensions.get())
             holder.setD(x)
@@ -463,70 +463,6 @@ def main_window():
     resources folder.
     """
 
-    def SSH_prompt():
-        window3 = tk.Tk()
-        style = Style()
-        window3.title('Remote Access')
-        window3.geometry('300x300')
-        window.iconbitmap(default='key.ico')
-        text = "Remote Access Login"
-
-        Remote = ttk.Label(window3, text=text, font=("Times New Roman", 15), background='green',
-                           foreground="white")
-        Remote.pack()
-        Remote.place(x=65, y=0)
-
-        Host = ttk.Label(window3, text="Host:", font=("Times New Roman", 18))
-        Host.pack()
-        Host.place(x=30, y=30)
-
-        Host_entry = ttk.Entry(window3, font=("Times New Roman", 12))
-        zebra = tk.StringVar()
-        Host_box = ttk.Combobox(window3, textvariable=zebra)
-        Host_entry.place(x=115, y=32)
-
-        User = ttk.Label(window3, text="Username:", font=("Times New Roman", 18))
-        User.pack()
-        User.place(x=10, y=65)
-
-        Username_entry = ttk.Entry(window3, font=("Times New Roman", 12))
-        lion = tk.StringVar()
-        Echo = ttk.Combobox(window3, textvariable=lion)
-        Username_entry.place(x=115, y=68)
-
-        Password = ttk.Label(window3, text="Password:", font=("Times New Roman", 18))
-        Password.pack()
-        Password.place(x=10, y=100)
-
-        Password_entry = ttk.Entry(window3, font=("Times New Roman", 12))
-        Password_entry.config(show="*")
-        tiger = tk.StringVar()
-        Hunter = ttk.Combobox(window3, textvariable=tiger)
-        Password_entry.place(x=115, y=103)
-
-        # For running slum on a server
-
-        def Enter():
-            holder.host = Host_entry.get()
-            holder.user = Username_entry.get()
-            holder.password = Password_entry.get()
-            window3.destroy()
-            # print(holder.host, holder.user, holder.password)
-            save_file_prompt()
-
-            holder.set_remote(1)
-
-            eq, pes = molecule_gui.molecule_testing(holder.N1, holder.L1,
-                                                    holder.N2, holder.L2, holder.N3,
-                                                    holder.L3)
-
-            holder.setEquilMolecule(eq)
-            holder.setPES(pes)
-
-        Enter = tk.Button(window3, text='Enter', bd='15', bg='green', fg='white',
-                          command=Enter).place(x=110, y=170)
-
-        window3.mainloop()
 
     """
     This method gets called when the GUI is terminated. This saves the values from the input to the DataObject file.
@@ -565,9 +501,10 @@ def main_window():
 
             # TODO change the 1 in getN and getL. Might use a for loop to include all values.
 
-        #           eq, pes = test11.molecule_testing_v1(holder.getD(), holder.getN(1), holder.getL(1), holder.equilibrium_file, holder.potential_energy_file)
-        #          holder.setEquilMolecule(eq)
-        #          holder.setPES(pes)
+            import jnwtest11
+            eq, pes = jnwtest11.molecule_testing_v1(holder.getD(), holder.getN(1), holder.getL(1), holder.equilibrium_file, holder.potential_energy_file)
+            holder.setEquilMolecule(eq)
+            holder.setPES(pes)
 
         else:
 
@@ -585,7 +522,7 @@ def main_window():
         #        DataObject.test.equilibrium_file = x
         #        DataObject.test.potential_energy_file = y
         holder.setpotential_energy(y)
-        holder.setvalue_holder(False)
+        # holder.setvalue_holder(False)
 
     def Read_Structures_Button2():
         global opened
@@ -600,63 +537,65 @@ def main_window():
         #        DataObject.test.equilibrium_file = x
         #        DataObject.test.potential_energy_file = y
         holder.setequilibrium_file(x)
-        holder.setvalue_holder(False)
+        # holder.setvalue_holder(False)
+
+    def model_prompt(potential_model):
+
+        window1 = tk.Tk()
+        style = Style()
+        window1.title('PyFGH Parameters')
+        box_length = 103
+        for q in range(1):
+            box_length = box_length + 33 * potential_model[q].nparam
+        box_len_str = '300x' + str(box_length)
+        window1.geometry(box_len_str)
+
+        qvar = np.empty(3, dtype=list)
+        for i in range(3):
+            qvar[i] = []
+        j = 0
+        y = 5
+
+        for q in range(1):
+            qvar[q] = [0] * potential_model[q].nparam
+
+            for qparam in range(potential_model[q].nparam):
+                ttk.Label(window1, text=potential_model[q].label[qparam] + " for Q" + str(q + 1) + ":",
+                          font=("Times New Roman", 15)).place(x=50, y=y)
+                qvar[q][qparam] = ttk.Entry(window1, font=("Times New Roman", 10))
+                qvar[q][qparam].place(x=140, y=y)
+                j += 1
+                y += 35
+
+        def enter_button():
+            for q in range(1):
+                param_list = []
+                for qparam in range(potential_model[q].nparam):
+                    param_list.append(qvar[q][qparam].get())
+                potential_model[q].set_param(param_list)
+
+            for q in range(1):
+                for qparam in range(potential_model[q].nparam):
+                    print(potential_model[q].param[qparam])
+
+            holder.model_data = potential_model
+            # print(type(potential_model))
+            # print(DataObject.holdData.model_data)
+            window1.destroy()
+            """
+            if SSH_box.get() == 'Yes':
+                SSH_prompt()
+            else:
+                save_file_prompt()
+            """
+
+        enter = tk.Button(window1, text='Enter', bd='20', bg='green', fg='white',
+                          command=enter_button).place(x=110, y=y)
+
+        window1.mainloop()
 
     def output():
-        def model_prompt(potential_model):
 
-            window1 = tk.Tk()
-            style = Style()
-            window1.title('PyFGH Parameters')
-            box_length = 103
-            for q in range(1):
-                box_length = box_length + 33 * potential_model[q].nparam
-            box_len_str = '300x' + str(box_length)
-            window1.geometry(box_len_str)
-
-            qvar = np.empty(3, dtype=list)
-            for i in range(3):
-                qvar[i] = []
-            j = 0
-            y = 5
-
-            for q in range(1):
-                qvar[q] = [0] * potential_model[q].nparam
-
-                for qparam in range(potential_model[q].nparam):
-                    ttk.Label(window1, text=potential_model[q].label[qparam] + " for Q" + str(q + 1) + ":",
-                              font=("Times New Roman", 15)).place(x=50, y=y)
-                    qvar[q][qparam] = ttk.Entry(window1, font=("Times New Roman", 10))
-                    qvar[q][qparam].place(x=140, y=y)
-                    j += 1
-                    y += 35
-
-            def enter_button():
-                for q in range(1):
-                    param_list = []
-                    for qparam in range(potential_model[q].nparam):
-                        param_list.append(qvar[q][qparam].get())
-                    potential_model[q].set_param(param_list)
-
-                for q in range(1):
-                    for qparam in range(potential_model[q].nparam):
-                        print(potential_model[q].param[qparam])
-
-                holder.model_data = potential_model
-                # print(type(potential_model))
-                # print(DataObject.holdData.model_data)
-                window1.destroy()
-                """
-                if SSH_box.get() == 'Yes':
-                    SSH_prompt()
-                else:
-                    save_file_prompt()
-                """
-
-            enter = tk.Button(window1, text='Enter', bd='20', bg='green', fg='white',
-                              command=enter_button).place(x=110, y=y)
-
-            window1.mainloop()
         try:
             """
             Added validation rules to my interface. All N values must be positive, odd integers.
@@ -670,12 +609,13 @@ def main_window():
             if calculation.get() == "Sparse Matrix":
                 holder.setEigenvalueMethod(True)
 
-            elif calculation.get() == "Full Matrix":
+            if calculation.get() == "Full Matrix":
                 holder.setEigenvalueMethod(False)
 
-            elif calculation2.get() == "Read from File":
+            if calculation2.get() == "Read from File":
                 Read_Structures_Button()
-            elif calculation2.get() == "Harmonic Oscillator":
+                test()
+            if calculation2.get() == "Harmonic Oscillator":
                 import inspect
                 holder_model = []
                 import re
@@ -687,7 +627,8 @@ def main_window():
 
                 print(holder_model)
                 model_prompt(holder_model)
-            elif calculation2.get() == "Morse Oscillator":
+                test()
+            if calculation2.get() == "Morse Oscillator":
                 import inspect
                 holder_model = []
                 import re
@@ -699,8 +640,9 @@ def main_window():
 
                 print(holder_model)
                 model_prompt(holder_model)
+                test()
 
-            elif calculation2.get() == "Morse Oscillator":
+            if calculation2.get() == "Morse Oscillator":
                 import inspect
                 holder_model = []
                 import re
@@ -712,13 +654,14 @@ def main_window():
 
                 print(holder_model)
                 model_prompt(holder_model)
+                test()
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")
         except IndexError:  # TODO this is not working properly. After the error restart the interface!
             messagebox.showerror("PyFGH", "Error, Please restart program!!!")
             main_window()
-        test()
+
 
     # This is the calculate button.
     calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',

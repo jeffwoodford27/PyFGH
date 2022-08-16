@@ -1,49 +1,68 @@
 import numpy as np
 
-
 def IndexToPoint(N, idx):
     return np.ravel_multi_index(idx, tuple(N))
-
 
 def PointToIndex(N, pt):
     return list(np.unravel_index(pt, tuple(N)))
 
-
-# The Molecule class.  Defines a chemical molecule.
-# Z = a list of length 3 of atomic numbers of the atoms.
-# A = a list of length 3 of mass numbers of the atoms.
-# m = a list of length 3 of the masses of the atoms
-# x = a list of length 3 of the x coordinates of each atom
-# y = a list of length 3 of the y coordinates of each atom
+'''
+The Molecule class.  Defines a chemical molecule.
+Nat = number of atoms in the molecule
+Q = the molecular charge (int)
+Mult = the electronic spin multiplicity (int)
+S = a list of length Nat of atomic symbols for each atom (str)
+Z = a list of length Nat of atomic numbers for each atom (int)
+A = a list of length Nat of mass numbers for each atom (int)
+m = a list of length Nat of the masses for each atom (float)
+x = a list of length Nat of the x coordinates for each atom (float)
+y = a list of length Nat of the y coordinates for each atom (float)
+z = a list of length Nat of the z coordinates for each atom (float)
+'''
 
 class Molecule:
     def __init__(self):
-        self.Nat = 3
-        self.symbol = []
+        self.Nat = 0
+        self.Q = 0
+        self.Mult = 1
+        self.S = []
         self.x = []
         self.y = []
         self.z = []
         self.A = []
         self.Z = []
         self.m = []
-        # self.m = MassLookup[self.s + "-" + str(self.A)] * 1822.89
 
     def setNatom(self,Nat):
         self.Nat = Nat
         return
 
+    def setCharge(self,Q):
+        self.Q = Q
+        return
+
+    def setMultiplicity(self,Mult):
+        self.Mult = Mult
+        return
+
     def getNatom(self):
         return self.Nat
 
+    def getCharge(self):
+        return self.Q
+
+    def getMultiplicity(self):
+        return self.Mult
+
     def setSymbolList(self, S):
-        self.symbol = S
+        self.S = S
         return
 
     def getSymbolList(self):
-        return self.symbol
+        return self.S
 
     def getSymbol(self,n):
-        return self.symbol[n-1]
+        return self.S[n-1]
 
     def setAtomicNoList(self, Z):
         self.Z = Z
@@ -115,9 +134,6 @@ class PESpoint:
     def __init__(self):
         self.n = 0
         self.q = []
-#        self.x = []
-#        self.y = []
-#        self.z = []
         self.mol = Molecule()
         self.en = 0
 
@@ -132,23 +148,6 @@ class PESpoint:
         self.q = q
         return
 
-    def getq1(self):
-        return self.q[0]
-
-    def getq2(self):
-        return self.q[1]
-
-    def getq3(self):
-        return self.q[2]
-
-    def getq(self, n):
-        if (n == 1):
-            return self.getq1()
-        elif (n == 2):
-            return self.getq2()
-        elif (n == 3):
-            return self.getq3()
-
     def getQList(self):
         return self.q
 
@@ -161,42 +160,33 @@ class PESpoint:
 
 
     def setXList(self, x):
-#        self.x = x
         self.getMolecule().setXList(x)
         return
 
     def getX(self,n):
-#        return self.x[n-1]
         return self.getMolecule().getX(n)
 
     def getXList(self):
-#        return self.x
         return self.getMolecule().getXList()
 
     def setYList(self, y):
-#        self.y = y
         self.getMolecule().setYList(y)
         return
 
     def getY(self,n):
-#        return self.y[n-1]
         return self.getMolecule().getY(n)
 
     def getYList(self):
-#        return self.y
         return self.getMolecule().getYList()
 
     def setZList(self, z):
-#        self.z = z
         self.getMolecule().setZList(z)
         return
 
     def getZ(self,n):
-#        return self.z[n-1]
         return self.getMolecule().getZ(n)
 
     def getZList(self):
-#        return self.z
         return self.getMolecule().getZList()
 
     def getCoord(self,c):
@@ -214,44 +204,25 @@ class PESpoint:
     def getEnergy(self):
         return self.en
 
-
-# A class to define a potential energy surface.
-# N = a list of length D containing the number of grid points in each dimension
-# Npts = number of points in the PES
-# pts = a list of length Npts of PESpoint objects
-
+'''
+A class to define a potential energy surface.
+N = a list of length D containing the number of grid points in each dimension
+Npts = number of points in the PES
+pts = a list of length Npts of PESpoint objects
+'''
 
 class PotentialEnergySurface:
-    def __init__(self):
-        self.N = []
-        self.Npts = 0
-        self.pts = []
-
-    def setN (self, N):
+    def __init__(self,N):
         self.N = N
-        return
-
-    def setNpts(self, Npts):
-        self.Npts = Npts
-        return
+        self.Npts = np.prod(N)
+        self.pts = [None]*Npts
 
     def getNpts(self):
         return self.Npts
 
-    def appendPESpt(self, pt):
-        self.pts.append(pt)
+    def setPESpt(self, pt, pespt):
+        self.pts[pt] = pespt
         return
-
-#    def getPointByN(self, t, u, v):
-#        m = v + self.N[2] * (u + self.N[1] * t)
-#        return self.pts[m]
-
-    def getPointByN(self, t, u, v):
-        idx = [t, u, v]
-        return self.getPointByIdx(idx)
-
-    #    def getPointByIdx(self, idx):
-    #        return self.getPointByN(idx[0],idx[1],idx[2])
 
     def getPointByIdx(self, idx):
         pt = IndexToPoint(self.N, idx)
@@ -259,53 +230,6 @@ class PotentialEnergySurface:
 
     def getPointByPt(self, pt):
         return self.pts[pt]
-
-
-
-def AlphaAndBetaToCounter(alpha, beta, D, N):
-    alphaidx = PointToIndex(N, alpha)
-    betaidx = PointToIndex(N, beta)
-    counter = np.zeros(D * 2, dtype=int)
-    for j in range(D):
-        counter[2 * j] = betaidx[D - j - 1]
-        counter[2 * j + 1] = alphaidx[D - j - 1]
-    return counter
-
-
-def AlphaCalc(D, counterarray, NValues):
-    output = 0
-    for a in reversed(range(D)):
-        if (a + 1 == D):
-            output += counterarray[(a * 2) + 1] * 1
-        else:
-            output += counterarray[(a * 2) + 1] * (np.prod(NValues[:(D - 1) - a]))
-    return output
-
-
-def BetaCalc(D, counterarray, NValues):
-    output = 0
-    for b in reversed(range(D)):
-        if (b + 1 == D):
-            output += counterarray[(b * 2)] * 1
-        else:
-            output += counterarray[(b * 2)] * (np.prod(NValues[:(D - 1) - b]))
-    return output
-
-
-def DCAAdvance(D, counterArray, NValues):
-    counterArray[(D * 2) - 1, 0] += 1
-    NValueC = 0
-    jlcounter = 0
-    for c in reversed(range(len(counterArray))):
-        if (counterArray[c] >= NValues[NValueC]):
-            counterArray[c] = 0
-            counterArray[c - 1] += 1
-        jlcounter += 1
-        if (jlcounter >= 2):
-            jlcounter = 0
-            NValueC += 1
-    return counterArray
-
 
 # A lookup dictionary connecting each atomic number with its corresponding atomic symbol.
 

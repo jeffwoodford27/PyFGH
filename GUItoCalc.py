@@ -6,18 +6,15 @@ import Gmatrix
 import numpy as np
 from scipy import linalg
 from scipy.sparse import linalg as sparse_linalg
-import math
 from util.DataObject import OutputData
 from util import pyfghutil
 import time
 
-def eckartTranslation(D,N,equil,pes):
+def eckartTranslation(N,equil,pes):
     Nat = equil.getNatom()
     Npts = np.prod(N)
     m = equil.getMassList()
-    M = 0.0
-    for i in range(3):
-        M += m[i]
+    M = np.sum(m)
 
     for p in range(Npts):
         idx = pyfghutil.PointToIndex(N,p)
@@ -42,38 +39,7 @@ def eckartTranslation(D,N,equil,pes):
         pes.getPointByIdx(idx).setZList(z)
     return
 
-
-def eckartTranslationOld(D, N, equil, pes):
-    N1 = N[0]
-    N2 = N[1]
-    N3 = N[2]
-
-    m = equil.getMassList()
-    M = 0.0
-    for i in range(3):
-        M += m[i]
-
-    for i in range(N1):
-        for j in range(N2):
-            for k in range(N3):
-                xcm = ycm = 0.0
-                x = pes.getPointByN(i, j, k).getXList()
-                y = pes.getPointByN(i, j, k).getYList()
-                for p in range(3):
-                    xcm += m[p]*x[p]
-                    ycm += m[p]*y[p]
-                xcm = xcm/M
-                ycm = ycm/M
-                xnew = np.zeros(3,float)
-                ynew = np.zeros(3,float)
-                for p in range(3):
-                    xnew[p] = x[p] - xcm
-                    ynew[p] = y[p] - ycm
-                pes.getPointByN(i,j,k).setXList(xnew)
-                pes.getPointByN(i,j,k).setYList(ynew)
-    return
-
-def eckartRotation(D,N,equil,pes):
+def eckartRotation(N,equil,pes):
     Nat = equil.getNatom()
     Npts = np.prod(N)
     m = equil.getMassList()
@@ -148,36 +114,6 @@ def eckartRotation(D,N,equil,pes):
         pes.getPointByIdx(idx).setZList(zr)
     return
 
-def eckartRotationOld(D, N, equil, pes):
-    N1 = N[0]
-    N2 = N[1]
-    N3 = N[2]
-
-    m = equil.getMassList()
-    xeq = equil.getXList()
-    yeq = equil.getYList()
-    for i in range(N1):
-        for j in range(N2):
-            for k in range(N3):
-                x = pes.getPointByN(i, j, k).getXList()
-                y = pes.getPointByN(i, j, k).getYList()
-                numer = denom = 0.0
-                for p in range(3):
-                    numer += m[p]*(x[p]*yeq[p] - y[p]*xeq[p])
-                    denom += m[p]*(x[p]*xeq[p] + y[p]*yeq[p])
-                theta = math.atan2(numer,denom)
-                xnew = np.zeros(3,float)
-                ynew = np.zeros(3,float)
-                for p in range(3):
-                    xnew[p] = x[p]*math.cos(theta) - y[p]*math.sin(theta)
-                    ynew[p] = x[p]*math.sin(theta) + y[p]*math.cos(theta)
-                pes.getPointByN(i,j,k).setXList(xnew)
-                pes.getPointByN(i,j,k).setYList(ynew)
-    return
-
-def main():
-    pass
-
 def passToCalc(dataObj):
     # print("Got an object.")
     # print(dataObj)
@@ -186,29 +122,33 @@ def passToCalc(dataObj):
     N = np.zeros(D,dtype=int)
     for i in range(D):
         N[i] = dataObj.getN(i)
+    L = dataObj.getLlist()
 
     equil = dataObj.getEquilMolecule()
     pes = dataObj.getPES()
 
     print("Imposing Eckart conditions")
-    eckartTranslation(D, N, equil, pes)
-    eckartRotation(D, N, equil, pes)
+    eckartTranslation(N, equil, pes)
+    eckartRotation(N, equil, pes)
 
     print("Creating G Matrix")
     t0 = time.perf_counter()
-    GMat = Gmatrix.calcGMatrix(D, N, dataObj.PES, dataObj.EquilMolecule)
+    G = Gmatrix.calcGMatrix(D, N, dataObj.PES, dataObj.EquilMolecule)
     t1 = time.perf_counter()
     print("Done with G Matrix time = {0}".format(t1-t0))
 
+    cores = dataObj.cores_amount
+
     t0 = time.perf_counter()
     print("Creating V Matrix")
-    VMat = Vmatrix.VMatrixCalc(dataObj)
+    Vmethod = dataObj.getVmethod()
+    V = Vmatrix.VMatrixCalc(D, N, Vmethod, pes, cores)
     t1 = time.perf_counter()
     print("Done with V Matrix time = {0}".format(t1-t0))
 
     t0 = time.perf_counter()
     print("Creating T Matrix")
-    TMat = Tmatrix.TMatrixCalc(dataObj, GMat)
+    T = Tmatrix.TMatrixCalc(D, N, L, G, cores)
     t1 = time.perf_counter()
     print("Done with T Matrix time = {0}".format(t1-t0))
 
@@ -217,12 +157,12 @@ def passToCalc(dataObj):
     EigenSparseMethod = dataObj.getEigenvalueMethod()
     Npts = np.prod(N)
 
-    HMat = VMat + TMat
+    H = V + T
 
     if (EigenSparseMethod):
         NIter = 10*Npts
         try:
-            eigenval, eigenvec = sparse_linalg.eigsh(HMat, k=Neigen, which='SM', tol=1.0e-6, maxiter=NIter)
+            eigenval, eigenvec = sparse_linalg.eigsh(H, k=Neigen, which='SM', tol=1.0e-6, maxiter=NIter)
         except sparse_linalg.ArpackNoConvergence as error_obj:
             eigenval = error_obj.eigenvalues
             eigenvec = error_obj.eigenvectors
@@ -230,8 +170,8 @@ def passToCalc(dataObj):
             print("could not find {0} eigenvalues in {1} iterations, found {2} instead.".format(dataObj.getNumberOfEigenvalues(),NIter, Neigen))
             print()
     else:
-        HMat = HMat.toarray("C")
-        eigenval, eigenvec = linalg.eigh(HMat)
+        H = H.toarray("C")
+        eigenval, eigenvec = linalg.eigh(H)
 
     eigenval = eigenval * 219474.6  # conversion from hartree to cm-1
 

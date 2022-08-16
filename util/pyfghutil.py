@@ -24,99 +24,133 @@ class Molecule:
     def __init__(self):
         self.Nat = 0
         self.Q = 0
-        self.Mult = 1
-        self.S = []
-        self.x = []
-        self.y = []
-        self.z = []
-        self.A = []
-        self.Z = []
-        self.m = []
+        self.Mult = 0
+        self.S = None
+        self.x = None
+        self.y = None
+        self.z = None
+        self.A = None
+        self.Z = None
+        self.m = None
 
-    def setNatom(self,Nat):
+    def setNatom(self, Nat):
         self.Nat = Nat
-        return
-
-    def setCharge(self,Q):
-        self.Q = Q
-        return
-
-    def setMultiplicity(self,Mult):
-        self.Mult = Mult
         return
 
     def getNatom(self):
         return self.Nat
 
+    def setCharge(self, Q):
+        self.Q = Q
+        return
+
     def getCharge(self):
         return self.Q
+
+    def setMultiplicity(self, mult):
+        self.Mult = mult
+        return
 
     def getMultiplicity(self):
         return self.Mult
 
-    def setSymbolList(self, S):
+    def setSymbol(self,n,s):
+        self.S[n] = s
+        return
+
+    def setSymbolList(self,S):
         self.S = S
         return
+
+    def getSymbol(self,n):
+        return self.S[n]
 
     def getSymbolList(self):
         return self.S
 
-    def getSymbol(self,n):
-        return self.S[n-1]
+    def setAtomicNo(self,n,Z):
+        self.Z[n] = Z
+        return
 
-    def setAtomicNoList(self, Z):
+    def setAtomicNoList(self,Z):
         self.Z = Z
         return
+
+    def getAtomicNo(self,n):
+        return self.Z[n]
 
     def getAtomicNoList(self):
         return self.Z
 
-    def setMassNoList(self, A):
+    def setMassNo(self,n,A):
+        self.A[n] = A
+        return
+
+    def setMassNoList(self,A):
         self.A = A
         return
+
+    def getMassNo(self,n):
+        return self.A[n]
 
     def getMassNoList(self):
         return self.A
 
-    def setMassList(self, m):
+    def setMass(self,n,m):
+        self.m[n] = m
+        return
+
+    def setMassList(self,m):
         self.m = m
         return
+
+    def getMass(self,n):
+        return self.m[n]
 
     def getMassList(self):
         return self.m
 
-    def setXList(self, x):
+    def setX(self, n, x):
+        self.x[n] = x
+        return
+
+    def setXList(self,x):
         self.x = x
         return
 
-    def getX(self,n):
-        return self.x[n-1]
-
-    def getY(self,n):
-        return self.y[n-1]
-
-    def getZ(self,n):
-        return self.z[n-1]
-
-    def getXList(self):
-        return self.x
+    def setY(self, n, y):
+        self.y[n] = y
+        return
 
     def setYList(self, y):
         self.y = y
         return
 
-    def getYList(self):
-        return self.y
+    def setZ(self, n, z):
+        self.z[n] = z
+        return
 
     def setZList(self, z):
         self.z = z
         return
 
+    def getX(self,n):
+        return self.x[n]
+
+    def getY(self,n):
+        return self.y[n]
+
+    def getZ(self,n):
+        return self.z[n]
+
+    def getXList(self):
+        return self.x
+
+    def getYList(self):
+        return self.y
+
     def getZList(self):
         return self.z
-
-    def getMassByAtom(self,n):
-        return self.m[n-1]
 
     def getMassByCoord(self,n):
         return self.m[n//3]
@@ -131,22 +165,21 @@ class Molecule:
 
 
 class PESpoint:
-    def __init__(self):
-        self.n = 0
+    def __init__(self,n):
+        self.n = n
         self.q = []
         self.mol = Molecule()
         self.en = 0
 
-    def setN(self, n):
-        self.n = n
-        return
-
-    def getN(self):
+    def getPointNo(self):
         return self.n
 
     def setQList(self, q):
         self.q = q
         return
+
+    def getQ(self,n):
+        return self.q[n]
 
     def getQList(self):
         return self.q
@@ -157,7 +190,6 @@ class PESpoint:
 
     def getMolecule(self):
         return(self.mol)
-
 
     def setXList(self, x):
         self.getMolecule().setXList(x)
@@ -191,11 +223,11 @@ class PESpoint:
 
     def getCoord(self,c):
         if (c % 3 == 0):
-            return self.getMolecule().getX(c // 3 + 1)
+            return self.getMolecule().getX(c // 3)
         elif (c % 3 == 1):
-            return self.getMolecule().getY(c // 3 + 1)
+            return self.getMolecule().getY(c // 3)
         elif (c % 3 == 2):
-            return self.getMolecule().getZ(c // 3 + 1)
+            return self.getMolecule().getZ(c // 3)
 
     def setEnergy(self, en):
         self.en = en
@@ -215,7 +247,7 @@ class PotentialEnergySurface:
     def __init__(self,N):
         self.N = N
         self.Npts = np.prod(N)
-        self.pts = [None]*Npts
+        self.pts = [None]*self.Npts
 
     def getNpts(self):
         return self.Npts

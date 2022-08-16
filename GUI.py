@@ -580,6 +580,7 @@ def main_window():
             """
             holder.setcores_amount(max(1, int(cores.get())))
             holder.setNumberOfEigenvalues(int(eigenvalues.get()))
+            holder.setVmethod(calculation2.get())
 
             if calculation.get() == "Sparse Matrix":
                 holder.setEigenvalueMethod(True)

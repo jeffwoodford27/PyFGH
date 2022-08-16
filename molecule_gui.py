@@ -148,24 +148,24 @@ def linearTest(mol, cutoff=0.05):
 def molecule_testing(holder):
     D = holder.getD()
     N = holder.getNlist()
-    Npts = np.prod(N)
 
     equil = readEqfile(holder.getEquilFile())
-    pes = readPESfile(holder.getPESFile(), equil, D, N)
+    if (closeContactTest(equil) == False):
+        raise ValidationError("Atoms less than 0.1 A apart in the equilibrium structure.")
+    if (linearTest(equil) == False):
+        raise ValidationError("The equilibrium structure is linear. Linear molecules not yet supported.")
 
-    for i in range(-1,Npts):
-        if (i == -1):
-            mol = equil
-            errstr = "equilibrium structure"
-        else:
-            mol = pes.getPointByPt(i).getMolecule()
-            errstr = "PES point " + str(i+1)
-
-        if (closeContactTest(mol) == False):
-            raise ValidationError("Atoms less than 0.1 A apart in " + errstr)
-
-        if (linearTest(mol) == False):
-            raise ValidationError("The " + errstr + " is linear. Linear molecules not yet supported.")
+    if (holder.getVmethod() == "Read from File"):
+        pes = readPESfile(holder.getPESFile(), equil, D, N)
+        Npts = np.prod(N)
+        for pt in range(Npts):
+            mol = pes.getPointByPt(pt).getMolecule()
+            if (closeContactTest(mol) == False):
+                raise ValidationError("Atoms less than 0.1 A apart in PES structure " + str(pt+1))
+            if (linearTest(mol) == False):
+                raise ValidationError("PES structure " + str(pt+1) + " is linear. Linear molecules not yet supported.")
+    else:
+        pes = None
 
     return equil, pes
 

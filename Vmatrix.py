@@ -107,6 +107,47 @@ class NBlock:
             else:
                 return(self.difblocks)
 
+def calcPESfromPsi4(D, N, L, equil, psi4method):
+    import psi4
+
+    mol_geom = """
+    {0} {1}
+    {2}
+    {3} 1 {4}
+    {5} 1 {6} 2 {7}
+    """
+
+    dq = L / N
+    Npts = np.prod(N)
+
+    for pt in range(Npts):
+        idx = pyfghutil.PointToIndex(N,pt)
+        q = np.zeros(D, dtype=float)
+        for d in range(D):
+            q[d] = (d - N[d] // 2) * dq[d]
+
+        R1 = R1eq + q[0]
+        R2 = R2eq + q[1]
+        th = theq + q[2]
+
+    R = np.zeros(N, dtype=float)
+    en = np.zeros(N, dtype=float)
+    for i in range(N):
+        q[i] = (i - N // 2) * dq
+        R[i] = Req + q[i]
+
+    print(q)
+    print(R)
+
+    for i in range(N):
+        r_ang = R[i] * 0.529177249
+        mol = psi4.geometry(mol_geom.format(r_ang))
+        en[i] = psi4.energy('ccsd(t)/aug-cc-pvqz', molecule=mol)
+        print(q[i], R[i], en[i])
+
+    for i in range(N):
+        en[i] = en[i] - en[N // 2]
+    return
 
 
 def Vab(D, N, pes, alpha, beta):
@@ -170,9 +211,20 @@ def VBlockCalc(dimensions, NValue, pes, blockX, blockY):
 def VMatrixCalc(dataObject):
     #Establish variables needed
     NValue = dataObject.getNlist()
-
     dimensions = dataObject.getD()
-    pes = dataObject.getPES()
+
+    Vmethod = dataObject.getVmethod()
+    if (Vmethod == "Read from File"):
+        pes = dataObject.getPES()
+
+    elif (Vmethod == "Harmonic Oscillator"):
+        pes = calcPESfromModel(0)
+
+    elif (Vmethod == "Morse Oscillator"):
+        pes = calcPESfromModel(1)
+
+    elif (Vmethod == "Compute with Psi4"):
+        pes = calcPESfromPsi4(dataObject.getPsi4Method())
 
     #Create the VMatrix
     #The alpha and beta values are used to create the VMatrix in the correct position

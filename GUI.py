@@ -94,7 +94,7 @@ def main_window():
     d1 = tk.StringVar()
     N1text = ttk.Combobox(window, width=10, textvariable=d1)
 
-    eigenvalues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    eigenvalues = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     n11 = tk.StringVar()
     eigenvalues = ttk.Combobox(window, values=eigenvalues, width=10, textvariable=n11)
@@ -480,7 +480,7 @@ def main_window():
 
             # TODO change the 1 in getN and getL. Might use a for loop to include all values.
 
-            eq, pes = molecule_gui.molecule_testing(holder.getN(0), holder.getL(0), holder.getN(1), holder.getL(1), holder.getN(2), holder.getL(2), holder.equilibrium_file, holder.potential_energy_file)
+            eq, pes = molecule_gui.molecule_testing(holder)
             holder.setEquilMolecule(eq)
             holder.setPES(pes)
 
@@ -602,21 +602,6 @@ def main_window():
                         if testing == key:
                             holder_model.append(className())
 
-
-                print(holder_model)
-                model_prompt(holder_model)
-                test()
-
-            if calculation2.get() == "Morse Oscillator":
-                import inspect
-                holder_model = []
-                import re
-                testing = "Morse_Oscillator"
-
-                for i in range(int(dimensions.get())):
-                    for key, className in inspect.getmembers(model_objects):
-                        if testing == key:
-                            holder_model.append(className())
 
                 print(holder_model)
                 model_prompt(holder_model)

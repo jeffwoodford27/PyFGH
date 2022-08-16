@@ -4,44 +4,181 @@ import os
 import numpy as np
 from util import pyfghutil, DataObject
 
-Q1 = []
-Q2 = []
-Q3 = []
-Z = []
-s = []
-A = []
-m = []
-list2 = []
-list3 = []
-x_coordinates = []
-y_coordinates = []
-z_coordinates = []
-mass = []
-potx1 = []
-potx2 = []
-potx3 = []
-poty1 = []
-poty2 = []
-poty3 = []
-potenergy = []
-energy = []
-totalN = 0
+class ValidationError(Exception):
+    pass
 
-"""
-When selecting the files must select first and then select enter N and L values!!!
-"""
+def readEqfile(eqfile):
+    S = []
+    A = []
+    Z = []
+    x = []
+    y = []
+    z = []
+    m = []
+    try:
+        with open(eqfile, newline='') as f:
+            reader = csv.reader(f,delimiter=',')
+            Nat = 0
+            for row in reader:
+                try:
+                    S.append(row[0])
+                    A.append(int(row[1]))
+                    x.append(float(row[2]))
+                    y.append(float(row[3]))
+                    z.append(float(row[4]))
+                except IndexError:
+                    raise ValidationError('In Equil File: Missing Data on Line {0}'.format(Nat))
+                Nat = Nat + 1
 
+    except FileNotFoundError:
+        raise
 
-def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
-    #print(DataObject.test.equilibrium_file)
+    eqmol = pyfghutil.Molecule()
+    eqmol.setNatom(Nat)
+    eqmol.setSymbolList(S)
+    eqmol.setMassNoList(A)
+    eqmol.setXList(x)
+    eqmol.setYList(y)
+    eqmol.setZList(z)
+    for n in range(Nat):
+        symbolFound = False
+        for key, value in pyfghutil.AtomicSymbolLookup.items():
+            if (value == S[n]):
+                Z.append(key)
+                symbolFound = True
+                break
+        if (not symbolFound):
+            raise ValidationError('Atom {0} Symbol {1} Not Found In Dictionary'.format(n+1,S[n]))
+
+    for n in range(Nat):
+        nucl = S[n] + "-" + str(A[n])
+        m.append(pyfghutil.MassLookup.get(nucl))
+        if (m[n] == None):
+            raise ValidationError('Atom {0} Nuclide {1} Not Found In Dictionary'.format(n+1,nucl))
+        else:
+            m[n] = float(m[n]) * 1822.89
+
+    eqmol.setMassList(m)
+    return eqmol
+
+def readPESfile(pesfile, equil, D, N):
+    Npts = np.prod(N)
+    Nat = equil.getNatom()
+
+    pes = pyfghutil.PotentialEnergySurface()
+    pes.setN(N)
+    try:
+        with open(pesfile, newline='') as f:
+            reader = csv.reader(f)
+
+            n = 0
+            for row in reader:
+                pespt = pyfghutil.PESpoint()
+                pespt.setN(n)
+
+                try:
+                    q = np.zeros(D, dtype=float)
+                    for i in range(D):
+                        q[i] = float(row[i])
+
+                    x = np.zeros(D, dtype=float)
+                    y = np.zeros(D, dtype=float)
+                    z = np.zeros(D, dtype=float)
+                    for i in range(Nat):
+                        x[i] = float(row[D+3*i])
+                        y[i] = float(row[D+3*i+1])
+                        z[i] = float(row[D+3*i+2])
+
+                    en = float(row[D+3*Nat])
+                except IndexError:
+                    raise ValidationError("In PES file: Missing data on line {0}".format(n+1))
+                    os._exit(0)
+
+                pespt.setQList(q)
+                pespt.setXList(x)
+                pespt.setYList(y)
+                pespt.setZList(z)
+                pespt.getMolecule().setNatom(Nat)
+                pespt.getMolecule().setSymbolList(equil.getSymbolList())
+                pespt.getMolecule().setAtomicNoList(equil.getAtomicNoList())
+                pespt.getMolecule().setMassNoList(equil.getMassNoList())
+                pespt.getMolecule().setMassList(equil.getMassList())
+                pespt.setEnergy(en)
+                pes.appendPESpt(pespt)
+                n = n + 1
+    except FileNotFoundError:
+        raise
+
+    if (Npts != n):
+        raise ValidationError("Error: Expecting {0} lines in PES file, received {1}".format(Npts,n))
+
+    return pes
+
+def closeContactTest(mol, dist_cutoff=0.10):
+    Nat = mol.getNatom()
+    x = mol.getXList()
+    y = mol.getYList()
+    z = mol.getZList()
+    for i in range(Nat):
+        for j in range(i+1,Nat):
+            d = np.sqrt((x[j]-x[i])*(x[j]-x[i]) + (y[j]-y[i])*(y[j]-y[i]) + (z[j]-z[i])*(z[j]-z[i]))
+            if (d < dist_cutoff):
+                return False
+
+    return True
+
+def linearTest(mol, cutoff=0.05):
+    Nat = mol.getNatom()
+    x = mol.getXList()
+    y = mol.getYList()
+    z = mol.getZList()
+    for at1 in range(Nat):
+        for at2 in range(at1+1,Nat):
+            for at3 in range(at2+1,Nat):
+                v12 = np.array([x[at2]-x[at1],y[at2]-y[at1],z[at2]-z[at1]])
+                v13 = np.array([x[at3]-x[at1],y[at3]-y[at1],z[at3]-z[at1]])
+                dot1213 = np.dot(v12,v13)
+                v12len = np.linalg.norm(v12)
+                v13len = np.linalg.norm(v13)
+                costheta = dot1213/(v12len*v13len)
+                if (costheta > (1-cutoff)) or (costheta < (-1+cutoff)):
+                    return False
+    return True
+
+def molecule_testing(holder):
+    D = holder.getD()
+    N = holder.getNlist()
+    Npts = np.prod(N)
+
+    equil = readEqfile(holder.getEquilFile())
+    pes = readPESfile(holder.getPESFile(), equil, D, N)
+
+    for i in range(-1,Npts):
+        if (i == -1):
+            mol = equil
+            errstr = "equilibrium structure"
+        else:
+            mol = pes.getPointByPt(i).getMolecule()
+            errstr = "PES point " + str(i+1)
+
+        if (closeContactTest(mol) == False):
+            raise ValidationError("Atoms less than 0.1 A apart in " + errstr)
+
+        if (linearTest(mol) == False):
+            raise ValidationError("The " + errstr + " is linear. Linear molecules not yet supported.")
+
+    return equil, pes
+
+def molecule_testing_old(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
+    # print(DataObject.test.equilibrium_file)
     N1_1 = N1
     N2_1 = N2
     N3_1 = N3
-    #print(N1_1)
-#    with open(DataObject.test.equilibrium_file) as f:
+    # print(N1_1)
+    #    with open(DataObject.test.equilibrium_file) as f:
     with open(eqfile) as f:
         for row in f:
-            #print(row)
+            # print(row)
             list2.append(row.split(',')[0])  # Li
             new_row = ['-'.join([row.split(',')[0], row.split(',')[1]])]
             x = ' '.join(new_row)
@@ -52,8 +189,8 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
             mass.append(row.split(',')[1])
             masslist = ([float(x) for x in mass])
             # print(list2)  # ['Li']
-            #print(list3)  # ['Li-6']
-            #print("\n")
+            # print(list3)  # ['Li-6']
+            # print("\n")
 
         """
         for x in list2:
@@ -62,7 +199,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
 
         for x in list2:  # x is the atomic symbol
             if x in pyfghutil.AtomicSymbolLookup.values():
-                #print(x + " is a valid element")
+                # print(x + " is a valid element")
                 s.append(x)
             else:
                 raise Exception("Atom is not valid")
@@ -73,13 +210,13 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
             for key, value in pyfghutil.AtomicSymbolLookup.items():
                 if x == value:
                     Z.append(key)
-                    #print("Atomic number of " + x + ":", key)
+                    # print("Atomic number of " + x + ":", key)
 
         print("\n")
         for x in list3:  # x is the atomic symbol
             for key, value in pyfghutil.MassLookup.items():
                 if value is masslist:
-                    #raise Exception("Atom is not valid")
+                    # raise Exception("Atom is not valid")
                     pass
                 """
                 else:
@@ -87,7 +224,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
                 """
                 if x == key:
                     A.append(value)
-                    #print("Atomic mass of " + x + ":", value)
+                    # print("Atomic mass of " + x + ":", value)
         """
         print("\n")
         for x in list3:
@@ -100,21 +237,21 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
         for x in A:
             atomic = x * 1822.89
             m.append(atomic)
-            #print("amu to atomic ", m)
+            # print("amu to atomic ", m)
 
     def getNs():
-#        file = open(DataObject.test.potential_energy_file)
+        #        file = open(DataObject.test.potential_energy_file)
         file = open(pesfile)
         reader = csv.reader(file)
         lines = len(list(reader))
         f.close()
         totalN_2 = N1_1 * N2_1 * N3_1
         if lines == totalN_2:
-            #print("The lines of waterpot-data equals the total of all N vales")
+            # print("The lines of waterpot-data equals the total of all N vales")
             pass
         else:
-            #print("The lines of waterpot-data do not equal the total of all N vales ", lines)
-            #raise Exception("N is not valid")
+            # print("The lines of waterpot-data do not equal the total of all N vales ", lines)
+            # raise Exception("N is not valid")
             pass
             # come back and fix this
         return totalN_2
@@ -133,26 +270,26 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
                        math.pow(zz3 - zz2, 2))
         # cos theta equation
         costheta = (((x2 - x1) * (xx3 - x1) + (y2 - y1) * (yy3 - y1) + (z2 - z1) * (zz3 - z1)) / (d * d2))
-        #print("Cos Theta is: ", costheta)
+        # print("Cos Theta is: ", costheta)
 
         if -1 < costheta < 1:
-            #print('molecule is non-linear')
-            #print("Cos Theta is: ", costheta)
+            # print('molecule is non-linear')
+            # print("Cos Theta is: ", costheta)
             pass
         else:
             raise Exception("Molecular is linear")
             # throw an error
 
         if d >= 0.10 and d2 >= 0.10 and d3 >= 0.10:
-            #print("Distance is", d + d2 + d3, " Atom is unique")
+            # print("Distance is", d + d2 + d3, " Atom is unique")
             pass
         else:
             raise Exception("Atom is not unique")
-            #throw an error
+            # throw an error
 
         return
 
-            # First atom is assumed to be the central atom
+        # First atom is assumed to be the central atom
 
     xlist = [float(x) for x in x_coordinates]
     ylist = [float(x) for x in y_coordinates]
@@ -180,9 +317,9 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
     def hi():
         holder = DataObject.InputData()
         r = holder.potential_energy_file
-        #print(r)
-#        hola = open(DataObject.test.potential_energy_file)
-#        hola = open(pesfile)
+        # print(r)
+        #        hola = open(DataObject.test.potential_energy_file)
+        #        hola = open(pesfile)
         with open(pesfile) as hola:
             for hello in hola:
                 potx1.append(hello.split(',')[3])
@@ -222,26 +359,26 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
 
         # cos theta equation
         costheta = (((x2 - x1) * (x3 - x1) + (y2 - y1) * (y3 - y1)) / (d * d2))
-        #print("Cos Theta is: ", costheta)
+        # print("Cos Theta is: ", costheta)
 
         if -1 < costheta < 1:
-            #print('molecule is non-linear')
-            #print("Cos Theta is: ", costheta)
+            # print('molecule is non-linear')
+            # print("Cos Theta is: ", costheta)
             pass
         else:
-            #print("Molecule is linear")
+            # print("Molecule is linear")
             raise Exception("Molecule is linear")
 
         if d >= 0.10 and d2 >= 0.10 and d3 >= 0.10:
-            #print("Distance is", d + d2 + d3, " Atom is unique")
+            # print("Distance is", d + d2 + d3, " Atom is unique")
             pass
         else:
-            #print("Atom is not unique")
+            # print("Atom is not unique")
             raise Exception("Atom is not unique")
 
         return
 
-            # First atom is assumed to be the central atom
+        # First atom is assumed to be the central atom
 
     """
     This does validation checking for the waterpot-data.csv file
@@ -275,9 +412,9 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
     EquilMolecule.setMassList(m)
     EquilMolecule.setXList(xlist)
     EquilMolecule.setYList(ylist)
-    EquilMolecule.setZList(np.zeros(3,dtype=float))
+    EquilMolecule.setZList(np.zeros(3, dtype=float))
 
-    #print("This is from the molecule gui: ", EquilMolecule.Z)
+    # print("This is from the molecule gui: ", EquilMolecule.Z)
     getNs()
 
     # validateQ()
@@ -295,7 +432,7 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
     deltaQ1 = L1_2 / float(N1_2)
     deltaQ2 = L2_2 / float(N2_2)
     deltaQ3 = L3_2 / float(N3_2)
-#    with open(DataObject.test.potential_energy_file) as a:
+    #    with open(DataObject.test.potential_energy_file) as a:
     with open(pesfile) as a:
         for x in a:
             Q1.append(float(x.split(',')[0]))
@@ -303,8 +440,8 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
             Q3.append(float(x.split(',')[2]))
 
     pes = pyfghutil.PotentialEnergySurface()
-    pes.setN([N1,N2,N3])
-    pes.setNpts(N1*N2*N3)
+    pes.setN([N1, N2, N3])
+    pes.setNpts(N1 * N2 * N3)
     n = 0
     for i in range(N1_2):
         for j in range(N2_2):
@@ -314,20 +451,19 @@ def molecule_testing(N1, L1, N2, L2, N3, L3, eqfile, pesfile):
                 q3 = deltaQ3 * float(k - int(N3_2 / 2))
 
                 if (round(q1, 3) == round(Q1[n], 3)) \
-                        and (round(q2, 3) == round(Q2[n], 3))\
+                        and (round(q2, 3) == round(Q2[n], 3)) \
                         and (round(q3, 3) == round(Q3[n], 3)):
                     pass
                 else:
-                    #print(round(q1, 3), round(Q1[n], 3), round(q2, 3), round(Q2[n], 3), round(q3, 3), round(Q3[n], 3))
+                    # print(round(q1, 3), round(Q1[n], 3), round(q2, 3), round(Q2[n], 3), round(q3, 3), round(Q3[n], 3))
                     print("Error!!!!!!!!!!!!!!!, File is NOT Valid")
                     os._exit(0)
-                    #print('Values are not valid')
-
+                    # print('Values are not valid')
 
                 pt = pyfghutil.PESpoint()
                 pt.setN(n)
                 pt.setQList([q1, q2, q3])
-                pt.setXList([potxlist1[n],potxlist2[n],potxlist3[n]])
+                pt.setXList([potxlist1[n], potxlist2[n], potxlist3[n]])
                 pt.setYList([potylist1[n], potylist2[n], potylist3[n]])
                 pt.setZList([0, 0, 0])
                 pt.setEnergy(potenergy[n])

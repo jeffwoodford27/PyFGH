@@ -197,6 +197,12 @@ class InputData:
     def getL(self,j):
         return self.L[j]
 
+    def getEquilFile(self):
+        return self.equilibrium_file
+
+    def getPESFile(self):
+        return self.potential_energy_file
+
     def getEquilMolecule(self):
         return self.EquilMolecule
 

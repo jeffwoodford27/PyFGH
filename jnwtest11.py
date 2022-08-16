@@ -1,33 +1,9 @@
 import csv
-import math
 import os
 import numpy as np
 from util import pyfghutil, DataObject
 
 # Proposed replacement for molecule_gui
-
-Q1 = []
-Q2 = []
-Q3 = []
-Z = []
-s = []
-A = []
-m = []
-list2 = []
-list3 = []
-x_coordinates = []
-y_coordinates = []
-z_coordinates = []
-mass = []
-potx1 = []
-potx2 = []
-potx3 = []
-poty1 = []
-poty2 = []
-poty3 = []
-potenergy = []
-energy = []
-totalN = 0
 
 """
 When selecting the files must select first and then select enter N and L values!!!
@@ -47,7 +23,7 @@ def readEqfile(eqfile):
     try:
         with open(eqfile, newline='') as f:
             reader = csv.reader(f,delimiter=',')
-            Nat = 1
+            Nat = 0
             for row in reader:
                 try:
                     S.append(row[0])
@@ -62,6 +38,7 @@ def readEqfile(eqfile):
     except FileNotFoundError:
         raise
 
+    print(Nat)
     eqmol = pyfghutil.Molecule()
     eqmol.setNatom(Nat)
     eqmol.setSymbolList(S)
@@ -87,6 +64,7 @@ def readEqfile(eqfile):
         else:
             m[n] = float(m[n]) * 1822.89
 
+    eqmol.setMassList(m)
     return eqmol
 
 def readPESfile(pesfile, equil, D, N):
@@ -109,11 +87,9 @@ def readPESfile(pesfile, equil, D, N):
                     for i in range(D):
                         q[i] = float(row[i])
 
-
-                    x = np.zeros(Nat, dtype=float)
-                    y = np.zeros(Nat, dtype=float)
-                    z = np.zeros(Nat, dtype=float)
-
+                    x = np.zeros(D, dtype=float)
+                    y = np.zeros(D, dtype=float)
+                    z = np.zeros(D, dtype=float)
                     for i in range(Nat):
                         x[i] = float(row[D+3*i])
                         y[i] = float(row[D+3*i+1])
@@ -130,8 +106,8 @@ def readPESfile(pesfile, equil, D, N):
                 pespt.setZList(z)
                 pespt.getMolecule().setNatom(Nat)
                 pespt.getMolecule().setSymbolList(equil.getSymbolList())
-                pespt.getMolecule().setAtomicNumberList(equil.getAtomicNumberList())
-                pespt.getMolecule().setMassNumberList(equil.getMassNumberList())
+                pespt.getMolecule().setAtomicNoList(equil.getAtomicNoList())
+                pespt.getMolecule().setMassNoList(equil.getMassNoList())
                 pespt.getMolecule().setMassList(equil.getMassList())
                 pespt.setEnergy(en)
                 pes.appendPESpt(pespt)
@@ -144,24 +120,36 @@ def readPESfile(pesfile, equil, D, N):
 
     return pes
 
-def closeContactTest(mol, no, dist_cutoff):
-    Nat = mol.getNatom(mol)
-    x = mol.getXList(mol)
-    y = mol.getYList(mol)
-    z = mol.getZList(mol)
+def closeContactTest(mol, dist_cutoff=0.10):
+    Nat = mol.getNatom()
+    x = mol.getXList()
+    y = mol.getYList()
+    z = mol.getZList()
     for i in range(Nat):
         for j in range(i+1,Nat):
             d = np.sqrt((x[j]-x[i])*(x[j]-x[i]) + (y[j]-y[i])*(y[j]-y[i]) + (z[j]-z[i])*(z[j]-z[i]))
             if (d < dist_cutoff):
-                if (no < 0):
-                    raise ValidationError("Error: In equil structure, distance between atom {0} and atom {1} is less than the cutoff distance of {2}".format(i+1,j+1,dist_cutoff))
-                else:
-                    raise ValidationError("Error: In PES point {0}, distance between atom {1} and atom {2} is less than the cutoff distance of {3}".format(no+1,i+1,j+1,dist_cutoff))
+                return False
 
-    return
+    return True
 
-
-
+def linearTest(mol, cutoff=0.05):
+    Nat = mol.getNatom()
+    x = mol.getXList()
+    y = mol.getYList()
+    z = mol.getZList()
+    for at1 in range(Nat):
+        for at2 in range(at1+1,Nat):
+            for at3 in range(at2+1,Nat):
+                v12 = np.array([x[at2]-x[at1],y[at2]-y[at1],z[at2]-z[at1]])
+                v13 = np.array([x[at3]-x[at1],y[at3]-y[at1],z[at3]-z[at1]])
+                dot1213 = np.dot(v12,v13)
+                v12len = np.linalg.norm(v12)
+                v13len = np.linalg.norm(v13)
+                costheta = dot1213/(v12len*v13len)
+                if (costheta > (1-cutoff)) or (costheta < (-1+cutoff)):
+                    return False
+    return True
 
 def molecule_testing_v1(D, N, L, eqfile, pesfile):
     Npts = np.prod(N)
@@ -177,8 +165,8 @@ def molecule_testing_v1(D, N, L, eqfile, pesfile):
 
     holder = DataObject.InputData()
     holder.setD(D)
-    holder.setNList(N)
-    holder.setLList(L)
+    holder.setNlist(N)
+    holder.setLlist(L)
     holder.setEquilMolecule(equil)
     holder.setPES(pes)
 
@@ -186,17 +174,29 @@ def molecule_testing_v1(D, N, L, eqfile, pesfile):
 
 def molecule_testing_v2(holder):
     D = holder.getD()
-    N = holder.getNList()
+    N = holder.getNlist()
     Npts = np.prod(N)
 
     equil = readEqfile(holder.getEquilFile())
     pes = readPESfile(holder.getPESFile(), equil, D, N)
 
-    dist_cutoff = 0.10
-    closeContactTest(equil, -1, dist_cutoff)
+    for i in range(-1,Npts):
+        if (i == -1):
+            mol = equil
+            errstr = "equilibrium structure"
+        else:
+            mol = pes.getPointByPt(i).getMolecule()
+            errstr = "PES point " + str(i+1)
 
-    for i in range(Npts):
-        closeContactTest(pes.getPointByPt(i).getMolecule(), i, dist_cutoff)
+        if (closeContactTest(mol) == False):
+            raise ValidationError("Atoms less than 0.1 A apart in " + errstr)
+        else:
+            print(errstr + " passed the close contact test!")
+
+        if (linearTest(mol) == False):
+            raise ValidationError("The " + errstr + " is linear. Linear molecules not yet supported.")
+        else:
+            print(errstr + " passed the linear test!")
 
     holder.setEquilMolecule(equil)
     holder.setPES(pes)
@@ -512,6 +512,16 @@ def setMessage(param):
     return None
 
 
-eqfile = "./testing files/water-equxl.csv"
-equil = readEqfile(eqfile)
-print(equil.getXList())
+D = 3
+N = [11,11,11]
+L = [1.1,1.1,1.65]
+holder = DataObject.InputData()
+holder.setD(D)
+holder.setNlist(N)
+holder.setLlist(L)
+eqfile = "./testing files/water-equil.csv"
+holder.setequilibrium_file(eqfile)
+pesfile = "./testing files/water-potential.csv"
+holder.setpotential_energy(pesfile)
+
+molecule_testing_v2(holder)

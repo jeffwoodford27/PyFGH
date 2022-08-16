@@ -92,34 +92,44 @@ def NewCounter(D,  N, alpha, beta):
         counter[2 * j + 1] = alphaidx[D - j - 1]
     return counter
 
-D = 5
-N = [5,5,5,5,5]
+#D = 3
+#N = [11,11,11]
+
+D = 3
+N = [3,3,3]
+
 Npt = np.prod(N)
+
+for alpha in range(Npt):
+    for beta in range(Npt):
+        print(alpha,beta,NewCounter(D,N,alpha,beta))
+
 
 
 #for pt in range(Npt):
 #    print(pt,PointToIndex(D,N,pt),IndexToPoint(D,N,PointToIndex(D,N,pt)))
 
-t0 = time.perf_counter()
-for alpha in range(Npt):
+#t0 = time.perf_counter()
+#for alpha in range(Npt):
 #    print ("alpha = " + str(alpha))
-    for beta in range(Npt):
-        nelsoncounter = AlphaAndBetaToCounter(alpha,beta,D,N)
+#    for beta in range(Npt):
+#        nelsoncounter = AlphaAndBetaToCounter(alpha,beta,D,N)
 #        jeffcounter = NewCounter(D,N,alpha,beta)
 #        print(n, nelsoncounter, jeffcounter)
-t1 = time.perf_counter()
-print(t1-t0)
-print(sys.getsizeof(nelsoncounter))
+#t1 = time.perf_counter()
+#print(t1-t0)
+#print(sys.getsizeof(nelsoncounter))
 
-t0 = time.perf_counter()
-for alpha in range(Npt):
+#t0 = time.perf_counter()
+#for alpha in range(Npt):
 #    print ("alpha = " + str(alpha))
-    for beta in range(Npt):
+#    for beta in range(Npt):
 #        nelsoncounter = AlphaAndBetaToCounter(alpha,beta,D,N)
-        jeffcounter = NewCounter(D,N,alpha,beta)
-#        print(n, nelsoncounter, jeffcounter)
-t1 = time.perf_counter()
-print(t1-t0)
-print(sys.getsizeof(jeffcounter))
+#        print(alpha,beta,nelsoncounter)
+#        jeffcounter = NewCounter(D,N,alpha,beta)
+#        print(alpha, beta, jeffcounter)
+#t1 = time.perf_counter()
+#print(t1-t0)
+#print(sys.getsizeof(jeffcounter))
 
 

@@ -10,7 +10,7 @@ from scipy.interpolate import griddata
 def PointToIndex(N,pt):
     return list(np.unravel_index(pt,tuple(N)))
 
-evfile = "output files/Eigenvector-9.csv"
+evfile = "output files/Eigenvector-6.csv"
 D = 3
 N = np.zeros(D,dtype=int)
 N[0] = N[1] = N[2] = 11
@@ -37,7 +37,7 @@ with open(evfile, newline='') as csvfile:
 sum = 0
 for i in range(Npts):
     sum += c[i]*c[i]
-print(sum)
+#print(sum)
 
 for i in range(Npts):
     val = (c[i]*c[i])/sum
@@ -52,16 +52,16 @@ for pt in range(Npts):
     points[pt,1] = idx[1]
     points[pt,2] = idx[2]
 
-grid_x,grid_y,grid_z = np.mgrid[0:11:55j,0:11:55j,0:11:55j]
+grid_x,grid_y,grid_z = np.mgrid[0:11:33j,0:11:33j,0:11:33j]
 griddata = griddata(points, c, (grid_x, grid_y, grid_z), method='linear')
-print(griddata.shape)
+#print(griddata.shape)
 
-print(grid_x[0])
-print(grid_y[0])
-print(grid_z[0])
+#print(grid_x[0])
+#print(grid_y[0])
+#print(grid_z[0])
 
 def plot4d(x,y,z,c,N,L):
-    fig = plt.figure(figsize=(5, 5))
+    fig = plt.figure(figsize=(7, 7))
     ax = fig.add_subplot(projection="3d")
     ax.xaxis.pane.fill = False
     ax.yaxis.pane.fill = False
@@ -74,11 +74,13 @@ def plot4d(x,y,z,c,N,L):
 #    print(x.shape,y.shape,z.shape)
 #    pt = PointToIndex(N,[5,5,5])
 #    print(x[pt],y[pt],z[pt],data.flatten()[pt])
-    x = (x+1/2)*L[0]/N[0] - L[0]/2
+    x = (x+1/2)*L[2]/N[2] - L[2]/2
     y = (y+1/2)*L[1]/N[1] - L[1]/2
-    z = (z+1/2)*L[2]/N[2] - L[2]/2
-    print(x,y,z)
-    ax.scatter(x, y, z, c=c, s=10.0 * mask, edgecolor="face", alpha=0.2, marker="o", linewidth=0)
+    z = (z+1/2)*L[0]/N[0] - L[0]/2
+    ax.set_xlabel("q1")
+    ax.set_ylabel("q2")
+    ax.set_zlabel("q3")
+    ax.scatter(z, y, x, c=c, s=10.0 * mask, edgecolor="face", alpha=None, marker="o", linewidth=0)
 #    ax.scatter(x, y, z, c=data.flatten(), edgecolor="face", alpha=None, marker="o", cmap="magma", linewidth=0)
     plt.tight_layout()
     plt.show()

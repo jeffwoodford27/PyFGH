@@ -1,6 +1,6 @@
 import csv
 import numpy as np
-from util import pyfghutil
+from PyFGHVersion2.util import pyfghutil as pyfghutil
 
 class ValidationError(Exception):
     pass
@@ -152,7 +152,7 @@ def generatePESCoordinates_Psi4(D, N, L, equil):
     pes = pyfghutil.PotentialEnergySurface(N)
     for pt in Npts:
         pespt = pyfghutil.PESpoint(pt)
-        idx = pyfghutil.PointToIndex(N,pt)
+        idx = pyfghutil.PointToIndex(N, pt)
         q = np.zeros(D, dtype=float)
         for d in D:
             dq = L[d]/N[d]

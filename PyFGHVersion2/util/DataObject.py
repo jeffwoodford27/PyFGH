@@ -57,6 +57,56 @@ class InputData:
 
         self.psi4method = None
 
+        self.psi4method = None
+
+        self.inputobject = None
+
+        self.calculation = None
+
+        self.calculation2 = None
+
+        self.valuesN = None
+
+        self.valuesL = None
+
+    """
+    The following methods are setters. These values get set in test1.py
+    """
+
+    def setvaluesN(self, valuesN):
+        self.valuesN = valuesN
+        return
+
+    def getvaluesN(self):
+        return self.valuesN
+
+    def setvaluesL(self, valuesL):
+        self.valuesL = valuesL
+        return
+
+    def getvaluesL(self):
+        return self.valuesL
+
+    def setinputobject(self, inputobject):
+        self.inputobject = inputobject
+        return
+
+    def getinputobject(self):
+        return self.inputobject
+
+    def setcalculation(self, calculation):
+        self.calculation = calculation
+        return
+
+    def getcalculation(self):
+        return self.calculation
+
+    def setcalculation2(self, calculation2):
+        self.calculation2 = calculation2
+        return
+
+    def getcalculation2(self):
+        return self.calculation2
 
 
     """

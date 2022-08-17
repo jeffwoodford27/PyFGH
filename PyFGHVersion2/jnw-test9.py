@@ -1,8 +1,9 @@
 #Import the needed modules
 import numpy as np
 from util import pyfghutil
+from util import DataObject
 import multiprocessing as mp
-from scipy.sparse import lil_matrix
+import csv
 
 class NBlock:
     def __init__(self, D, NValues):
@@ -107,70 +108,27 @@ class NBlock:
             else:
                 return(self.difblocks)
 
-'''
-def calcPESfromPsi4(D, N, L, equil, psi4method):
-    import psi4
 
-    mol_geom = """
-    {0} {1}
-    {2}
-    {3} 1 {4}
-    {5} 1 {6} 2 {7}
-    """
 
-    dq = L / N
-    Npts = np.prod(N)
 
-    for pt in range(Npts):
-        idx = pyfghutil.PointToIndex(N,pt)
-        q = np.zeros(D, dtype=float)
-        for d in range(D):
-            q[d] = (d - N[d] // 2) * dq[d]
+#A function to calculate the invidivdual values for the VMatrix
+def Vab(d, NValue, LValue, deltax, pes, dimensionCounterArray):
+    #Deltacounter is used to makes sure that the value being calculated is in the diagonal of the matrix
+    Deltacounter = 0
+    #Total is the value returned for the calculation
+    total = 0.0
+    for Vcounter in range(d):
+        #Add 1 to deltacounter if the corrosponding x and y values for the dimension equals each other
+        if(dimensionCounterArray[Vcounter*2] == dimensionCounterArray[(Vcounter*2)+1]):
+            Deltacounter += 1
+    #If the deltacounter amount equals the amount of dimensions, perform a summation for the formula
+    #Otherwise, the total will remain 0.0
+    if (Deltacounter == d):
+        total += pes.getPointByN(int(dimensionCounterArray[1]),int(dimensionCounterArray[3]),int(dimensionCounterArray[5])).getEnergy()
 
-        R1 = R1eq + q[0]
-        R2 = R2eq + q[1]
-        th = theq + q[2]
+    return(total)
 
-    R = np.zeros(N, dtype=float)
-    en = np.zeros(N, dtype=float)
-    for i in range(N):
-        q[i] = (i - N // 2) * dq
-        R[i] = Req + q[i]
-
-    print(q)
-    print(R)
-
-    for i in range(N):
-        r_ang = R[i] * 0.529177249
-        mol = psi4.geometry(mol_geom.format(r_ang))
-        en[i] = psi4.energy('ccsd(t)/aug-cc-pvqz', molecule=mol)
-        print(q[i], R[i], en[i])
-
-    for i in range(N):
-        en[i] = en[i] - en[N // 2]
-    return
-'''
-
-def Vab(D, N, pes, alpha, beta):
-    if (alpha == beta):
-        return pes.getPointByPt(alpha).getEnergy()
-
-    idx_a = pyfghutil.PointToIndex(N, alpha)
-    idx_b = pyfghutil.PointToIndex(N, beta)
-
-    deltacounter = True
-    j = 0
-    while (deltacounter and (j < D)):
-        if (idx_a[j] != idx_b[j]):
-            deltacounter = False
-        j = j + 1
-
-    if (deltacounter):
-        return pes.getPointByIdx(idx_a).getEnergy()
-    else:
-        return 0.0
-
-def VBlockCalc(dimensions, NValue, pes, blockX, blockY):
+def VBlockCalc(dimensions, NValue, LValue, pes, blockX, blockY):
     #Blocks will be 0 index
     blockHolder = np.zeros((NValue[0], NValue[0]), float)
     #The 0Start variables will always be 0 at the beginning to act as loop variables that correspond to the blockHolder size
@@ -178,22 +136,43 @@ def VBlockCalc(dimensions, NValue, pes, blockX, blockY):
     beta0start = 0
     for alpha in range(0+NValue[0]*blockX, NValue[0]+NValue[0]*blockX):
         for beta in range(0+NValue[0]*blockY, NValue[0]+NValue[0]*blockY):
-            blockHolder[alpha0start, beta0start] = (Vab(dimensions, NValue, pes, alpha, beta))
+            counter = pyfghutil.AlphaAndBetaToCounter(alpha, beta, dimensions, NValue)
+            if (blockX == 0 and blockY == 10):
+                print(counter)
+            blockHolder[alpha0start, beta0start] = (Vab(dimensions, NValue, LValue, 0, pes, counter))
             beta0start += 1
         alpha0start += 1
         beta0start = 0
     return blockHolder
 
 #The function to calculate a VMatrix using the DataObject class input
-def VMatrixCalc(dimensions, NValue, Vmethod, pes, cores):
+def VMatrixCalc(dataObject):
+    #Establish variables needed
+    NValue = []
+    LValue = []
+    if(int(dataObject.N1) > 0):
+        NValue.append(int(dataObject.N1))
+        LValue.append(float(dataObject.L1))
+    if(int(dataObject.N2) > 0):
+        NValue.append(int(dataObject.N2))
+        LValue.append(float(dataObject.L2))
+    if(int(dataObject.N3) > 0):
+        NValue.append(int(dataObject.N3))
+        LValue.append(float(dataObject.L3))
+
+    dimensions = len(NValue)
+    pes = dataObject.PES
+
+    dimensionCounterArray = np.zeros((dimensions*2,1), int)
+
     #Create the VMatrix
     #The alpha and beta values are used to create the VMatrix in the correct position
-    Npts = np.prod(NValue)
-    vmatrix = lil_matrix((Npts,Npts), dtype=float)
+    vmatrix = np.zeros((np.prod(NValue), np.prod(NValue)), float)
 
     #NBlock Class System
     NBlocks = NBlock(dimensions, NValue)
     NBlocks.difSetup()
+
 
     #Calculate by blocks:
     #Don't optimize for now. Just calculate blocks as needed.
@@ -206,12 +185,19 @@ def VMatrixCalc(dimensions, NValue, Vmethod, pes, cores):
     for x in range(repeatamount):
         for y in range(repeatamount):
             blockCoords.append((x,y))
+
+            if (x == 0 and y == 10):
+                print(pyfghutil.PointToIndex(dimensions, NValue, x))
+                print(pyfghutil.PointToIndex(dimensions, NValue, y))
+
     optBlockCoords = NBlocks.coordGen()
+    print(optBlockCoords)
+    print(len(optBlockCoords))
     for coords in optBlockCoords:
-        paramz.append((dimensions, NValue, pes, coords[0], coords[1]))
+        paramz.append((dimensions, NValue, LValue, pes, coords[0], coords[1]))
 
     #Pool and run
-    p = mp.Pool(cores)
+    p = mp.Pool(dataObject.cores_amount)
     #print("Pool go V")
     blocks = p.starmap(VBlockCalc, paramz)
     #print("Pool's done V")
@@ -230,3 +216,102 @@ def VMatrixCalc(dimensions, NValue, Vmethod, pes, cores):
         vmatrix[(0+NValue[precalc]*x):(NValue[precalc]+NValue[precalc]*x), (0+NValue[precalc]*y):(NValue[precalc]+NValue[precalc]*y)] = NBlocks.readBlock(x,y)
 
     return vmatrix
+
+if __name__ == '__main__':
+    D = 3
+    inp = DataObject.InputData()
+    inp.setN1(11)
+    inp.setN2(11)
+    inp.setN3(11)
+    inp.setL1(1.1)
+    inp.setL2(1.1)
+    inp.setL3(1.65)
+    inp.setequilibrium_file("./testing files/water-equil.csv")
+    inp.setpotential_energy("./testing files/water-potential.csv")
+
+    Nat = 3
+    equil = pyfghutil.Molecule()
+    with open(inp.equilibrium_file, newline='') as csvfile:
+        eqfile = csv.reader(csvfile)
+        A = np.empty(Nat, dtype=int)
+        Z = np.empty(Nat, dtype=int)
+        x = np.empty(Nat, dtype=float)
+        y = np.empty(Nat, dtype=float)
+        z = np.empty(Nat, dtype=float)
+        m = np.empty(Nat, dtype=float)
+        n = 0
+        for row in eqfile:
+            for key, value in pyfghutil.AtomicSymbolLookup.items():
+                if (value == row[0]):
+                    Z[n] = key
+                    break
+            A[n] = int(row[1])
+            x[n] = float(row[2])
+            y[n] = float(row[3])
+            z[n] = float(row[4])
+            nucl = row[0] + "-" + row[1]
+            m[n] = pyfghutil.MassLookup.get(nucl) * 1822.89
+            n = n + 1
+
+    equil.setXList(x)
+    equil.setYList(y)
+    equil.setZList(z)
+    equil.setAtomicNoList(Z)
+    equil.setMassNoList(A)
+    equil.setMassList(m)
+
+    N = np.zeros(D,dtype=int)
+    N[0] = inp.getN1()
+    N[1] = inp.getN2()
+    N[2] = inp.getN3()
+    Npts = np.prod(N)
+
+    pes = pyfghutil.PotentialEnergySurface()
+    pes.setN(N)
+    with open(inp.potential_energy_file, newline='') as csvfile:
+        pesfile = csv.reader(csvfile)
+
+        n = 0
+        for row in pesfile:
+            pespt = pyfghutil.PESpoint()
+            pespt.setN(n)
+
+            q = np.zeros(D, dtype=float)
+            q[0] = float(row[0])
+            q[1] = float(row[1])
+            q[2] = float(row[2])
+            pespt.setQList(q)
+
+            x = np.zeros(Nat, dtype=float)
+            y = np.zeros(Nat, dtype=float)
+            z = np.zeros(Nat, dtype=float)
+
+            x[0] = float(row[3])
+            y[0] = float(row[4])
+            x[1] = float(row[5])
+            y[1] = float(row[6])
+            x[2] = float(row[7])
+            y[2] = float(row[8])
+            pespt.setXList(x)
+            pespt.setYList(y)
+            pespt.setZList(z)
+
+            pespt.setEnergy(float(row[9]))
+
+            pes.appendPESpt(pespt)
+            n = n + 1
+
+    pes.setNpts(n)
+    inp.setPES(pes)
+
+for p in range(pes.getNpts()):
+    print(p)
+    idx = pyfghutil.PointToIndex(D, N, p)
+    print(idx)
+    print(pes.getPointByPt(p).getN())
+    print(pes.getPointByIdx(idx).getN())
+    print(pes.getPointByPt(p).getQList())
+
+
+#    V = VMatrixCalc(inp)
+#    print(V)

@@ -411,7 +411,7 @@ print(t1-t0)
 
 chisq = 0
 for p in range(Npts):
-    idx = pyfghutil.PointToIndex(D,N,p)
+    idx = pyfghutil.PointToIndex(D, N, p)
     for r in range(3):
         for s in range(3):
             chisq = chisq + (G[p][r][s]-Gold[idx[0]][idx[1]][idx[2]][r][s])*(G[p][r][s]-Gold[idx[0]][idx[1]][idx[2]][r][s])

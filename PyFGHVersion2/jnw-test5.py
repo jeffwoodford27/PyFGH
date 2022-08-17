@@ -1,6 +1,5 @@
 import numpy as np
 from util import pyfghutil
-import math
 import multiprocessing as mp
 from scipy.fft import ifft
 
@@ -15,8 +14,8 @@ class FGHMatrixObj:
         return self.mat(pt1,pt2)
 
     def getValueByIdx(self,idx1,idx2):
-        pt1 = pyfghutil.IndexToPoint(self.D,self.N,idx1)
-        pt2 = pyfghutil.IndexToPoint(self.D,self.N,idx2)
+        pt1 = pyfghutil.IndexToPoint(self.D, self.N, idx1)
+        pt2 = pyfghutil.IndexToPoint(self.D, self.N, idx2)
         return self.mat(pt1,pt2)
 
     def setValueByPt(self,pt1,pt2,val):
@@ -24,8 +23,8 @@ class FGHMatrixObj:
         return
 
     def setValueByIdx(self,idx1,idx2,val):
-        pt1 = pyfghutil.IndexToPoint(self.D,self.N,idx1)
-        pt2 = pyfghutil.IndexToPoint(self.D,self.N,idx2)
+        pt1 = pyfghutil.IndexToPoint(self.D, self.N, idx1)
+        pt2 = pyfghutil.IndexToPoint(self.D, self.N, idx2)
         self.mat[pt1,pt2] = val
         return
 

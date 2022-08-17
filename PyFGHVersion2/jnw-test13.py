@@ -4,26 +4,27 @@ from matplotlib import pyplot as plt
 import matplotlib.tri as mtri
 import numpy as np
 import csv
-from scipy.spatial import Delaunay
 from scipy.interpolate import griddata
 
-def PointToIndex(N,pt):
-    return list(np.unravel_index(pt,tuple(N)))
 
-evfile = "output files/Eigenvector-6.csv"
+def PointToIndex(N, pt):
+    return list(np.unravel_index(pt, tuple(N)))
+
+
+evfile = "output files/Eigenvector-9.csv"
 D = 3
-N = np.zeros(D,dtype=int)
+N = np.zeros(D, dtype=int)
 N[0] = N[1] = N[2] = 11
 Npts = np.prod(N)
-L = np.zeros(D,dtype=float)
+L = np.zeros(D, dtype=float)
 L[0] = L[1] = 1.1
 L[2] = 1.65
 
-x = np.zeros(Npts,dtype=float)
-y = np.zeros(Npts,dtype=float)
-z = np.zeros(Npts,dtype=float)
+x = np.zeros(Npts, dtype=float)
+y = np.zeros(Npts, dtype=float)
+z = np.zeros(Npts, dtype=float)
 
-c = np.zeros(Npts,dtype=float)
+c = np.zeros(Npts, dtype=float)
 with open(evfile, newline='') as csvfile:
     ev = csv.reader(csvfile)
     pt = 0
@@ -36,57 +37,60 @@ with open(evfile, newline='') as csvfile:
 
 sum = 0
 for i in range(Npts):
-    sum += c[i]*c[i]
-#print(sum)
+    sum += c[i] * c[i]
+# print(sum)
 
 for i in range(Npts):
-    val = (c[i]*c[i])/sum
-#    c[i] = val
-    c[i] = c[i]*c[i]
+    val = (c[i] * c[i]) / sum
+    #    c[i] = val
+    c[i] = c[i] * c[i]
 
-
-points = np.zeros([Npts,D],dtype=float)
+points = np.zeros([Npts, D], dtype=float)
 for pt in range(Npts):
-    idx = PointToIndex(N,pt)
-    points[pt,0] = idx[0]
-    points[pt,1] = idx[1]
-    points[pt,2] = idx[2]
+    idx = PointToIndex(N, pt)
+    points[pt, 0] = idx[0]
+    points[pt, 1] = idx[1]
+    points[pt, 2] = idx[2]
 
-grid_x,grid_y,grid_z = np.mgrid[0:11:33j,0:11:33j,0:11:33j]
+grid_x, grid_y, grid_z = np.mgrid[0:11:33j, 0:11:33j, 0:11:33j]
 griddata = griddata(points, c, (grid_x, grid_y, grid_z), method='linear')
-#print(griddata.shape)
 
-#print(grid_x[0])
-#print(grid_y[0])
-#print(grid_z[0])
 
-def plot4d(x,y,z,c,N,L):
+# print(griddata.shape)
+
+# print(grid_x[0])
+# print(grid_y[0])
+# print(grid_z[0])
+
+def plot4d(x, y, z, c, N, L):
     fig = plt.figure(figsize=(7, 7))
     ax = fig.add_subplot(projection="3d")
     ax.xaxis.pane.fill = False
     ax.yaxis.pane.fill = False
     ax.zaxis.pane.fill = False
     mask = c > 0.001
-#    idx = np.arange(int(np.prod(data.shape)))
-#    x, y, z = np.unravel_index(idx, data.shape)
-#    print(x[5],y[5],z[5])
-#    print(data.flatten().shape)
-#    print(x.shape,y.shape,z.shape)
-#    pt = PointToIndex(N,[5,5,5])
-#    print(x[pt],y[pt],z[pt],data.flatten()[pt])
-    x = (x+1/2)*L[2]/N[2] - L[2]/2
-    y = (y+1/2)*L[1]/N[1] - L[1]/2
-    z = (z+1/2)*L[0]/N[0] - L[0]/2
+    #    idx = np.arange(int(np.prod(data.shape)))
+    #    x, y, z = np.unravel_index(idx, data.shape)
+    #    print(x[5],y[5],z[5])
+    #    print(data.flatten().shape)
+    #    print(x.shape,y.shape,z.shape)
+    #    pt = PointToIndex(N,[5,5,5])
+    #    print(x[pt],y[pt],z[pt],data.flatten()[pt])
+    x = (x + 1 / 2) * L[2] / N[2] - L[2] / 2
+    y = (y + 1 / 2) * L[1] / N[1] - L[1] / 2
+    z = (z + 1 / 2) * L[0] / N[0] - L[0] / 2
     ax.set_xlabel("q1")
     ax.set_ylabel("q2")
     ax.set_zlabel("q3")
     ax.scatter(z, y, x, c=c, s=10.0 * mask, edgecolor="face", alpha=None, marker="o", linewidth=0)
-#    ax.scatter(x, y, z, c=data.flatten(), edgecolor="face", alpha=None, marker="o", cmap="magma", linewidth=0)
+    #    ax.scatter(x, y, z, c=data.flatten(), edgecolor="face", alpha=None, marker="o", cmap="magma", linewidth=0)
     plt.tight_layout()
     plt.show()
     return
 
-plot4d(grid_x,grid_y,grid_z,griddata,N,L)
+
+plot4d(grid_x, grid_y, grid_z, griddata, N, L)
+
 
 def plot4dorig(data):
     fig = plt.figure(figsize=(5, 5))
@@ -97,10 +101,12 @@ def plot4dorig(data):
     mask = data > 0.01
     idx = np.arange(int(np.prod(data.shape)))
     x, y, z = np.unravel_index(idx, data.shape)
-    ax.scatter(x, y, z, c=data.flatten(), s=10.0 * mask, edgecolor="face", alpha=0.2, marker="o", cmap="magma", linewidth=0)
+    ax.scatter(x, y, z, c=data.flatten(), s=10.0 * mask, edgecolor="face", alpha=0.2, marker="o", cmap="magma",
+               linewidth=0)
     plt.tight_layout()
     plt.show()
     plt.close(fig)
+
 
 '''
 if __name__ == "__main__":

@@ -1,13 +1,13 @@
 # Interface between GUI and Calculation Scripts
 
-import Vmatrix
-import Tmatrix
-import Gmatrix
+import PyFGHVersion2.Vmatrix as Vmatrix
+import PyFGHVersion2.Tmatrix as Tmatrix
+import PyFGHVersion2.Gmatrix as Gmatrix
 import numpy as np
 from scipy import linalg
 from scipy.sparse import linalg as sparse_linalg
-from util.DataObject import OutputData
-from util import pyfghutil
+from PyFGHVersion2.util.DataObject import OutputData as OutputData
+from PyFGHVersion2.util import pyfghutil as pyfghutil
 import time
 
 def eckartTranslation(N,equil,pes):
@@ -17,7 +17,7 @@ def eckartTranslation(N,equil,pes):
     M = np.sum(m)
 
     for p in range(Npts):
-        idx = pyfghutil.PointToIndex(N,p)
+        idx = pyfghutil.PointToIndex(N, p)
         mol = pes.getPointByIdx(idx)
         xcm = ycm = zcm = 0.0
         x = mol.getXList()
@@ -48,7 +48,7 @@ def eckartRotation(N,equil,pes):
     ye = equil.getYList()
     ze = equil.getZList()
     for p in range(Npts):
-        idx = pyfghutil.PointToIndex(N,p)
+        idx = pyfghutil.PointToIndex(N, p)
         mol = pes.getPointByIdx(idx)
         x = mol.getXList()
         y = mol.getYList()

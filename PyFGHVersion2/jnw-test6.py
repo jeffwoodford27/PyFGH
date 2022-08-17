@@ -102,7 +102,7 @@ for n in range(Npts):
                     y[i] = pes.getPointByIdx(idx).getCoord(c)
                     f[c,d,pt] = y[i]
                     dxdqcalc[c,d,pt] = 1
-                idx = pyfghutil.PointToIndex(D,N,n)
+                idx = pyfghutil.PointToIndex(D, N, n)
                 for i in range(D):
                     if (i != d):
                         print("q"+str(i+1)+"="+str(pes.getPointByIdx(idx).getq(i+1)))

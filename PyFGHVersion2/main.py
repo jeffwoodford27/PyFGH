@@ -1,10 +1,12 @@
 import csv
 import os
-import GUI
+import PyFGHVersion2.GUI as GUI
 import numpy as np
-from multiprocessing import Process, Queue, Pool
-import GUItoCalc as GTC
+from multiprocessing import Process, Queue
+import PyFGHVersion2.GUItoCalc as GTC
 import time
+
+import PyFGHVersion2.molecule_gui as molecule_gui
 
 """
 This one uses Queues
@@ -31,16 +33,6 @@ def datamuncher(q):
     print("L3: ", holder1.L3)
     """
 
-    data = [holder1.equilibrium_file, holder1.getN(0), holder1.getL(0), holder1.getN(1),
-            holder1.getL(1), holder1.getN(2), holder1.getL(2)]
-
-    save_path = "./resources/"
-    file_name = "DataList.txt"
-    completeName = os.path.join(save_path, file_name)
-    file = open(completeName, "w", encoding="utf-8")
-    for x in data:
-        file.write('%s\n' % x)
-    file.close()
 
     ReturnObj = GTC.passToCalc(holder1)
     q.put(ReturnObj)
@@ -48,12 +40,23 @@ def datamuncher(q):
     return
 
 # this is the parent process
-def datagrabber():
+def datagrabber(holder=None):
     q = Queue()
     p1 = Process(target=datamuncher, args=(q,))
     p1.start()
     time.sleep(1)
-    holder = GUI.main_window()
+    if holder is None:
+        holder = GUI.main_window()
+    else:
+        def test():
+            try:
+                eq, pes = molecule_gui.molecule_testing(holder)
+                holder.setEquilMolecule(eq)
+                holder.setPES(pes)
+            except:
+                pass
+
+        test()
     print('The interface is started Process: ', os.getpid())
 
     holder.setMessage("This is from the parent")
@@ -72,15 +75,17 @@ def datagrabber():
     L = holder.getLlist()
     Npts = np.prod(N)
 
-    with open("./output files/Eigenvalues.csv", 'w', newline='', encoding='UTF8') as f:
-        writer = csv.writer(f)
-        for i in range(Neig):
-            val = eigvals[wfnorder[i]]-eigvals[wfnorder[0]]
-            writer.writerow([val])
+    # with open("./output files/Eigenvalues.csv", 'w', newline='', encoding='UTF8') as f:
+    #     writer = csv.writer(f)
+    #     for i in range(Neig):
+    #         val = eigvals[wfnorder[i]]-eigvals[wfnorder[0]]
+    #         writer.writerow([val])
 
-    for i in range(1,Neig):
-        val = eigvals[wfnorder[i]]-eigvals[wfnorder[0]]
-        print(val)
+    freq = np.zeros(Neig, dtype=float)
+
+    for i in range(Neig):
+        freq[i] = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
+        print(freq[i])
 
     wfn = np.zeros([Neig, N[0], N[1], N[2]], float)
 
@@ -98,25 +103,24 @@ def datagrabber():
     dq2 = L[1]/float(N[1])
     dq3 = L[2]/float(N[2])
 
-    for p in range(Neig):
-        filename = "./output files/Eigenvector-" + str(p) + ".csv"
-        with open(filename, 'w', newline='',encoding='UTF8') as f:
-            writer = csv.writer(f)
+    # for p in range(Neig):
+    #     filename = "./output files/Eigenvector-" + str(p) + ".csv"
+    #     with open(filename, 'w', newline='',encoding='UTF8') as f:
+    #         writer = csv.writer(f)
+    #
+    #         for n in range(Npts):
+    #             l = np.mod(n, N[2])
+    #             f = int(n / N[2])
+    #             k = np.mod(f, N[1])
+    #             f2 = int(f / N[1])
+    #             j = np.mod(f2, N[0])
+    #
+    #             q1 = dq1 * float(j - int(N[0]/2))
+    #             q2 = dq2 * float(k - int(N[1]/2))
+    #             q3 = dq3 * float(l - int(N[2]/2))
+    #             writer.writerow([q1,q2,q3,wfn[p][j][k][l]])
 
-            for n in range(Npts):
-                l = np.mod(n, N[2])
-                f = int(n / N[2])
-                k = np.mod(f, N[1])
-                f2 = int(f / N[1])
-                j = np.mod(f2, N[0])
-
-                q1 = dq1 * float(j - int(N[0]/2))
-                q2 = dq2 * float(k - int(N[1]/2))
-                q3 = dq3 * float(l - int(N[2]/2))
-                writer.writerow([q1,q2,q3,wfn[p][j][k][l]])
-
-    return
-
+    return wfn, freq
 
 if __name__ == '__main__':
     datagrabber()

@@ -1,19 +1,15 @@
 import multiprocessing
 import os
-import sys
 
 import tkinter
 import tkinter as tk
-from tkinter import ttk, messagebox, NW, END
-from tkinter.filedialog import askopenfilename, askopenfile
-from tkinter.messagebox import showinfo
+from tkinter import ttk, messagebox, NW
+from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
 
-import molecule_gui
-from util import DataObject
-from util import model_objects
+import PyFGHVersion2.molecule_gui as molecule_gui
+from PyFGHVersion2.util import model_objects as model_objects
 import numpy as np
-from tkinter import filedialog as fd
 
 # import jnwtest11 as test11
 # TODO take the Atom class and add it to InputData so Nelson can grab it
@@ -21,12 +17,9 @@ from tkinter import filedialog as fd
 # TODO [List of all of the molecules] made into a equalibrium class.
 # TODO
 
-import csv
-
 # import self
 opened = False
-from util import pyfghutil, DataObject
-import math
+from PyFGHVersion2.util import DataObject as DataObject
 
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
@@ -58,7 +51,6 @@ def main_window():
     window.geometry('910x255')
 
     # Water molecule icon in the top left conner
-    window.iconbitmap(default='icon.ico')
 
     # label text for title
     ttk.Label(window, text="A Python implementation of the Fourier Grid Hamiltonian method.",

@@ -107,6 +107,7 @@ class NBlock:
             else:
                 return(self.difblocks)
 
+'''
 def calcPESfromPsi4(D, N, L, equil, psi4method):
     import psi4
 
@@ -148,7 +149,7 @@ def calcPESfromPsi4(D, N, L, equil, psi4method):
     for i in range(N):
         en[i] = en[i] - en[N // 2]
     return
-
+'''
 
 def Vab(D, N, pes, alpha, beta):
     if (alpha == beta):
@@ -169,30 +170,6 @@ def Vab(D, N, pes, alpha, beta):
     else:
         return 0.0
 
-#A function to calculate the invidivdual values for the VMatrix
-#def Vab_old(d, NValue, LValue, deltax, pes, dimensionCounterArray):
-def Vab_old(d, NValue, LValue, deltax, pes, alpha, beta):
-    idx_a = pyfghutil.PointToIndex(NValue, alpha)
-    idx_b = pyfghutil.PointToIndex(NValue, beta)
-
-    #Deltacounter is used to makes sure that the value being calculated is in the diagonal of the matrix
-    Deltacounter = 0
-    #Total is the value returned for the calculation
-    total = 0.0
-    for Vcounter in range(d):
-        #Add 1 to deltacounter if the corrosponding x and y values for the dimension equals each other
-#        if(dimensionCounterArray[Vcounter*2] == dimensionCounterArray[(Vcounter*2)+1]):
-#            Deltacounter += 1
-        if idx_a[Vcounter] == idx_b[Vcounter]:
-            Deltacounter += 1
-    #If the deltacounter amount equals the amount of dimensions, perform a summation for the formula
-    #Otherwise, the total will remain 0.0
-    if (Deltacounter == d):
-#        total += pes.getPointByN(int(dimensionCounterArray[1]),int(dimensionCounterArray[3]),int(dimensionCounterArray[5])).getEnergy()
-        total += pes.getPointByIdx(idx_a).getEnergy()
-
-    return(total)
-
 def VBlockCalc(dimensions, NValue, pes, blockX, blockY):
     #Blocks will be 0 index
     blockHolder = np.zeros((NValue[0], NValue[0]), float)
@@ -208,24 +185,7 @@ def VBlockCalc(dimensions, NValue, pes, blockX, blockY):
     return blockHolder
 
 #The function to calculate a VMatrix using the DataObject class input
-def VMatrixCalc(dataObject):
-    #Establish variables needed
-    NValue = dataObject.getNlist()
-    dimensions = dataObject.getD()
-
-    Vmethod = dataObject.getVmethod()
-    if (Vmethod == "Read from File"):
-        pes = dataObject.getPES()
-
-    elif (Vmethod == "Harmonic Oscillator"):
-        pes = calcPESfromModel(0)
-
-    elif (Vmethod == "Morse Oscillator"):
-        pes = calcPESfromModel(1)
-
-    elif (Vmethod == "Compute with Psi4"):
-        pes = calcPESfromPsi4(dataObject.getPsi4Method())
-
+def VMatrixCalc(dimensions, NValue, Vmethod, pes, cores):
     #Create the VMatrix
     #The alpha and beta values are used to create the VMatrix in the correct position
     Npts = np.prod(NValue)
@@ -251,7 +211,7 @@ def VMatrixCalc(dataObject):
         paramz.append((dimensions, NValue, pes, coords[0], coords[1]))
 
     #Pool and run
-    p = mp.Pool(dataObject.cores_amount)
+    p = mp.Pool(cores)
     #print("Pool go V")
     blocks = p.starmap(VBlockCalc, paramz)
     #print("Pool's done V")

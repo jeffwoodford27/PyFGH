@@ -1,6 +1,6 @@
 import multiprocessing
 import os
-
+import gc
 import tkinter
 import tkinter as tk
 from tkinter import ttk, messagebox, NW
@@ -242,17 +242,12 @@ def main_window():
         else:
             messagebox.showerror("PyFGH", "The Vales For N Have Already Been Assigned!!!")
 
-
     lbutton = tk.Button(window, text='Get Values', bd='10', bg='gray', fg='white',
                         command=actionN).place(x=425, y=90)
-
-
 
     # Button
     exit = tk.Button(window, text='Exit', bd='10', bg='red', fg='white',
                      command=close_window).place(x=365, y=150)
-
-
 
     # This method clears all of the data in the GUI
     def clear_data():
@@ -268,23 +263,16 @@ def main_window():
     # This method saves the output of the GUI to a text file
     def save_file_prompt():
         window.destroy()
+        gc.collect()
 
 
     global model_prompt
 
-
-
     def test():
         try:
-            print('before save file prompt')
-            save_file_prompt()  # TODO Change this to work for All Dimensions
-            print('this is before molecule testing!!!!!!!')
-
             eq, pes = molecule_gui.molecule_testing(holder)
-            print('after molecule testing')
             holder.setEquilMolecule(eq)
             holder.setPES(pes)
-            print('after setting variables')
         except:
             pass
 
@@ -317,61 +305,6 @@ def main_window():
         holder.setequilibrium_file(x)
         # holder.setvalue_holder(False)
 
-    def model_prompt(potential_model):
-
-        window1 = tk.Tk()
-        style = Style()
-        window1.title('PyFGH Parameters')
-        box_length = 103
-        for q in range(3):
-            box_length = box_length + 33 * potential_model[q].nparam
-        box_len_str = '300x' + str(box_length)
-        window1.geometry(box_len_str)
-
-        qvar = np.empty(3, dtype=list)
-        for i in range(3):
-            qvar[i] = []
-        j = 0
-        y = 5
-
-        for q in range(3):
-            qvar[q] = [0] * potential_model[q].nparam
-
-            for qparam in range(potential_model[q].nparam):
-                ttk.Label(window1, text=potential_model[q].label[qparam] + " for Q" + str(q + 1) + ":",
-                          font=("Times New Roman", 15)).place(x=50, y=y)
-                qvar[q][qparam] = ttk.Entry(window1, font=("Times New Roman", 10))
-                qvar[q][qparam].place(x=140, y=y)
-                j += 1
-                y += 35
-
-        def enter_button():
-            for q in range(3):
-                param_list = []
-                for qparam in range(potential_model[q].nparam):
-                    param_list.append(qvar[q][qparam].get())
-                potential_model[q].set_param(param_list)
-
-            for q in range(3):
-                for qparam in range(potential_model[q].nparam):
-                    print(potential_model[q].param[qparam])
-
-            holder.model_data = potential_model
-            # print(type(potential_model))
-            # print(DataObject.holdData.model_data)
-            window1.destroy()
-            """
-            if SSH_box.get() == 'Yes':
-                SSH_prompt()
-            else:
-                save_file_prompt()
-            """
-
-        enter = tk.Button(window1, text='Enter', bd='20', bg='green', fg='white',
-                          command=enter_button).place(x=110, y=y)
-
-        window1.mainloop()
-
     def output():
 
         try:
@@ -394,44 +327,55 @@ def main_window():
             if calculation2.get() == "Read from File":
                 Read_Structures_Button()
                 test()
+                save_file_prompt()
+            # try:
+            #     if calculation.get() == "Matrix":
+            #         holder.setEigenvalueMethod(True)
+            # except:
+            #     print("error")
+            #     pass
+            # if calculation.get() == "test":
+            #     holder.setEigenvalueMethod(True)
 
-            if calculation2.get() == "Harmonic Oscillator":
-                import inspect
-                holder_model = []
-                import re
-                testing = "Harmonic_Oscillator"
+            # if calculation2.get() == "Harmonic Oscillator":
+            #     import inspect
+            # holder_model = []
+            # import re
+            # testing = "Harmonic_Oscillator"
+            #
+            # for i in range(int(dimensions.get())):
+            #     for key, className in inspect.getmembers(model_objects):
+            #         if testing == key:
+            #             holder_model.append(className())
 
-                for i in range(int(dimensions.get())):
-                    for key, className in inspect.getmembers(model_objects):
-                        if testing == key:
-                            holder_model.append(className())
-
-                print(holder_model)
-                model_prompt(holder_model)
-                test()
-
-            if calculation2.get() == "Morse Oscillator":
-                import inspect
-                holder_model = []
-                import re
-                testing = "Morse_Oscillator"
-
-                for i in range(int(dimensions.get())):
-                    for key, className in inspect.getmembers(model_objects):
-                        if testing == key:
-                            holder_model.append(className())
-
-                print(holder_model)
-                model_prompt(holder_model)
-                test()
+            # print(holder_model)
+            # model_prompt(holder_model)
+            # test()
+            #
+            # if calculation2.get() == "Morse Oscillator":
+            #     import inspect
+            #     holder_model = []
+            #     import re
+            #     testing = "Morse_Oscillator"
+            #
+            #     for i in range(int(dimensions.get())):
+            #         for key, className in inspect.getmembers(model_objects):
+            #             if testing == key:
+            #                 holder_model.append(className())
+            #
+            #     print(holder_model)
+            #     model_prompt(holder_model)
+            #     test()
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")
         except IndexError:  # TODO this is not working properly. After the error restart the interface!
             messagebox.showerror("PyFGH", "Error, Please restart program!!!")
             main_window()
+        except:
+            print("problem")
 
-    # This is the calculate button.
+            # This is the calculate button.
     calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',
                           command=output).place(x=420, y=140)
 

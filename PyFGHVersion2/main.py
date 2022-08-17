@@ -33,94 +33,85 @@ def datamuncher(q):
     print("L3: ", holder1.L3)
     """
 
-
     ReturnObj = GTC.passToCalc(holder1)
     q.put(ReturnObj)
 
-    return
+    #return
 
 # this is the parent process
+class Tcl_AsyncDelete:
+    pass
+
+
 def datagrabber(holder=None):
-    q = Queue()
-    p1 = Process(target=datamuncher, args=(q,))
-    p1.start()
-    time.sleep(1)
-    if holder is None:
-        holder = GUI.main_window()
-    else:
-        def test():
-            try:
-                eq, pes = molecule_gui.molecule_testing(holder)
-                holder.setEquilMolecule(eq)
-                holder.setPES(pes)
-            except:
-                pass
+    try:
 
-        test()
-    print('The interface is started Process: ', os.getpid())
+        q = Queue()
+        p1 = Process(target=datamuncher, args=(q,))
+        p1.start()
+        time.sleep(1)
+        if holder is None:
+            holder = GUI.main_window()
+        else:
+            def test():
+                try:
+                    eq, pes = molecule_gui.molecule_testing(holder)
+                    holder.setEquilMolecule(eq)
+                    holder.setPES(pes)
+                except:
+                    pass
 
-    holder.setMessage("This is from the parent")
-    q.put(holder)
+            test()
 
-    # At this point, insert the data into the handler
+        print('The interface is started Process: ', os.getpid())
 
-    ResultObj = q.get()  # an object of type OutputData
+        holder.setMessage("This is from the parent")
+        q.put(holder)
 
-    eigvals = ResultObj.getEigenvalues()
-    eigvecs = ResultObj.getEigenvectors()
-    Neig = ResultObj.getNumberOfEigenvalues()
+        # At this point, insert the data into the handler
+        ResultObj = q.get()  # an object of type OutputData
 
-    wfnorder = np.argsort(eigvals)
-    N = holder.getNlist()
-    L = holder.getLlist()
-    Npts = np.prod(N)
+        eigvals = ResultObj.getEigenvalues()
+        eigvecs = ResultObj.getEigenvectors()
+        Neig = ResultObj.getNumberOfEigenvalues()
 
-    # with open("./output files/Eigenvalues.csv", 'w', newline='', encoding='UTF8') as f:
-    #     writer = csv.writer(f)
-    #     for i in range(Neig):
-    #         val = eigvals[wfnorder[i]]-eigvals[wfnorder[0]]
-    #         writer.writerow([val])
+        wfnorder = np.argsort(eigvals)
+        N = holder.getNlist()
+        L = holder.getLlist()
+        Npts = np.prod(N)
 
-    freq = np.zeros(Neig, dtype=float)
+        # with open("./output files/Eigenvalues.csv", 'w', newline='', encoding='UTF8') as f:
+        #     writer = csv.writer(f)
+        #     for i in range(Neig):
+        #         val = eigvals[wfnorder[i]]-eigvals[wfnorder[0]]
+        #         writer.writerow([val])
 
-    for i in range(Neig):
-        freq[i] = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
-        print(freq[i])
+        freq = np.zeros(Neig, dtype=float)
 
-    wfn = np.zeros([Neig, N[0], N[1], N[2]], float)
+        for i in range(Neig):
+            freq[i] = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
+            print(freq[i])
 
-    for p in range(Neig):
-        for alpha in range(Npts):
-            l = np.mod(alpha, N[2])
-            f = int(alpha / N[2])
-            k = np.mod(f, N[1])
-            f2 = int(f / N[1])
-            j = np.mod(f2, N[0])
+        wfn = np.zeros([Neig, N[0], N[1], N[2]], float)
 
-            wfn[p][j][k][l] = eigvecs[alpha][wfnorder[p]]
+        for p in range(Neig):
+            for alpha in range(Npts):
+                l = np.mod(alpha, N[2])
+                f = int(alpha / N[2])
+                k = np.mod(f, N[1])
+                f2 = int(f / N[1])
+                j = np.mod(f2, N[0])
 
-    dq1 = L[0]/float(N[0])
-    dq2 = L[1]/float(N[1])
-    dq3 = L[2]/float(N[2])
+                wfn[p][j][k][l] = eigvecs[alpha][wfnorder[p]]
 
-    # for p in range(Neig):
-    #     filename = "./output files/Eigenvector-" + str(p) + ".csv"
-    #     with open(filename, 'w', newline='',encoding='UTF8') as f:
-    #         writer = csv.writer(f)
-    #
-    #         for n in range(Npts):
-    #             l = np.mod(n, N[2])
-    #             f = int(n / N[2])
-    #             k = np.mod(f, N[1])
-    #             f2 = int(f / N[1])
-    #             j = np.mod(f2, N[0])
-    #
-    #             q1 = dq1 * float(j - int(N[0]/2))
-    #             q2 = dq2 * float(k - int(N[1]/2))
-    #             q3 = dq3 * float(l - int(N[2]/2))
-    #             writer.writerow([q1,q2,q3,wfn[p][j][k][l]])
+        return wfn, freq
 
-    return wfn, freq
+    except:
+        print('error with handler!!!!!!!!!!!!!!!!!')
+
+
+
+
 
 if __name__ == '__main__':
     datagrabber()

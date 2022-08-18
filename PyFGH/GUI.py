@@ -7,8 +7,8 @@ from tkinter import ttk, messagebox, NW
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
 
-import PyFGHVersion2.molecule_gui as molecule_gui
-from PyFGHVersion2.util import model_objects as model_objects
+import PyFGH.molecule_gui as molecule_gui
+from PyFGH.util import model_objects as model_objects
 import numpy as np
 
 # import jnwtest11 as test11
@@ -19,7 +19,7 @@ import numpy as np
 
 # import self
 opened = False
-from PyFGHVersion2.util import DataObject as DataObject
+from PyFGH.util import DataObject as DataObject
 
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
@@ -252,13 +252,6 @@ def main_window():
     # This method clears all of the data in the GUI
     def clear_data():
         cores.set('')
-
-        # N1.delete(0, END)
-        # L1.delete(0, END)
-        # N2.delete(0, END)
-        # L2.delete(0, END)
-        # N3.delete(0, END)
-        # L3.delete(0, END)
 
     # This method saves the output of the GUI to a text file
     def save_file_prompt():

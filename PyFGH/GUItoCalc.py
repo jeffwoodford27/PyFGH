@@ -1,13 +1,13 @@
 # Interface between GUI and Calculation Scripts
 
-import PyFGHVersion2.Vmatrix as Vmatrix
-import PyFGHVersion2.Tmatrix as Tmatrix
-import PyFGHVersion2.Gmatrix as Gmatrix
+import PyFGH.Vmatrix as Vmatrix
+import PyFGH.Tmatrix as Tmatrix
+import PyFGH.Gmatrix as Gmatrix
 import numpy as np
 from scipy import linalg
 from scipy.sparse import linalg as sparse_linalg
-from PyFGHVersion2.util.DataObject import OutputData as OutputData
-from PyFGHVersion2.util import pyfghutil as pyfghutil
+from PyFGH.util.DataObject import OutputData as OutputData
+from PyFGH.util import pyfghutil as pyfghutil
 import time
 try:
 

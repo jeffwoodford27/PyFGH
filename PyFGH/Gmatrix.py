@@ -1,7 +1,7 @@
 import scipy
 from scipy import interpolate
 import numpy as np
-from PyFGHVersion2.util import pyfghutil
+from PyFGH.util import pyfghutil
 
 def compute_derivative (x, y):
     spl = scipy.interpolate.splrep(x,y,s=0)

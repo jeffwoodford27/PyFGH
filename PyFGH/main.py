@@ -78,6 +78,7 @@ def datagrabber(holder=None):
     Neig = ResultObj.getNumberOfEigenvalues()
 
     wfnorder = np.argsort(eigvals)
+    D = holder.getD()
     N = holder.getNlist()
     L = holder.getLlist()
     Npts = np.prod(N)
@@ -126,7 +127,7 @@ def datagrabber(holder=None):
                     idx = pyfghutil.PointToIndex(N,pt)
                     row = []
                     for d in range(D):
-                        row.append(q[idx[d])
+                        row.append(q[idx[d]])
                     row.append(wfn[p][pt])
                     writer.writerow(row)
 

@@ -5,6 +5,7 @@ import numpy as np
 from multiprocessing import Process, Queue
 import PyFGH.GUItoCalc as GTC
 import time
+import PyFGH.util.pyfghutil as pyfghutil
 
 import PyFGH.molecule_gui as molecule_gui
 
@@ -101,24 +102,17 @@ def datagrabber(holder=None):
         freq[i] = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
         print(freq[i])
 
-    wfn = np.zeros([Neig, N[0], N[1], N[2]], float)
+    wfn = np.zeros([Neig, Npts], dtype=float)
 
     for p in range(Neig):
         for alpha in range(Npts):
-            l = np.mod(alpha, N[2])
-            f = int(alpha / N[2])
-            k = np.mod(f, N[1])
-            f2 = int(f / N[1])
-            j = np.mod(f2, N[0])
-
-            wfn[p][j][k][l] = eigvecs[alpha][wfnorder[p]]
-
-    dq1 = L[0] / float(N[0])
-    dq2 = L[1] / float(N[1])
-    dq3 = L[2] / float(N[2])
+            wfn[p][alpha] = eigvecs[alpha][wfnorder[p]]
 
     #filename = "./output files/Eigenvector-" + str(p) + ".csv"
 
+    q = np.zeros(D,dtype=float)
+    for i in range(D):
+        q[i] = (L[i]/N[i])*(i-N[i]//2)
 
     for p in range(Neig):
         file = Path(__file__).parent / "./output files/Eigenvector-"
@@ -128,17 +122,13 @@ def datagrabber(holder=None):
             with open(f.name, 'w', newline='', encoding='UTF8') as f:
                 writer = csv.writer(f)
 
-                for n in range(Npts):
-                    l = np.mod(n, N[2])
-                    f = int(n / N[2])
-                    k = np.mod(f, N[1])
-                    f2 = int(f / N[1])
-                    j = np.mod(f2, N[0])
-
-                    q1 = dq1 * float(j - int(N[0] / 2))
-                    q2 = dq2 * float(k - int(N[1] / 2))
-                    q3 = dq3 * float(l - int(N[2] / 2))
-                    writer.writerow([q1, q2, q3, wfn[p][j][k][l]])
+                for pt in range(Npts):
+                    idx = pyfghutil.PointToIndex(N,pt)
+                    row = []
+                    for d in range(D):
+                        row.append(q[idx[d])
+                    row.append(wfn[p][pt])
+                    writer.writerow(row)
 
 
 

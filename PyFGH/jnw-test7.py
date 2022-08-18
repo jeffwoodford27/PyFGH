@@ -124,8 +124,8 @@ inp.setN3(11)
 inp.setL1(1.1)
 inp.setL2(1.1)
 inp.setL3(1.65)
-inp.setequilibrium_file("./testing files/water-equil.csv")
-inp.setpotential_energy("./testing files/water-potential.csv")
+inp.setequilibrium_file("./testingfiles/water-equil.csv")
+inp.setpotential_energy("./testingfiles/water-potential.csv")
 
 Nat = 3
 equil = pyfghutil.Molecule()

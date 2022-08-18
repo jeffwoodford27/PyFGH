@@ -11,7 +11,7 @@ def PointToIndex(N, pt):
     return list(np.unravel_index(pt, tuple(N)))
 
 
-evfile = "output files/Eigenvector-9.csv"
+evfile = "outputfiles/Eigenvector-9.csv"
 D = 3
 N = np.zeros(D, dtype=int)
 N[0] = N[1] = N[2] = 11

@@ -299,8 +299,8 @@ N[1] = 11
 N[2] = 11
 inp.setNlist(N)
 inp.setLlist([1.1,1.1,1.65])
-inp.setequilibrium_file("./testing files/water-equil.csv")
-inp.setpotential_energy("./testing files/water-potential.csv")
+inp.setequilibrium_file("./testingfiles/water-equil.csv")
+inp.setpotential_energy("./testingfiles/water-potential.csv")
 
 Nat = 3
 equil = pyfghutil.Molecule()

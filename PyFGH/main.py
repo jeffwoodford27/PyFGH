@@ -81,17 +81,22 @@ def datagrabber(holder=None):
     L = holder.getLlist()
     Npts = np.prod(N)
 
-    from pathlib import Path
 
-    filepath = Path(__file__).parent / "./output files/Eigenvalues.csv"
 
-    with open(filepath, "r") as f:
-        with open(f.name, 'w',
-                  newline='', encoding='UTF8') as f:
-            writer = csv.writer(f)
-            for i in range(Neig):
-                val = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
-                writer.writerow([val])
+    try:
+        from pathlib import Path
+
+        filepath = Path(__file__).parent / "./outputfiles/Eigenvalues.csv"
+
+        with open(filepath, "r") as f:
+            with open(f.name, 'w',
+                      newline='', encoding='UTF8') as f:
+                writer = csv.writer(f)
+                for i in range(Neig):
+                    val = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
+                    writer.writerow([val])
+    except:
+        pass
 
 
 
@@ -117,28 +122,31 @@ def datagrabber(holder=None):
     dq2 = L[1] / float(N[1])
     dq3 = L[2] / float(N[2])
 
-    #filename = "./output files/Eigenvector-" + str(p) + ".csv"
+    #filename = "./outputfiles/Eigenvector-" + str(p) + ".csv"
 
+    try:
+        from pathlib import Path
+        for p in range(Neig):
+            file = Path(__file__).parent / "./outputfiles/Eigenvector-"
+            filepath = str(file) + str(p) + ".csv"
 
-    for p in range(Neig):
-        file = Path(__file__).parent / "./output files/Eigenvector-"
-        filepath = str(file) + str(p) + ".csv"
+            with open(filepath, "r") as f:
+                with open(f.name, 'w', newline='', encoding='UTF8') as f:
+                    writer = csv.writer(f)
 
-        with open(filepath, "r") as f:
-            with open(f.name, 'w', newline='', encoding='UTF8') as f:
-                writer = csv.writer(f)
+                    for n in range(Npts):
+                        l = np.mod(n, N[2])
+                        f = int(n / N[2])
+                        k = np.mod(f, N[1])
+                        f2 = int(f / N[1])
+                        j = np.mod(f2, N[0])
 
-                for n in range(Npts):
-                    l = np.mod(n, N[2])
-                    f = int(n / N[2])
-                    k = np.mod(f, N[1])
-                    f2 = int(f / N[1])
-                    j = np.mod(f2, N[0])
-
-                    q1 = dq1 * float(j - int(N[0] / 2))
-                    q2 = dq2 * float(k - int(N[1] / 2))
-                    q3 = dq3 * float(l - int(N[2] / 2))
-                    writer.writerow([q1, q2, q3, wfn[p][j][k][l]])
+                        q1 = dq1 * float(j - int(N[0] / 2))
+                        q2 = dq2 * float(k - int(N[1] / 2))
+                        q3 = dq3 * float(l - int(N[2] / 2))
+                        writer.writerow([q1, q2, q3, wfn[p][j][k][l]])
+    except:
+        pass
 
 
 

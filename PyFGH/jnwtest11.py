@@ -519,9 +519,9 @@ holder = DataObject.InputData()
 holder.setD(D)
 holder.setNlist(N)
 holder.setLlist(L)
-eqfile = "./testing files/water-equil.csv"
+eqfile = "./testingfiles/water-equil.csv"
 holder.setequilibrium_file(eqfile)
-pesfile = "./testing files/water-potential.csv"
+pesfile = "./testingfiles/water-potential.csv"
 holder.setpotential_energy(pesfile)
 
 molecule_testing_v2(holder)

@@ -1,6 +1,6 @@
 import csv
 import numpy as np
-from PyFGHVersion2.util import pyfghutil as pyfghutil
+from PyFGH.util import pyfghutil as pyfghutil
 
 try:
 

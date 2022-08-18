@@ -1,6 +1,6 @@
 #Import the needed modules
 import numpy as np
-from PyFGHVersion2.util import pyfghutil as pyfghutil
+from PyFGH.util import pyfghutil as pyfghutil
 import multiprocessing as mp
 from scipy.sparse import lil_matrix
 

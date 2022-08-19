@@ -35,6 +35,7 @@ This is the main method.
 def main_window():
     holder = DataObject.InputData()
 
+    # this closes the gui and terminates the program
     def close_window():
         global running
         running = False
@@ -133,114 +134,136 @@ def main_window():
     def clearLdimensions():
         holder.setLlist(None)
 
+    # This gets the N and L values and builds the GUI based on the Dimensions
+
+    # This method saves the output of the GUI to a text file
+    def save_file_prompt():
+        window.destroy()
+        gc.collect()
+
+    # This method clears all of the data in the GUI
+    def clear_data():
+        cores.set('')
+        dimensions.set('')
+        eigenvalues.set('')
+        calculation.set('')
+        calculation2.set('')
+        holder.setNlist(None)
+        holder.setLlist(None)
+        holder.setequilibrium_file(None)
+        holder.setpotential_energy(None)
+        gc.collect()
+
     def actionN():
-
-        global isopenedN
-        if holder.getNlist() == None and holder.getLlist() == None:
-            window = tk.Tk()
-            x = int(dimensions.get())
-            holder.setD(x)
-
-            style = Style()
-            window.title('PyFGH')
-            box_len_str = '300x' + str((x * 95 + 70))
-            window.geometry(box_len_str)
-            # window.geometry('300x450')
-            # Label
-
-            x1 = [None] * x
-
-            x2 = [None] * x
-
-            fireflies = 0
-
-            for number in range(x):
-                ttk.Label(window, text="Values:", font=("Times New Roman", 15)).place(x=60, y=10)
-                d = tk.StringVar()
-                N1text = ttk.Combobox(window, width=15, textvariable=d)
-
-                x1[number] = ttk.Entry(window, font=("Times New Roman", 10))
-                c = tk.StringVar()
-                N1box = ttk.Combobox(window, textvariable=c)
-
-                ttk.Label(window, text=("N") + str(number + 1) + ":", font=("Times New Roman", 15)).place(x=60, y=(
-                        40 + fireflies))
-                d = tk.StringVar()
-                N1text = ttk.Combobox(window, width=15, textvariable=d)
-
-                x1[number].place(x=100, y=(40 + fireflies), width=100)
-                fireflies += 40
-
-            for number in range(x):
-                ttk.Label(window, text="", font=("Times New Roman", 15)).place(x=60, y=10)
-                d = tk.StringVar()
-                N1text = ttk.Combobox(window, width=15, textvariable=d)
-
-                x2[number] = ttk.Entry(window, font=("Times New Roman", 10))
-                c = tk.StringVar()
-                N1box = ttk.Combobox(window, textvariable=c)
-
-                ttk.Label(window, text=("L") + str(number + 1) + ":", font=("Times New Roman", 15)).place(x=60, y=(
-                        40 + fireflies))
-                d = tk.StringVar()
-                N1text = ttk.Combobox(window, width=15, textvariable=d)
-
-                x2[number].place(x=100, y=(40 + fireflies), width=100)
-                fireflies += 40
-
-            # Make a section for N and L.
-            # If it is 3 dimension there must be 3 boxes for N and 3 boxs for L so a total of 6.
-
-            def enter_button():
+        try:
+            global isopenedN
+            if holder.getNlist() == None and holder.getLlist() == None:
+                window2 = tk.Tk()
                 x = int(dimensions.get())
-                valuesN = []
-                valuesL = []
-                try:
-                    for y in range(x):
-                        valuesN.append(int(x1[y].get()))
+                holder.setD(x)
 
-                    for i in range(x):
-                        valuesL.append(float(x2[i].get()))
-                except ValueError:
-                    messagebox.showerror("PyFGH", "Must include only number values!!!")
-                    holder.setNlist(None)
-                    holder.setLlist(None)
-                    actionN()
+                style = Style()
+                window2.title('PyFGH')
+                box_len_str = '300x' + str((x * 95 + 70))
+                window2.geometry(box_len_str)
+                # window.geometry('300x450')
+                # Label
 
-                window.destroy()
+                x1 = [None] * x
 
-                holder.setNlist(valuesN)
-                holder.setLlist(valuesL)
+                x2 = [None] * x
 
-                print(holder.getNlist())
-                print(holder.getLlist())
-                print(holder.getD())
+                fireflies = 0
 
-                for x in holder.getNlist():
-                    if x % 2 == 0 or x < 5:
-                        messagebox.showerror("PyFGH", "N must be odd, positive integer greater to or equal to 5!!!")
+                for number in range(x):
+                    ttk.Label(window2, text="Values:", font=("Times New Roman", 15)).place(x=60, y=10)
+                    d = tk.StringVar()
+                    N1text = ttk.Combobox(window2, width=15, textvariable=d)
+
+                    x1[number] = ttk.Entry(window2, font=("Times New Roman", 10))
+                    c = tk.StringVar()
+                    N1box = ttk.Combobox(window2, textvariable=c)
+
+                    ttk.Label(window2, text=("N") + str(number + 1) + ":", font=("Times New Roman", 15)).place(x=60, y=(
+                            40 + fireflies))
+                    d = tk.StringVar()
+                    N1text = ttk.Combobox(window2, width=15, textvariable=d)
+
+                    x1[number].place(x=100, y=(40 + fireflies), width=100)
+                    fireflies += 40
+
+                for number in range(x):
+                    ttk.Label(window2, text="", font=("Times New Roman", 15)).place(x=60, y=10)
+                    d = tk.StringVar()
+                    N1text = ttk.Combobox(window2, width=15, textvariable=d)
+
+                    x2[number] = ttk.Entry(window2, font=("Times New Roman", 10))
+                    c = tk.StringVar()
+                    N1box = ttk.Combobox(window2, textvariable=c)
+
+                    ttk.Label(window2, text=("L") + str(number + 1) + ":", font=("Times New Roman", 15)).place(x=60, y=(
+                            40 + fireflies))
+                    d = tk.StringVar()
+                    N1text = ttk.Combobox(window2, width=15, textvariable=d)
+
+                    x2[number].place(x=100, y=(40 + fireflies), width=100)
+                    fireflies += 40
+
+
+                def enter_button():
+                    x = int(dimensions.get())
+                    valuesN = []
+                    valuesL = []
+                    try:
+                        for y in range(x):
+                            valuesN.append(int(x1[y].get()))
+
+                        for i in range(x):
+                            valuesL.append(float(x2[i].get()))
+                    except ValueError:
+                        messagebox.showerror("PyFGH", "Must include only number values!!!")
                         holder.setNlist(None)
                         holder.setLlist(None)
+                        gc.collect()
                         actionN()
 
-                if holder.getLlist() != None:
-                    for x in holder.getLlist():
-                        if x < 0:
-                            messagebox.showerror("PyFGH", "L must be positive!!!")
-                            holder.setNlist(None)
-                            holder.setLlist(None)
-                            actionN()
-                # for x in holder.getLlist():
-                #     if int(x) < 0:
-                #         messagebox.showerror("PyFGH", "L must be positive!!!")
-                #         clearLdimensions()
+                    window2.destroy()
 
-            yvalue = int(dimensions.get())
-            enter = tk.Button(window, text='Enter', bd='20', bg='green', fg='white',
-                              command=enter_button).place(x=110, y=(yvalue * 85 + 20))
+                    holder.setNlist(valuesN)
+                    holder.setLlist(valuesL)
 
-        else:
-            messagebox.showerror("PyFGH", "The Vales For N Have Already Been Assigned!!!")
+                    print(holder.getNlist())
+                    print(holder.getLlist())
+                    print(holder.getD())
+
+                    for x in holder.getNlist():
+                        if x % 2 == 0 or x < 5:
+                            messagebox.showerror("PyFGH", "N must be odd, positive integer greater to or equal to 5!!!")
+                            clearNdimensions()
+
+                    if holder.getLlist() is not None:
+                        for x in holder.getLlist():
+                            if x < 0:
+                                messagebox.showerror("PyFGH", "L must be positive!!!")
+                                clearLdimensions()
+                    # for x in holder.getLlist():
+                    #     if int(x) < 0:
+                    #         messagebox.showerror("PyFGH", "L must be positive!!!")
+                    #         clearLdimensions()
+
+                yvalue = int(dimensions.get())
+                enter = tk.Button(window2, text='Enter', bd='20', bg='green', fg='white',
+                                  command=enter_button).place(x=110, y=(yvalue * 85 + 20))
+
+            else:
+                messagebox.showerror("PyFGH", "The Vales For N Have Already Been Assigned!!!")
+        except ValueError:
+            messagebox.showerror("PyFGH", "Error, Please Select The Dimensions First!!!")
+            window2.destroy()
+            window.destroy()
+            gc.collect()
+            main_window()
+
 
     lbutton = tk.Button(window, text='Get Values', bd='10', bg='gray', fg='white',
                         command=actionN).place(x=425, y=90)
@@ -249,17 +272,7 @@ def main_window():
     exit = tk.Button(window, text='Exit', bd='10', bg='red', fg='white',
                      command=close_window).place(x=365, y=150)
 
-    # This method clears all of the data in the GUI
-    def clear_data():
-        cores.set('')
 
-    # This method saves the output of the GUI to a text file
-    def save_file_prompt():
-        window.destroy()
-        gc.collect()
-
-
-    global model_prompt
 
     def test():
         try:
@@ -321,44 +334,6 @@ def main_window():
                 Read_Structures_Button()
                 test()
                 save_file_prompt()
-            # try:
-            #     if calculation.get() == "Matrix":
-            #         holder.setEigenvalueMethod(True)
-            # except:
-            #     print("error")
-            #     pass
-            # if calculation.get() == "test":
-            #     holder.setEigenvalueMethod(True)
-
-            # if calculation2.get() == "Harmonic Oscillator":
-            #     import inspect
-            # holder_model = []
-            # import re
-            # testing = "Harmonic_Oscillator"
-            #
-            # for i in range(int(dimensions.get())):
-            #     for key, className in inspect.getmembers(model_objects):
-            #         if testing == key:
-            #             holder_model.append(className())
-
-            # print(holder_model)
-            # model_prompt(holder_model)
-            # test()
-            #
-            # if calculation2.get() == "Morse Oscillator":
-            #     import inspect
-            #     holder_model = []
-            #     import re
-            #     testing = "Morse_Oscillator"
-            #
-            #     for i in range(int(dimensions.get())):
-            #         for key, className in inspect.getmembers(model_objects):
-            #             if testing == key:
-            #                 holder_model.append(className())
-            #
-            #     print(holder_model)
-            #     model_prompt(holder_model)
-            #     test()
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")
@@ -412,56 +387,6 @@ def main_window():
 
     help = tk.Button(window, text='Help', bd='10', bg='#F9BB46', fg='white',
                      command=help_window).place(x=303, y=150)
-
-    # This method here displays the T equations.
-    def t0():
-        window = tk.Toplevel()
-        window.title("T Equations")
-        window.geometry("500x650")
-        canvas = tkinter.Canvas(window, width=500, height=650)
-        canvas.pack()
-
-        x = ttk.Label(window, text="None: ", font=("Times New Roman", 15), background='green',
-                      foreground="white")
-        x.pack()
-        x.place(x=215, y=0)
-
-        img = tkinter.PhotoImage(file="t0.png")
-        canvas.create_image(30, 30, anchor=NW, image=img)
-
-        x2 = ttk.Label(window, text="Approximation 1: ", font=("Times New Roman", 15), background='green',
-                       foreground="white")
-        x2.pack()
-        x2.place(x=175, y=135)
-
-        img1 = tkinter.PhotoImage(file="t1.png")
-        canvas.create_image(100, 165, anchor=NW, image=img1)
-
-        x3 = ttk.Label(window, text="Approximation 2: ", font=("Times New Roman", 15), background='green',
-                       foreground="white")
-        x3.pack()
-        x3.place(x=175, y=255)
-
-        img2 = tkinter.PhotoImage(file="t2.png")
-        canvas.create_image(250, 330, image=img2)
-
-        x4 = ttk.Label(window, text="Approximation 3: ", font=("Times New Roman", 15), background='green',
-                       foreground="white")
-        x4.pack()
-        x4.place(x=175, y=380)
-
-        img3 = tkinter.PhotoImage(file="t3.png")
-        canvas.create_image(250, 460, image=img3)
-
-        x5 = ttk.Label(window, text="Approximation 4: ", font=("Times New Roman", 15), background='green',
-                       foreground="white")
-        x5.pack()
-        x5.place(x=175, y=512)
-
-        img4 = tkinter.PhotoImage(file="t4.png")
-        canvas.create_image(250, 585, image=img4)
-
-        window.mainloop()
 
     """
     This is a validation checker for the Read Structures button. You can not read in values and also try to run the 

@@ -112,7 +112,6 @@ def main_window():
         gc.collect()
 
     # This method clears all of the data in the GUI+
-    # TODO clear everything in holder
     def clear_data():
         cores.set('')
         dimensions.set('')

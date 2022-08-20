@@ -158,13 +158,13 @@ def calcPESfromPsi4(D, N, equil, pes, cores, psi4method):
             raise Exception("Unknown/unsupported method " + psi4method + " or other Psi4 error.")
 
         for pt in range(Npts):
-            mol = pes.getPointByPt[pt].getMolecule()
+            mol = pes.getPointByPt(pt).getMolecule()
             z = mol.getZList()
             psimol = psi4.geometry(mol_geom.format(q=Q, mult=Mult,
                                                    s1=S[0], x1=0, y1=0, z1=z[0],
                                                    s2=S[1], x2=0, y2=0, z2=z[1]))
 
-            paramz.append((psi4method,psimol))
+            paramz.append((psi4method, psimol))
 
     elif (D == 3):
         mol_geom = """
@@ -185,23 +185,24 @@ def calcPESfromPsi4(D, N, equil, pes, cores, psi4method):
             raise Exception("Unknown/unsupported method " + psi4method + " or other Psi4 error.")
 
         for pt in range(Npts):
-            mol = pes.getPointByPt[pt].getMolecule()
+            mol = pes.getPointByPt(pt).getMolecule()
             x = mol.getXList()
             y = mol.getYList()
             psimol = psi4.geometry(mol_geom.format(q=Q, mult=Mult,
                                                    s1=S[0], x1=x[0], y1=y[0], z1=0,
                                                    s2=S[1], x2=x[1], y2=y[1], z2=0,
                                                    s3=S[2], x3=x[2], y3=y[2], z3=0))
-            paramz.append((psi4method,psimol))
 
-        else:
-            raise ("Invalid call to Psi4 driver")
+            paramz.append((psi4method, psimol))
+
+    else:
+        raise ("Invalid call to Psi4 driver")
 
     p = mp.Pool(cores)
-    en = p.starmap(calcPsi4Energy,paramz)
+    en = p.starmap(calcPsi4Energy, paramz)
     p.close()
     for pt in range(Npts):
-        pes.getPointByPt[pt].setEnergy(en[pt] - emin)
+        pes.getPointByPt(pt).setEnergy(en[pt] - emin)
 
     return
 

@@ -1,8 +1,11 @@
 # Import the needed modules
-import numpy as np
-from PyFGH.util import pyfghutil as pyfghutil
 import multiprocessing as mp
+
+import numpy as np
 from scipy.sparse import lil_matrix
+
+from PyFGH.util import pyfghutil as pyfghutil
+
 try:
     import psi4
 except:
@@ -249,7 +252,8 @@ def VMatrixCalc(dimensions, NValue, Vmethod, equil, pes, psi4method, cores):
     Npts = np.prod(NValue)
     vmatrix = lil_matrix((Npts, Npts), dtype=float)
 
-    if (Vmethod == "Calculate with Psi4"):
+    if Vmethod == "Compute With Psi4":
+        print("Computing With Psi4")
         calcPESfromPsi4(dimensions, NValue, equil, pes, psi4method, cores)
 
     # NBlock Class System

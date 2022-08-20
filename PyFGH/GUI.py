@@ -6,31 +6,17 @@ import tkinter as tk
 from tkinter import ttk, messagebox, NW
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
-
 import PyFGH.molecule_gui as molecule_gui
-from PyFGH.util import model_objects as model_objects
 from PyFGH.util.pyfghutil import ValidationError as ValidationError
-import numpy as np
-
-# import jnwtest11 as test11
-# TODO take the Atom class and add it to InputData so Nelson can grab it
-# TODO 3 Atom class. Have a list of the three members of the atom class. [Atom1, Atom2, Atom3]
-# TODO [List of all of the molecules] made into a equalibrium class.
-# TODO
-
-# import self
-opened = False
 from PyFGH.util import DataObject as DataObject
 
 """
 The code in this file is for a gui (graphic user interface) application. This code is written with the tkinter library framework.
 Author: Josiah Randleman
-© Copyright 2021, Josiah Randleman, All rights reserved. jrandl516@gmail.com
 """
 
-"""
-This is the main method. 
-"""
+opened = False
+
 
 
 def main_window():
@@ -51,7 +37,7 @@ def main_window():
     style = Style()
     window.title('PyFGH')
     window.geometry('910x255')
-
+    from pathlib import Path
     # Water molecule icon in the top left conner
 
     # label text for title
@@ -73,8 +59,8 @@ def main_window():
     cores = ttk.Combobox(window, values=cores, width=10, textvariable=n)
 
     # definition for calculating core counts.
-    # Label
 
+    # Label to get the dimensions
     ttk.Label(window, text="Dimensions:", font=("Times New Roman", 15)).place(x=25, y=47)
     d = tk.StringVar()
     N1text = ttk.Combobox(window, width=15, textvariable=d)
@@ -84,6 +70,7 @@ def main_window():
     n10 = tk.StringVar()
     dimensions = ttk.Combobox(window, values=dimensions, width=10, textvariable=n10)
 
+    # Label to get the number of eigenvalues
     ttk.Label(window, text="Number of Eigenvalues:", font=("Times New Roman", 12)).place(x=620, y=47)
     d1 = tk.StringVar()
     N1text = ttk.Combobox(window, width=10, textvariable=d1)
@@ -93,6 +80,7 @@ def main_window():
     n11 = tk.StringVar()
     eigenvalues = ttk.Combobox(window, values=eigenvalues, width=10, textvariable=n11)
 
+    # Label to get the eigenvalue calculation method
     ttk.Label(window, text="Eigenvalue Calculation Method:", font=("Times New Roman", 10)).place(x=22, y=100)
     d1 = tk.StringVar()
     N1text = ttk.Combobox(window, width=10, textvariable=d1)
@@ -102,6 +90,7 @@ def main_window():
     n12 = tk.StringVar()
     calculation = ttk.Combobox(window, values=calculation, width=10, textvariable=n12)
 
+    # Label to get the potential energy calculation method
     ttk.Label(window, text="Potential Energy Calculation Method:", font=("Times New Roman", 8)).place(x=600, y=100)
     d1 = tk.StringVar()
     N1text = ttk.Combobox(window, width=12, textvariable=d1)
@@ -111,38 +100,19 @@ def main_window():
     n15 = tk.StringVar()
     calculation2 = ttk.Combobox(window, values=calculation2, width=16, textvariable=n15)
 
-    # Entry
-    N10 = ttk.Entry(window, font=("Times New Roman", 10))
-    c10 = tk.StringVar()
-    N10box = ttk.Combobox(window, textvariable=c10)
-
-    # Entry
-    N12 = ttk.Entry(window, font=("Times New Roman", 10))
-    c12 = tk.StringVar()
-    N120box = ttk.Combobox(window, textvariable=c12)
-    global isopenedN
-    global isopenedL
-    global holderN
-    global holderL
-    holderN = 0
-    holderL = 0
-    isopenedN = holderN
-    isopenedL = holderL
-
     def clearNdimensions():
         holder.setNlist(None)
 
     def clearLdimensions():
         holder.setLlist(None)
 
-    # This gets the N and L values and builds the GUI based on the Dimensions
-
-    # This method saves the output of the GUI to a text file
-    def save_file_prompt():
+    # This method exits the program and then it clears unneeded memory
+    def exit():
         window.destroy()
         gc.collect()
 
-    # This method clears all of the data in the GUI
+    # This method clears all of the data in the GUI+
+    # TODO clear everything in holder
     def clear_data():
         cores.set('')
         dimensions.set('')
@@ -155,9 +125,9 @@ def main_window():
         holder.setpotential_energy(None)
         gc.collect()
 
+    # This gets the N and L values and builds the GUI based on the Dimensions
     def actionN():
         try:
-            global isopenedN
             if holder.getNlist() == None and holder.getLlist() == None:
                 window2 = tk.Tk()
                 x = int(dimensions.get())
@@ -210,7 +180,6 @@ def main_window():
                     x2[number].place(x=100, y=(40 + fireflies), width=100)
                     fireflies += 40
 
-
                 def enter_button():
                     x = int(dimensions.get())
                     valuesN = []
@@ -247,10 +216,6 @@ def main_window():
                             if x < 0:
                                 messagebox.showerror("PyFGH", "L must be positive!!!")
                                 clearLdimensions()
-                    # for x in holder.getLlist():
-                    #     if int(x) < 0:
-                    #         messagebox.showerror("PyFGH", "L must be positive!!!")
-                    #         clearLdimensions()
 
                 yvalue = int(dimensions.get())
                 enter = tk.Button(window2, text='Enter', bd='20', bg='green', fg='white',
@@ -265,21 +230,21 @@ def main_window():
             gc.collect()
             main_window()
 
-
+    # Label get values
     lbutton = tk.Button(window, text='Get Values', bd='10', bg='gray', fg='white',
                         command=actionN).place(x=425, y=90)
 
-    # Button
+    # Label Exit window
     exit = tk.Button(window, text='Exit', bd='10', bg='red', fg='white',
                      command=close_window).place(x=365, y=150)
 
-
-
+    # Sends holder to validation file
     def test():
-         eq, pes = molecule_gui.molecule_testing(holder)
-         holder.setEquilMolecule(eq)
-         holder.setPES(pes)
+        eq, pes = molecule_gui.molecule_testing(holder)
+        holder.setEquilMolecule(eq)
+        holder.setPES(pes)
 
+    # opens file explorer to have the user to enter file
     def Read_Structures_Button():
         global opened
         """
@@ -288,12 +253,11 @@ def main_window():
             time just only use a CSV file format!!!!!!!!!! Excel has the ability to save it to CSV format. To find out 
             how to save it to that format, just google it. This is the end of my rant. Happy Coding!
         """
-        y = askopenfilename()
-        #        DataObject.test.equilibrium_file = x
-        #        DataObject.test.potential_energy_file = y
-        holder.setpotential_energy(y)
-        # holder.setvalue_holder(False)
 
+        y = askopenfilename(title='File Explorer for Potential Energy')
+        holder.setpotential_energy(y)
+
+    # opens file explorer to have the user to enter file
     def Read_Structures_Button2():
         global opened
         """
@@ -303,11 +267,8 @@ def main_window():
             how to save it to that format, just google it. This is the end of my rant. Happy Coding!
         """
 
-        x = askopenfilename()
-        #        DataObject.test.equilibrium_file = x
-        #        DataObject.test.potential_energy_file = y
+        x = askopenfilename(title='File Explorer for Equilibrium Structure')
         holder.setequilibrium_file(x)
-        # holder.setvalue_holder(False)
 
     def output():
 
@@ -331,7 +292,35 @@ def main_window():
             if calculation2.get() == "Read from File":
                 Read_Structures_Button()
                 test()
-                save_file_prompt()
+                exit()
+
+            if calculation2.get() == "Compute With Psi4":
+                windowpsi4 = tk.Tk()
+                style = Style()
+                windowpsi4.title('PyFGH')
+                windowpsi4.geometry('600x200')
+
+                ttk.Label(windowpsi4, text="Enter Valid Psi4 Method:",
+                          font=("Times New Roman", 10)).place(x=25, y=70)
+
+                n10 = tk.StringVar()
+                psi4 = ttk.Entry(windowpsi4, width=70, textvariable=n10)
+
+                def psi4enter() :
+                    holder.setPsi4Method(psi4.get())
+                    print(psi4.get())
+                    windowpsi4.destroy()
+                    window.d
+                    test()
+
+
+                readbutton = tk.Button(windowpsi4, text='Enter', bd='10', bg='green', fg='white',
+                                       command=psi4enter).place(x=270, y=125)
+
+                psi4.place(x=160, y=70)
+                windowpsi4.mainloop()
+
+
 
         except ValueError:
             messagebox.showerror("PyFGH", "Data is missing! FILL in ALL of the boxes before hitting calculate!!!")
@@ -346,6 +335,7 @@ def main_window():
             raise
 
             # This is the calculate button.
+
     calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',
                           command=output).place(x=420, y=140)
 
@@ -357,7 +347,7 @@ def main_window():
     def about_window():
         window = tk.Toplevel()
         window.title("About")
-        window.geometry("500x235")
+        window.geometry("550x255")
         canvas = tkinter.Canvas(window, width=500, height=235)
         canvas.pack()
 
@@ -398,12 +388,6 @@ def main_window():
     # This is a button called Read Structures
     readbutton = tk.Button(window, text='Read Equilibrium Structure from File', bd='10', bg='gray', fg='white',
                            command=Read_Structures_Button2).place(x=360, y=200)
-    # Disabled the compute button for now
-    # compute = tk.Button(window, text='Compute on the fly', bd='10', bg='gray', fg='white',
-    #                    command=open_file).place(x=410, y=370)
-
-    # Adding combobox drop down list
-    # cores['values'] = (multiprocessing.cpu_count())
 
     # This places a lot of things in the GUI
     cores.place(x=450, y=50)

@@ -9,6 +9,7 @@ from tkinter.ttk import Style
 
 import PyFGH.molecule_gui as molecule_gui
 from PyFGH.util import model_objects as model_objects
+from PyFGH.util.pyfghutil import ValidationError as ValidationError
 import numpy as np
 
 # import jnwtest11 as test11
@@ -275,12 +276,9 @@ def main_window():
 
 
     def test():
-        try:
-            eq, pes = molecule_gui.molecule_testing(holder)
-            holder.setEquilMolecule(eq)
-            holder.setPES(pes)
-        except:
-            pass
+         eq, pes = molecule_gui.molecule_testing(holder)
+         holder.setEquilMolecule(eq)
+         holder.setPES(pes)
 
     def Read_Structures_Button():
         global opened
@@ -340,8 +338,12 @@ def main_window():
         except IndexError:  # TODO this is not working properly. After the error restart the interface!
             messagebox.showerror("PyFGH", "Error, Please restart program!!!")
             main_window()
+        except ValidationError as e:
+            print(e)
+            raise
         except:
             print("problem")
+            raise
 
             # This is the calculate button.
     calculate = tk.Button(window, text='Calculate', bd='20', bg='green', fg='white',

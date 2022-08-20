@@ -2,7 +2,6 @@ import csv
 import os
 import PyFGH.GUI as GUI
 import numpy as np
-from multiprocessing import Process, Queue
 import PyFGH.GUItoCalc as GTC
 import time
 
@@ -21,10 +20,9 @@ Author: Josiah Randleman
 # TODO fix ssh problem. problem is with pes in remotegmatrix.py
 
 # This is the parent process
-def datamuncher(q):
-    print('This is the child process: ', os.getpid())
-    holder1 = q.get()
-    print(holder1.message)
+def datamuncher(holder):
+
+    print(holder.message)
 
     """
     print("N1: ", holder1.N1)
@@ -35,10 +33,10 @@ def datamuncher(q):
     print("L3: ", holder1.L3)
     """
 
-    ReturnObj = GTC.passToCalc(holder1)
-    q.put(ReturnObj)
+    ReturnObj = GTC.passToCalc(holder)
 
-    # return
+
+    return ReturnObj
 
 
 # this is the parent process
@@ -47,30 +45,18 @@ class Tcl_AsyncDelete:
 
 
 def datagrabber(holder=None):
-    q = Queue()
-    p1 = Process(target=datamuncher, args=(q,))
-    p1.start()
-    time.sleep(1)
     if holder is None:
         holder = GUI.main_window()
     else:
-        def test():
-            try:
-                eq, pes = molecule_gui.molecule_testing(holder)
-                holder.setEquilMolecule(eq)
-                holder.setPES(pes)
-            except:
-                pass
-
-        test()
+        eq, pes = molecule_gui.molecule_testing(holder)
+        holder.setEquilMolecule(eq)
+        holder.setPES(pes)
 
     print('The interface is started Process: ', os.getpid())
 
     holder.setMessage("This is from the parent")
-    q.put(holder)
 
-    # At this point, insert the data into the handler
-    ResultObj = q.get()  # an object of type OutputData
+    ResultObj = datamuncher(holder)
 
     eigvals = ResultObj.getEigenvalues()
     eigvecs = ResultObj.getEigenvectors()

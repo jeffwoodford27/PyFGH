@@ -1,5 +1,9 @@
 import numpy as np
 
+
+class ValidationError(Exception):
+    pass
+
 def IndexToPoint(N, idx):
     return np.ravel_multi_index(idx, tuple(N))
 

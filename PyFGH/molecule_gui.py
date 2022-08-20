@@ -1,11 +1,11 @@
 import csv
 import numpy as np
 from PyFGH.util import pyfghutil as pyfghutil
+from PyFGH.util.pyfghutil import ValidationError as ValidationError
 
 try:
 
-    class ValidationError(Exception):
-        pass
+
 
 
     def readEqfile(eqfile):

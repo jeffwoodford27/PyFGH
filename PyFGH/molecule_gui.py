@@ -56,10 +56,10 @@ try:
         eqmol.setCharge(Q)
         eqmol.setMultiplicity(Mult)
         eqmol.setSymbolList(S)
-        eqmol.setMassNoList(A)
-        eqmol.setXList(x)
-        eqmol.setYList(y)
-        eqmol.setZList(z)
+        eqmol.setMassNoList(np.array(A))
+        eqmol.setXList(np.array(x))
+        eqmol.setYList(np.array(y))
+        eqmol.setZList(np.array(z))
         for n in range(Nat):
             symbolFound = False
             for key, value in pyfghutil.AtomicSymbolLookup.items():
@@ -69,6 +69,8 @@ try:
                     break
             if (not symbolFound):
                 raise ValidationError('Atom {0} Symbol {1} Not Found In Dictionary'.format(n + 1, S[n]))
+
+        eqmol.setAtomicNoList(np.array(Z))
 
         Nel = np.sum(Z) - Q
         if ((Nel % 2) == (Mult % 2)):
@@ -81,7 +83,7 @@ try:
                 raise ValidationError('Atom {0} Nuclide {1} Not Found In Dictionary'.format(n + 1, nucl))
             else:
                 m[n] = float(m[n]) * 1822.89
-        eqmol.setMassList(m)
+        eqmol.setMassList(np.array(m))
 
         return eqmol
 
@@ -144,14 +146,15 @@ try:
     def generatePESCoordinates_Psi4(D, N, L, equil):
         Nat = equil.getNatom()
 
-        if ((D == 1) and (Nat != 2)) or ((D == 3) and (Nat != 3)) or (D != 1) or (D != 3):
+        if not (((D == 1) and (Nat == 2)) or ((D == 3) and (Nat == 3))):
             raise ValidationError("Psi4 Calculation Method only implemented for diatomic and triatomic molecules.")
 
         Npts = np.prod(N)
         xeq = equil.getXList()
         yeq = equil.getYList()
         zeq = equil.getZList()
-
+        Z = equil.getAtomicNoList()
+        A = equil.getMassNoList()
         m = equil.getMassList()
 
         pes = pyfghutil.PotentialEnergySurface(N)
@@ -170,7 +173,7 @@ try:
                 pespt = pyfghutil.PESpoint(pt)
                 idx = pyfghutil.PointToIndex(N, pt)
                 q = np.zeros(D, dtype=float)
-                for d in D:
+                for d in range(D):
                     dq = L[d] / N[d]
                     q[d] = idx[d] * dq - L[d] / 2 + dq / 2
 
@@ -200,33 +203,30 @@ try:
             R1eqlen = np.linalg.norm(R1eq)
             R2eq = np.array([xeq[2] - xeq[0], yeq[2] - yeq[0], zeq[2] - zeq[0]])
             R2eqlen = np.linalg.norm(R2eq)
-            theta_eq = np.acos((np.dot(R1eq, R2eq)) / (R1eqlen * R2eqlen))
+            theta_eq = np.arccos((np.dot(R1eq, R2eq)) / (R1eqlen * R2eqlen))
 
             m1 = m[0]
             m2 = m[1]
             m3 = m[2]
             M = m1 + m2 + m3
 
-            xeq[0] = (m2 * R1eq - m3 * R2eq) * np.sin(theta_eq / 2.0) / M
-            yeq[0] = -(m3 * R2eq + m2 * R1eq) * np.cos(theta_eq / 2.0) / M
-            xeq[1] = xeq[0] - R1eq * np.sin(theta_eq / 2.0)
-            yeq[1] = yeq[0] + R1eq * np.cos(theta_eq / 2.0)
-            xeq[2] = xeq[0] + R2eq * np.sin(theta_eq / 2.0)
-            yeq[2] = yeq[0] + R2eq * np.cos(theta_eq / 2.0)
+            xeq[0] = (m2 * R1eqlen - m3 * R2eqlen) * np.sin(theta_eq / 2.0) / M
+            yeq[0] = -(m3 * R2eqlen + m2 * R1eqlen) * np.cos(theta_eq / 2.0) / M
+            xeq[1] = xeq[0] - R1eqlen * np.sin(theta_eq / 2.0)
+            yeq[1] = yeq[0] + R1eqlen * np.cos(theta_eq / 2.0)
+            xeq[2] = xeq[0] + R2eqlen * np.sin(theta_eq / 2.0)
+            yeq[2] = yeq[0] + R2eqlen * np.cos(theta_eq / 2.0)
             zeq[0] = zeq[1] = zeq[2] = 0
 
-            equil.setXList(xeq)
+            equil.x = xeq
             equil.setYList(yeq)
             equil.setZList(zeq)
-
-            A = equil.getMassNoList()
-            Z = equil.getAtomicNoList()
 
             for pt in range(Npts):
                 pespt = pyfghutil.PESpoint(pt)
                 idx = pyfghutil.PointToIndex(N, pt)
                 q = np.zeros(D, dtype=float)
-                for d in D:
+                for d in range(D):
                     dq = L[d] / N[d]
                     q[d] = idx[d] * dq - L[d] / 2 + dq / 2
 

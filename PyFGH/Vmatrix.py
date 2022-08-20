@@ -3,6 +3,10 @@ import numpy as np
 from PyFGH.util import pyfghutil as pyfghutil
 import multiprocessing as mp
 from scipy.sparse import lil_matrix
+try:
+    import psi4
+except:
+    pass
 
 
 class NBlock:
@@ -118,11 +122,26 @@ class NBlock:
                 return (self.difblocks)
 
 
-def calcPESfromPsi4(D, N, equil, pes, cores, psi4method):
-    import psi4
+def calcPsi4Energy(psi4method, psimol):
+    return psi4.energy(psi4method, molecule=psimol)
 
-    psi4.core.be_quiet()
+def calcPESfromPsi4(D, N, equil, pes, cores, psi4method):
+    try:
+        psi4.core.be_quiet()
+    except:
+        raise ("Psi4 could not be found")
+
+    S = equil.getSymbolList()
+    x = equil.getXList()
+    y = equil.getYList()
+    z = equil.getZList()
+    Q = equil.getCharge()
+    Mult = equil.getMultiplicity()
+
     Npts = np.prod(N)
+
+    paramz = []
+
     if (D == 1):
         mol_geom = """
         {q} {mult}
@@ -130,18 +149,13 @@ def calcPESfromPsi4(D, N, equil, pes, cores, psi4method):
         {s2} {x2} {y2} {z2}
         """
 
-        S = equil.getSymbolList()
-        z = equil.getZList()
-        Q = equil.getCharge()
-        Mult = equil.getMultiplicity()
         psimol = psi4.geometry(mol_geom.format(q=Q, mult=Mult,
                                                s1=S[0], x1=0, y1=0, z1=z[0],
                                                s2=S[1], x2=0, y2=0, z2=z[1]))
         try:
-            emin = psi4.energy(psi4method, molecule=psimol)
+            emin = calcPsi4Energy(psi4method, psimol)
         except:
-            print("Error: Unknown/unsupported method " + psi4method + " or other Psi4 error.")
-            raise
+            raise Exception("Unknown/unsupported method " + psi4method + " or other Psi4 error.")
 
         for pt in range(Npts):
             mol = pes.getPointByPt[pt].getMolecule()
@@ -149,12 +163,9 @@ def calcPESfromPsi4(D, N, equil, pes, cores, psi4method):
             psimol = psi4.geometry(mol_geom.format(q=Q, mult=Mult,
                                                    s1=S[0], x1=0, y1=0, z1=z[0],
                                                    s2=S[1], x2=0, y2=0, z2=z[1]))
-            try:
-                en = psi4.energy(psi4method, molecule=psimol)
-            except:
-                print("Error: Unknown/unsupported method " + psi4method + " or other Psi4 error.")
-                raise
-            pes.getPointByPt[pt].setEnergy(en - emin)
+
+            paramz.append((psi4method,psimol))
+
     elif (D == 3):
         mol_geom = """
         {q} {mult}
@@ -163,20 +174,15 @@ def calcPESfromPsi4(D, N, equil, pes, cores, psi4method):
         {s3} {x3} {y3} {z3}
         """
 
-        S = equil.getSymbolList()
-        x = equil.getXList()
-        y = equil.getYList()
-        Q = equil.getCharge()
-        Mult = equil.getMultiplicity()
         psimol = psi4.geometry(mol_geom.format(q=Q, mult=Mult,
                                                s1=S[0], x1=x[0], y1=y[0], z1=0,
                                                s2=S[1], x2=x[1], y2=y[1], z2=0,
                                                s3=S[2], x3=x[2], y3=y[2], z3=0))
+
         try:
-            emin = psi4.energy(psi4method, molecule=psimol)
+            emin = calcPsi4Energy(psi4method, psimol)
         except:
-            print("Error: Unknown/unsupported method " + psi4method + " or other Psi4 error.")
-            raise
+            raise Exception("Unknown/unsupported method " + psi4method + " or other Psi4 error.")
 
         for pt in range(Npts):
             mol = pes.getPointByPt[pt].getMolecule()
@@ -186,14 +192,17 @@ def calcPESfromPsi4(D, N, equil, pes, cores, psi4method):
                                                    s1=S[0], x1=x[0], y1=y[0], z1=0,
                                                    s2=S[1], x2=x[1], y2=y[1], z2=0,
                                                    s3=S[2], x3=x[2], y3=y[2], z3=0))
-            try:
-                en = psi4.energy(psi4method, molecule=psimol)
-            except:
-                print("Error: Unknown/unsupported method " + psi4method + " or other Psi4 error.")
-                raise
-            pes.getPointByPt[pt].setEnergy(en - emin)
+            paramz.append((psi4method,psimol))
+
         else:
             raise ("Invalid call to Psi4 driver")
+
+    p = mp.Pool(cores)
+    en = p.starmap(calcPsi4Energy,paramz)
+    p.close()
+    for pt in range(Npts):
+        pes.getPointByPt[pt].setEnergy(en[pt] - emin)
+
     return
 
 
@@ -240,7 +249,7 @@ def VMatrixCalc(dimensions, NValue, Vmethod, equil, pes, psi4method, cores):
     vmatrix = lil_matrix((Npts, Npts), dtype=float)
 
     if (Vmethod == "Calculate with Psi4"):
-        calcPESfromPsi4(dimensions, N, equil, pes, psi4method, cores)
+        calcPESfromPsi4(dimensions, NValue, equil, pes, psi4method, cores)
 
     # NBlock Class System
     NBlocks = NBlock(dimensions, NValue)

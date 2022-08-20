@@ -143,7 +143,8 @@ try:
         t0 = time.perf_counter()
         print("Creating V Matrix")
         Vmethod = dataObj.getVmethod()
-        V = Vmatrix.VMatrixCalc(D, N, Vmethod, pes, cores)
+        psi4method = dataObj.getPsi4Method()
+        V = Vmatrix.VMatrixCalc(D, N, Vmethod, equil, pes, psi4method, cores)
         t1 = time.perf_counter()
         print("Done with V Matrix time = {0}".format(t1-t0))
 

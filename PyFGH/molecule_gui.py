@@ -144,7 +144,7 @@ try:
     def generatePESCoordinates_Psi4(D, N, L, equil):
         Nat = equil.getNatom()
 
-        if ((D == 1) and (Nat != 2)) or ((D == 3) and (Nat != 3)):
+        if ((D == 1) and (Nat != 2)) or ((D == 3) and (Nat != 3)) or (D != 1) or (D != 3):
             raise ValidationError("Psi4 Calculation Method only implemented for diatomic and triatomic molecules.")
 
         Npts = np.prod(N)
@@ -155,39 +155,93 @@ try:
         m = equil.getMassList()
 
         pes = pyfghutil.PotentialEnergySurface(N)
-        for pt in Npts:
-            pespt = pyfghutil.PESpoint(pt)
-            idx = pyfghutil.PointToIndex(N, pt)
-            q = np.zeros(D, dtype=float)
-            for d in D:
-                dq = L[d] / N[d]
-                q[d] = idx[d] * dq - L[d] / 2 + dq / 2
+        if (D == 1):
+            Req = np.linalg.norm(np.array([xeq[1] - xeq[0], yeq[1] - yeq[0], zeq[1] - zeq[0]]))
 
-            x = np.zeros(Nat, dtype=float)
-            y = np.zeros(Nat, dtype=float)
-            z = np.zeros(Nat, dtype=float)
+            xeq[0] = xeq[1] = yeq[0] = yeq[1] = 0
+            zeq[0] = -Req / 2
+            zeq[1] = Req / 2
 
-            if (D == 1):
-                Req = np.linalg.norm(np.array([xeq[1] - xeq[0], yeq[1] - yeq[0], zeq[1] - zeq[0]]))
+            equil.setXList(xeq)
+            equil.setYList(yeq)
+            equil.setZList(zeq)
+
+            for pt in Npts:
+                pespt = pyfghutil.PESpoint(pt)
+                idx = pyfghutil.PointToIndex(N, pt)
+                q = np.zeros(D, dtype=float)
+                for d in D:
+                    dq = L[d] / N[d]
+                    q[d] = idx[d] * dq - L[d] / 2 + dq / 2
+
+                x = np.zeros(Nat, dtype=float)
+                y = np.zeros(Nat, dtype=float)
+                z = np.zeros(Nat, dtype=float)
 
                 z[0] = -(Req + q[0]) / 2
                 z[1] = (Req + q[0]) / 2
 
-            elif (D == 3):
-                R1eq = np.array([xeq[1] - xeq[0], yeq[1] - yeq[0], zeq[1] - zeq[0]])
-                R1eqlen = np.linalg.norm(R1eq)
-                R2eq = np.array([xeq[2] - xeq[0], yeq[2] - yeq[0], zeq[2] - zeq[0]])
-                R2eqlen = np.linalg.norm(R2eq)
-                theta_eq = np.acos((np.dot(R1eq, R2eq)) / (R1eqlen * R2eqlen))
+                pespt.setQList(q)
+                pespt.setXList(x)
+                pespt.setYList(y)
+                pespt.setZList(z)
+                pespt.getMolecule().setNatom(Nat)
+                pespt.getMolecule().setCharge(equil.getCharge())
+                pespt.getMolecule().setMultiplicity(equil.getMultiplicity())
+                pespt.getMolecule().setSymbolList(equil.getSymbolList())
+                pespt.getMolecule().setAtomicNoList(Z)
+                pespt.getMolecule().setMassNoList(A)
+                pespt.getMolecule().setMassList(m)
+                pespt.setEnergy(0)
+                pes.setPESpt(pt, pespt)
 
-                R1 = R1eqlen + q[0]
-                R2 = R2eqlen + q[1]
+        elif (D == 3):
+            R1eq = np.array([xeq[1] - xeq[0], yeq[1] - yeq[0], zeq[1] - zeq[0]])
+            R1eqlen = np.linalg.norm(R1eq)
+            R2eq = np.array([xeq[2] - xeq[0], yeq[2] - yeq[0], zeq[2] - zeq[0]])
+            R2eqlen = np.linalg.norm(R2eq)
+            theta_eq = np.acos((np.dot(R1eq, R2eq)) / (R1eqlen * R2eqlen))
+
+            m1 = m[0]
+            m2 = m[1]
+            m3 = m[2]
+            M = m1 + m2 + m3
+
+            xeq[0] = (m2 * R1eq - m3 * R2eq) * np.sin(theta_eq / 2.0) / M
+            yeq[0] = -(m3 * R2eq + m2 * R1eq) * np.cos(theta_eq / 2.0) / M
+            xeq[1] = xeq[0] - R1eq * np.sin(theta_eq / 2.0)
+            yeq[1] = yeq[0] + R1eq * np.cos(theta_eq / 2.0)
+            xeq[2] = xeq[0] + R2eq * np.sin(theta_eq / 2.0)
+            yeq[2] = yeq[0] + R2eq * np.cos(theta_eq / 2.0)
+            zeq[0] = zeq[1] = zeq[2] = 0
+
+            equil.setXList(xeq)
+            equil.setYList(yeq)
+            equil.setZList(zeq)
+
+            A = equil.getMassNoList()
+            Z = equil.getAtomicNoList()
+
+            for pt in range(Npts):
+                pespt = pyfghutil.PESpoint(pt)
+                idx = pyfghutil.PointToIndex(N, pt)
+                q = np.zeros(D, dtype=float)
+                for d in D:
+                    dq = L[d] / N[d]
+                    q[d] = idx[d] * dq - L[d] / 2 + dq / 2
+
+                x = np.zeros(Nat, dtype=float)
+                y = np.zeros(Nat, dtype=float)
+                z = np.zeros(Nat, dtype=float)
+
+                if (A[1] == A[2]) and (Z[1] == Z[2]):
+                    R1 = R1eqlen + q[0] + q[1]
+                    R2 = R1eqlen + q[1] - q[0]
+                else:
+                    R1 = R1eqlen + q[0]
+                    R2 = R2eqlen + q[1]
+
                 theta = theta_eq + q[2]
-
-                m1 = m[0]
-                m2 = m[1]
-                m3 = m[2]
-                M = m1 + m2 + m3
 
                 x[0] = (m2 * R1 - m3 * R2) * np.sin(theta / 2.0) / M
                 y[0] = -(m3 * R2 + m2 * R1) * np.cos(theta / 2.0) / M
@@ -196,19 +250,22 @@ try:
                 x[2] = x[0] + R2 * np.sin(theta / 2.0)
                 y[2] = y[0] + R2 * np.cos(theta / 2.0)
 
-            pespt.setQList(q)
-            pespt.setXList(x)
-            pespt.setYList(y)
-            pespt.setZList(z)
-            pespt.getMolecule().setNatom(Nat)
-            pespt.getMolecule().setCharge(equil.getCharge())
-            pespt.getMolecule().setMultiplicity(equil.getMultiplicity())
-            pespt.getMolecule().setSymbolList(equil.getSymbolList())
-            pespt.getMolecule().setAtomicNoList(equil.getAtomicNoList())
-            pespt.getMolecule().setMassNoList(equil.getMassNoList())
-            pespt.getMolecule().setMassList(m)
-            pespt.setEnergy(0)
-            pes.setPESpt(pt, pespt)
+                pespt.setQList(q)
+                pespt.setXList(x)
+                pespt.setYList(y)
+                pespt.setZList(z)
+                pespt.getMolecule().setNatom(Nat)
+                pespt.getMolecule().setCharge(equil.getCharge())
+                pespt.getMolecule().setMultiplicity(equil.getMultiplicity())
+                pespt.getMolecule().setSymbolList(equil.getSymbolList())
+                pespt.getMolecule().setAtomicNoList(Z)
+                pespt.getMolecule().setMassNoList(A)
+                pespt.getMolecule().setMassList(m)
+                pespt.setEnergy(0)
+                pes.setPESpt(pt, pespt)
+
+        else:
+            print ("this shouldn't happen")
 
         return pes
 
@@ -260,13 +317,13 @@ try:
         if (holder.getVmethod() == "Read from File"):
             pes = readPESfile(holder.getPESFile(), equil, D, N)
             Npts = np.prod(N)
-            for pt in range(Npts):
-                mol = pes.getPointByPt(pt).getMolecule()
-                if (closeContactTest(mol) == False):
-                    raise ValidationError("Atoms less than 0.1 A apart in PES structure " + str(pt + 1))
-                if (linearTest(mol) == False):
-                    raise ValidationError(
-                        "PES structure " + str(pt + 1) + " is linear. Linear molecules not yet supported.")
+#            for pt in range(Npts):
+#                mol = pes.getPointByPt(pt).getMolecule()
+#                if (closeContactTest(mol) == False):
+#                    raise ValidationError("Atoms less than 0.1 A apart in PES structure " + str(pt + 1))
+#                if (linearTest(mol) == False):
+#                    raise ValidationError(
+#                        "PES structure " + str(pt + 1) + " is linear. Linear molecules not yet supported.")
         else:
             L = holder.getLlist()
             pes = generatePESCoordinates_Psi4(D, N, L, equil)

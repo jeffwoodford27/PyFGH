@@ -1,7 +1,9 @@
 #Import the needed modules
 import numpy as np
 from util import pyfghutil
+from util import DataObject
 import multiprocessing as mp
+import csv
 
 class NBlock:
     def __init__(self, D, NValues):
@@ -135,6 +137,8 @@ def VBlockCalc(dimensions, NValue, LValue, pes, blockX, blockY):
     for alpha in range(0+NValue[0]*blockX, NValue[0]+NValue[0]*blockX):
         for beta in range(0+NValue[0]*blockY, NValue[0]+NValue[0]*blockY):
             counter = pyfghutil.AlphaAndBetaToCounter(alpha, beta, dimensions, NValue)
+            if (blockX == 0 and blockY == 10):
+                print(counter)
             blockHolder[alpha0start, beta0start] = (Vab(dimensions, NValue, LValue, 0, pes, counter))
             beta0start += 1
         alpha0start += 1
@@ -181,7 +185,14 @@ def VMatrixCalc(dataObject):
     for x in range(repeatamount):
         for y in range(repeatamount):
             blockCoords.append((x,y))
+
+            if (x == 0 and y == 10):
+                print(pyfghutil.PointToIndex(dimensions, NValue, x))
+                print(pyfghutil.PointToIndex(dimensions, NValue, y))
+
     optBlockCoords = NBlocks.coordGen()
+    print(optBlockCoords)
+    print(len(optBlockCoords))
     for coords in optBlockCoords:
         paramz.append((dimensions, NValue, LValue, pes, coords[0], coords[1]))
 
@@ -205,3 +216,102 @@ def VMatrixCalc(dataObject):
         vmatrix[(0+NValue[precalc]*x):(NValue[precalc]+NValue[precalc]*x), (0+NValue[precalc]*y):(NValue[precalc]+NValue[precalc]*y)] = NBlocks.readBlock(x,y)
 
     return vmatrix
+
+if __name__ == '__main__':
+    D = 3
+    inp = DataObject.InputData()
+    inp.setN1(11)
+    inp.setN2(11)
+    inp.setN3(11)
+    inp.setL1(1.1)
+    inp.setL2(1.1)
+    inp.setL3(1.65)
+    inp.setequilibrium_file("./testingfiles/water-equil.csv")
+    inp.setpotential_energy("./testingfiles/water-potential.csv")
+
+    Nat = 3
+    equil = pyfghutil.Molecule()
+    with open(inp.equilibrium_file, newline='') as csvfile:
+        eqfile = csv.reader(csvfile)
+        A = np.empty(Nat, dtype=int)
+        Z = np.empty(Nat, dtype=int)
+        x = np.empty(Nat, dtype=float)
+        y = np.empty(Nat, dtype=float)
+        z = np.empty(Nat, dtype=float)
+        m = np.empty(Nat, dtype=float)
+        n = 0
+        for row in eqfile:
+            for key, value in pyfghutil.AtomicSymbolLookup.items():
+                if (value == row[0]):
+                    Z[n] = key
+                    break
+            A[n] = int(row[1])
+            x[n] = float(row[2])
+            y[n] = float(row[3])
+            z[n] = float(row[4])
+            nucl = row[0] + "-" + row[1]
+            m[n] = pyfghutil.MassLookup.get(nucl) * 1822.89
+            n = n + 1
+
+    equil.setXList(x)
+    equil.setYList(y)
+    equil.setZList(z)
+    equil.setAtomicNoList(Z)
+    equil.setMassNoList(A)
+    equil.setMassList(m)
+
+    N = np.zeros(D,dtype=int)
+    N[0] = inp.getN1()
+    N[1] = inp.getN2()
+    N[2] = inp.getN3()
+    Npts = np.prod(N)
+
+    pes = pyfghutil.PotentialEnergySurface()
+    pes.setN(N)
+    with open(inp.potential_energy_file, newline='') as csvfile:
+        pesfile = csv.reader(csvfile)
+
+        n = 0
+        for row in pesfile:
+            pespt = pyfghutil.PESpoint()
+            pespt.setN(n)
+
+            q = np.zeros(D, dtype=float)
+            q[0] = float(row[0])
+            q[1] = float(row[1])
+            q[2] = float(row[2])
+            pespt.setQList(q)
+
+            x = np.zeros(Nat, dtype=float)
+            y = np.zeros(Nat, dtype=float)
+            z = np.zeros(Nat, dtype=float)
+
+            x[0] = float(row[3])
+            y[0] = float(row[4])
+            x[1] = float(row[5])
+            y[1] = float(row[6])
+            x[2] = float(row[7])
+            y[2] = float(row[8])
+            pespt.setXList(x)
+            pespt.setYList(y)
+            pespt.setZList(z)
+
+            pespt.setEnergy(float(row[9]))
+
+            pes.appendPESpt(pespt)
+            n = n + 1
+
+    pes.setNpts(n)
+    inp.setPES(pes)
+
+for p in range(pes.getNpts()):
+    print(p)
+    idx = pyfghutil.PointToIndex(D, N, p)
+    print(idx)
+    print(pes.getPointByPt(p).getN())
+    print(pes.getPointByIdx(idx).getN())
+    print(pes.getPointByPt(p).getQList())
+
+
+#    V = VMatrixCalc(inp)
+#    print(V)

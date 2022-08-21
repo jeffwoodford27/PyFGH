@@ -10,6 +10,7 @@
 import numpy as np
 # For every new model, it must be add to the oscillator list to be displayed in the GUI interface!!!
 Oscillator_List = ['Harmonic_Oscillator', 'Morse_Oscillator', 'Test_Oscillator', 'Hi']
+Harmonic_List = ['Harmonic_Oscillator']
 Models_List = []
 
 class Harmonic_Oscillator:

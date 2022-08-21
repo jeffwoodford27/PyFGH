@@ -1,118 +1,247 @@
 import numpy as np
 
-# The Molecule class.  Defines a chemical molecule.
-# Z = a list of length 3 of atomic numbers of the atoms.
-# A = a list of length 3 of mass numbers of the atoms.
-# m = a list of length 3 of the masses of the atoms
-# x = a list of length 3 of the x coordinates of each atom
-# y = a list of length 3 of the y coordinates of each atom
+'''
+Custom Exception class for validating calculation data.
+'''
+class ValidationError(Exception):
+    pass
+
+'''
+IndexToPoint takes as input a list of length D of indices representing a particular grid point and returns the point number for that point.
+(D = number of dimensions)
+'''
+
+def IndexToPoint(N, idx):
+    return np.ravel_multi_index(idx, tuple(N))
+
+'''
+PointToIndex takes as input a point number of one of the grid points and returns a list of length D corresponding to the indicies of that point along each dimension.
+'''
+
+def PointToIndex(N, pt):
+    return list(np.unravel_index(pt, tuple(N)))
+
+'''
+The Molecule class.  Defines a chemical molecule.
+Nat = number of atoms in the molecule
+Q = the molecular charge (int)
+Mult = the electronic spin multiplicity (int)
+S = a list of length Nat of atomic symbols for each atom (str)
+Z = a list of length Nat of atomic numbers for each atom (int)
+A = a list of length Nat of mass numbers for each atom (int)
+m = a list of length Nat of the masses for each atom (float)
+x = a list of length Nat of the x coordinates for each atom (float)
+y = a list of length Nat of the y coordinates for each atom (float)
+z = a list of length Nat of the z coordinates for each atom (float)
+'''
 
 class Molecule:
     def __init__(self):
-        self.x = []
-        self.y = []
-        self.A = []
-        self.Z = []
-        self.m = []
-        # self.m = MassLookup[self.s + "-" + str(self.A)] * 1822.89
+        self.Nat = 0
+        self.Q = 0
+        self.Mult = 0
+        self.S = None
+        self.x = None
+        self.y = None
+        self.z = None
+        self.A = None
+        self.Z = None
+        self.m = None
 
-    def setAtomicNumber(self, Z):
+    def setNatom(self, Nat):
+        self.Nat = Nat
+        return
+
+    def getNatom(self):
+        return self.Nat
+
+    def setCharge(self, Q):
+        self.Q = Q
+        return
+
+    def getCharge(self):
+        return self.Q
+
+    def setMultiplicity(self, mult):
+        self.Mult = mult
+        return
+
+    def getMultiplicity(self):
+        return self.Mult
+
+    def setSymbol(self,n,s):
+        self.S[n] = s
+        return
+
+    def setSymbolList(self,S):
+        self.S = S
+        return
+
+    def getSymbol(self,n):
+        return self.S[n]
+
+    def getSymbolList(self):
+        return self.S
+
+    def setAtomicNo(self,n,Z):
+        self.Z[n] = Z
+        return
+
+    def setAtomicNoList(self,Z):
         self.Z = Z
         return
 
-    def getZ(self):
+    def getAtomicNo(self,n):
+        return self.Z[n]
+
+    def getAtomicNoList(self):
         return self.Z
 
-    """
-    def getS(self):
-        return self.S
-    """
-
-    def getA(self):
-        return self.A
-
-    def getM(self):
-        return self.m
-
-    def getX(self):
-        return self.x
-
-    def getY(self):
-        return self.y
-
-    def setX(self, x):
-        self.x = x
+    def setMassNo(self,n,A):
+        self.A[n] = A
         return
 
-    def setY(self, y):
-        self.y = y
-        return
-
-    def setA(self, A):
+    def setMassNoList(self,A):
         self.A = A
         return
 
-    def setZ(self, Z):
-        self.Z = Z
+    def getMassNo(self,n):
+        return self.A[n]
+
+    def getMassNoList(self):
+        return self.A
+
+    def setMass(self,n,m):
+        self.m[n] = m
         return
 
-    def setM(self, m):
+    def setMassList(self,m):
         self.m = m
         return
 
-# A class to define a point on the potential energy surface.
-# n = the number of the grid point (indexed from 0)
-# q = a list of length 3 to define the values of q for the grid point
-# x, y, z = a list of the x,y,z coordinates of the atoms at the point
-# en = the value of the potential energy at this point (in atomic units)
+    def getMass(self,n):
+        return self.m[n]
 
+    def getMassList(self):
+        return self.m
 
-class PESpoint:
-    def __init__(self):
-        self.n = 0
-        self.q = []
-        self.x = []
-        self.y = []
-        self.z = []
-        self.en = 0
-
-    def getq1(self):
-        return self.q[0]
-
-    def getq2(self):
-        return self.q[1]
-
-    def getq3(self):
-        return self.q[2]
-
-    def getX(self):
-        return self.x
-
-    def getY(self):
-        return self.y
-
-    def getZ(self):
-        return self.z
-
-    def setN(self, n):
-        self.n = n
+    def setX(self, n, x):
+        self.x[n] = x
         return
 
-    def setQ(self, q):
-        self.q = q
-        return
-
-    def setX(self, x):
+    def setXList(self,x):
         self.x = x
         return
 
-    def setY(self, y):
+    def setY(self, n, y):
+        self.y[n] = y
+        return
+
+    def setYList(self, y):
         self.y = y
         return
 
-    def setZ(self, z):
+    def setZ(self, n, z):
+        self.z[n] = z
+        return
+
+    def setZList(self, z):
         self.z = z
         return
+
+    def getX(self,n):
+        return self.x[n]
+
+    def getY(self,n):
+        return self.y[n]
+
+    def getZ(self,n):
+        return self.z[n]
+
+    def getXList(self):
+        return self.x
+
+    def getYList(self):
+        return self.y
+
+    def getZList(self):
+        return self.z
+
+    def getMassByCoord(self,n):
+        return self.m[n//3]
+
+'''
+A class to define a point on the potential energy surface.
+n = the number of the grid point (indexed from 0)
+q = a list of length 3 to define the values of q for the grid point
+mol = an instance of the Molecule class corresponding to the molecular structure at this point.
+en = the value of the potential energy at this point (in atomic units)
+'''
+
+class PESpoint:
+    def __init__(self,n):
+        self.n = n
+        self.q = []
+        self.mol = Molecule()
+        self.en = 0
+
+    def getPointNo(self):
+        return self.n
+
+    def setQList(self, q):
+        self.q = q
+        return
+
+    def getQ(self,n):
+        return self.q[n]
+
+    def getQList(self):
+        return self.q
+
+    def setMolecule(self,mol):
+        self.mol = mol
+        return
+
+    def getMolecule(self):
+        return(self.mol)
+
+    def setXList(self, x):
+        self.getMolecule().setXList(x)
+        return
+
+    def getX(self,n):
+        return self.getMolecule().getX(n)
+
+    def getXList(self):
+        return self.getMolecule().getXList()
+
+    def setYList(self, y):
+        self.getMolecule().setYList(y)
+        return
+
+    def getY(self,n):
+        return self.getMolecule().getY(n)
+
+    def getYList(self):
+        return self.getMolecule().getYList()
+
+    def setZList(self, z):
+        self.getMolecule().setZList(z)
+        return
+
+    def getZ(self,n):
+        return self.getMolecule().getZ(n)
+
+    def getZList(self):
+        return self.getMolecule().getZList()
+
+    def getCoord(self,c):
+        if (c % 3 == 0):
+            return self.getMolecule().getX(c // 3)
+        elif (c % 3 == 1):
+            return self.getMolecule().getY(c // 3)
+        elif (c % 3 == 2):
+            return self.getMolecule().getZ(c // 3)
 
     def setEnergy(self, en):
         self.en = en
@@ -121,98 +250,32 @@ class PESpoint:
     def getEnergy(self):
         return self.en
 
-
-# A class to define a potential energy surface.
-# N = a list of length 3 containing the number of grid points in each dimension
-# Npts = number of points in the PES
-# pts = a list of length Npts of PESpoint objects
-
+'''
+A class to define a potential energy surface.
+N = a list of length D containing the number of grid points in each dimension
+Npts = number of points in the PES
+pts = a list of length Npts of PESpoint objects
+'''
 
 class PotentialEnergySurface:
-    def __init__(self):
-        self.N = []
-        self.Npts = 0
-        self.pts = []
-
-    def getPointByN(self, t, u, v):
-        m = v + self.N[2] * (u + self.N[1] * t)
-        return self.pts[m]
-
-    def setNpts(self, Npts):
-        self.Npts = Npts
-        return
-
-    def setN (self, N):
+    def __init__(self,N):
         self.N = N
+        self.Npts = np.prod(N)
+        self.pts = [None]*self.Npts
+
+    def getNpts(self):
+        return self.Npts
+
+    def setPESpt(self, pt, pespt):
+        self.pts[pt] = pespt
         return
-    
-    def appendPESpt(self, pt):
-        self.pts.append(pt)
-        return
 
+    def getPointByIdx(self, idx):
+        pt = IndexToPoint(self.N, idx)
+        return self.getPointByPt(pt)
 
-def AlphaCalc(D, counterarray, NValues):
-    output = 0
-    for a in reversed(range(D)):
-        if (a + 1 == D):
-            output += counterarray[(a * 2) + 1] * 1
-        else:
-            output += counterarray[(a * 2) + 1] * (np.prod(NValues[:(D - 1) - a]))
-    return output
-
-
-def AlphaAndBetaToCounter(alpha, beta, D, NValues):
-    counter = np.zeros((D * 2, 1), int)
-    # I am uncertain about the ability to modify the input parameters,
-    # for now, I will create duplicate variables
-    modalpha = alpha
-    modbeta = beta
-    # alpha first
-    for x in range(D):
-        # print("Current modalpha is: "+str(modalpha))
-        if (not x + 1 == D):
-            npprod = np.prod(NValues[:D - (x + 1)])
-
-            manytimesalpha = modalpha // (npprod)
-            modalpha -= manytimesalpha * (npprod)
-            manytimesbeta = modbeta // (npprod)
-            modbeta -= manytimesbeta * (npprod)
-        else:
-            manytimesalpha = modalpha // 1
-            modalpha -= manytimesalpha
-            manytimesbeta = modbeta // 1
-            modbeta -= manytimesbeta
-        # Set Values
-        counter[(x * 2) + 1] = manytimesalpha
-        counter[(x * 2)] = manytimesbeta
-
-    return counter
-
-
-def BetaCalc(D, counterarray, NValues):
-    output = 0
-    for b in reversed(range(D)):
-        if (b + 1 == D):
-            output += counterarray[(b * 2)] * 1
-        else:
-            output += counterarray[(b * 2)] * (np.prod(NValues[:(D - 1) - b]))
-    return output
-
-
-def DCAAdvance(D, counterArray, NValues):
-    counterArray[(D * 2) - 1, 0] += 1
-    NValueC = 0
-    jlcounter = 0
-    for c in reversed(range(len(counterArray))):
-        if (counterArray[c] >= NValues[NValueC]):
-            counterArray[c] = 0
-            counterArray[c - 1] += 1
-        jlcounter += 1
-        if (jlcounter >= 2):
-            jlcounter = 0
-            NValueC += 1
-    return counterArray
-
+    def getPointByPt(self, pt):
+        return self.pts[pt]
 
 # A lookup dictionary connecting each atomic number with its corresponding atomic symbol.
 

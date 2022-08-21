@@ -239,7 +239,9 @@ def main_window():
 
     # Sends holder to validation file
     def test():
+
         eq, pes = molecule_gui.molecule_testing(holder)
+        gc.collect()
         holder.setEquilMolecule(eq)
         holder.setPES(pes)
 
@@ -290,34 +292,37 @@ def main_window():
 
             if calculation2.get() == "Read from File":
                 Read_Structures_Button()
+                window.destroy()
                 test()
-                exit()
+                gc.collect()
+                #exit()
+            else:
+                if calculation2.get() == "Compute With Psi4":
+                    windowpsi4 = tk.Tk()
+                    style = Style()
+                    windowpsi4.title('PyFGH')
+                    windowpsi4.geometry('600x200')
 
-            if calculation2.get() == "Compute With Psi4":
-                windowpsi4 = tk.Tk()
-                style = Style()
-                windowpsi4.title('PyFGH')
-                windowpsi4.geometry('600x200')
+                    ttk.Label(windowpsi4, text="Enter Valid Psi4 Method:",
+                              font=("Times New Roman", 10)).place(x=25, y=70)
 
-                ttk.Label(windowpsi4, text="Enter Valid Psi4 Method:",
-                          font=("Times New Roman", 10)).place(x=25, y=70)
+                    n10 = tk.StringVar()
+                    psi4 = ttk.Entry(windowpsi4, width=70, textvariable=n10)
 
-                n10 = tk.StringVar()
-                psi4 = ttk.Entry(windowpsi4, width=70, textvariable=n10)
-
-                def psi4enter() :
-                    holder.setPsi4Method(psi4.get())
-                    print(psi4.get())
-                    windowpsi4.destroy()
-                    window.d
-                    test()
+                    def psi4enter() :
+                        holder.setPsi4Method(psi4.get())
+                        print(psi4.get())
+                        windowpsi4.destroy()
+                        window.destroy()
+                        gc.collect()
+                        test()
 
 
-                readbutton = tk.Button(windowpsi4, text='Enter', bd='10', bg='green', fg='white',
-                                       command=psi4enter).place(x=270, y=125)
+                    readbutton = tk.Button(windowpsi4, text='Enter', bd='10', bg='green', fg='white',
+                                           command=psi4enter).place(x=270, y=125)
 
-                psi4.place(x=160, y=70)
-                windowpsi4.mainloop()
+                    psi4.place(x=160, y=70)
+                    windowpsi4.mainloop()
 
 
 

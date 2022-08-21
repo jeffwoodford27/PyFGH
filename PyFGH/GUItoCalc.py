@@ -1,5 +1,5 @@
 # Interface between GUI and Calculation Scripts
-
+import gc
 import PyFGH.Vmatrix as Vmatrix
 import PyFGH.Tmatrix as Tmatrix
 import PyFGH.Gmatrix as Gmatrix
@@ -140,13 +140,14 @@ try:
 
         cores = dataObj.cores_amount
 
-        t0 = time.perf_counter()
-        print("Creating V Matrix")
-        Vmethod = dataObj.getVmethod()
-        psi4method = dataObj.getPsi4Method()
-        V = Vmatrix.VMatrixCalc(D, N, Vmethod, equil, pes, psi4method, cores)
-        t1 = time.perf_counter()
-        print("Done with V Matrix time = {0}".format(t1-t0))
+    t0 = time.perf_counter()
+    print("Creating V Matrix")
+    gc.collect()
+    Vmethod = dataObj.getVmethod()
+    psi4method = dataObj.getPsi4Method()
+    V = Vmatrix.VMatrixCalc(D, N, Vmethod, equil, pes, psi4method, cores)
+    t1 = time.perf_counter()
+    print("Done with V Matrix time = {0}".format(t1-t0))
 
         t0 = time.perf_counter()
         print("Creating T Matrix")

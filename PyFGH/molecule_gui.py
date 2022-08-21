@@ -328,6 +328,4 @@ try:
             L = holder.getLlist()
             pes = generatePESCoordinates_Psi4(D, N, L, equil)
 
-        return equil, pes
-except:
-    print("error from molecule gui testing file!!!")
+    return equil, pes

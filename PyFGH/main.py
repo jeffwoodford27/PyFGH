@@ -3,46 +3,17 @@ import os
 import PyFGH.GUI as GUI
 import numpy as np
 import PyFGH.GUItoCalc as GTC
-import time
-
 import PyFGH.molecule_gui as molecule_gui
 
-"""
-This one uses Queues
-This communicates by using SSH
-Also connected to test3.py
-Author: Josiah Randleman
-© Copyright 2021, Josiah Randleman, All rights reserved. jrandl516@gmail.com
-"""
-
-
-# TODO fix the name of file. not passing file name.
-# TODO fix ssh problem. problem is with pes in remotegmatrix.py
 
 # This is the parent process
 def datamuncher(holder):
-
-    print(holder.message)
-
-    """
-    print("N1: ", holder1.N1)
-    print("L1: ", holder1.L1)
-    print("N2: ", holder1.N2)
-    print("L2: ", holder1.L2)
-    print("N3: ", holder1.N3)
-    print("L3: ", holder1.L3)
-    """
-
     ReturnObj = GTC.passToCalc(holder)
-
 
     return ReturnObj
 
 
 # this is the parent process
-class Tcl_AsyncDelete:
-    pass
-
 
 def datagrabber(holder=None):
     if holder is None:
@@ -51,10 +22,6 @@ def datagrabber(holder=None):
         eq, pes = molecule_gui.molecule_testing(holder)
         holder.setEquilMolecule(eq)
         holder.setPES(pes)
-
-    print('The interface is started Process: ', os.getpid())
-
-    holder.setMessage("This is from the parent")
 
     ResultObj = datamuncher(holder)
 
@@ -66,8 +33,6 @@ def datagrabber(holder=None):
     D = holder.getD()
     N = holder.getNlist()
     Npts = np.prod(N)
-
-
 
     try:
         from pathlib import Path
@@ -84,8 +49,6 @@ def datagrabber(holder=None):
     except:
         pass
 
-
-
     freq = np.zeros(Neig, dtype=float)
 
     for i in range(Neig):
@@ -98,7 +61,7 @@ def datagrabber(holder=None):
         for alpha in range(Npts):
             wfn[p][alpha] = eigvecs[alpha][wfnorder[p]]
 
-    #filename = "./outputfiles/Eigenvector-" + str(p) + ".csv"
+    # filename = "./outputfiles/Eigenvector-" + str(p) + ".csv"
 
     try:
         from pathlib import Path
@@ -118,8 +81,6 @@ def datagrabber(holder=None):
                         writer.writerow(row)
     except:
         pass
-
-
 
     return wfn, freq
 

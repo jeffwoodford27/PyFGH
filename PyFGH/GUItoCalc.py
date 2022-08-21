@@ -10,6 +10,17 @@ from PyFGH.util.DataObject import OutputData as OutputData
 from PyFGH.util import pyfghutil as pyfghutil
 import time
 
+'''
+eckartTranslation enforces the translational Eckart condition on the input structure by translating each structure to the center of mass.
+Input:
+N: a numpy array of length D (no. of dimensions) with the number of grid points in each dimension
+equil: a Molecule object with the equilibrium structure
+pes: a PotentialEnergySurface object with the potential energy surface
+
+This function modifies the data in the objects
+'''
+
+
 
 def eckartTranslation(N,equil,pes):
     Nat = equil.getNatom()
@@ -39,6 +50,16 @@ def eckartTranslation(N,equil,pes):
         pes.getPointByIdx(idx).setYList(y)
         pes.getPointByIdx(idx).setZList(z)
     return
+
+'''
+eckartRotation enforces the rotational Eckart condition by the method of foo.(look up this reference)
+N: a numpy array of length D (no. of dimensions) with the number of grid points in each dimension
+equil: a Molecule object with the equilibrium structure
+pes: a PotentialEnergySurface object with the potential energy surface
+
+This function modifies the data in the objects
+'''
+
 
 def eckartRotation(N,equil,pes):
     Nat = equil.getNatom()
@@ -117,9 +138,7 @@ def eckartRotation(N,equil,pes):
 
 def passToCalc(dataObj):
     D = dataObj.getD()
-    N = np.zeros(D,dtype=int)
-    for i in range(D):
-        N[i] = dataObj.getN(i)
+    N = dataObj.getNlist()
     L = dataObj.getLlist()
 
     equil = dataObj.getEquilMolecule()
@@ -130,10 +149,14 @@ def passToCalc(dataObj):
     eckartRotation(N, equil, pes)
 
     print("Creating G Matrix")
+
+    equil = dataObj.getEquilMolecule()
+    pes = dataObj.getPES()
+
     t0 = time.perf_counter()
-    G = Gmatrix.calcGMatrix(D, N, dataObj.PES, dataObj.EquilMolecule)
+    G = Gmatrix.calcGMatrix(D, N, pes, equil)
     t1 = time.perf_counter()
-    print("Done with G Matrix time = {:.4f}".format(t1-t0))
+    print("Done with G Matrix time = {:.2f} s".format(t1-t0))
 
     cores = dataObj.cores_amount
 
@@ -144,13 +167,13 @@ def passToCalc(dataObj):
     psi4method = dataObj.getPsi4Method()
     V = Vmatrix.VMatrixCalc(D, N, Vmethod, equil, pes, psi4method, cores)
     t1 = time.perf_counter()
-    print("Done with V Matrix time = {0}".format(t1-t0))
+    print("Done with V Matrix time = {:.2f} s".format(t1-t0))
 
     t0 = time.perf_counter()
     print("Creating T Matrix")
     T = Tmatrix.TMatrixCalc(D, N, L, G, cores)
     t1 = time.perf_counter()
-    print("Done with T Matrix time = {0}".format(t1-t0))
+    print("Done with T Matrix time = {:.2f} s".format(t1-t0))
 
     print("Calculating eigenvalues")
     Neigen = dataObj.getNumberOfEigenvalues()

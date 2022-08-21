@@ -18,10 +18,12 @@ def datamuncher(holder):
 def datagrabber(holder=None):
     if holder is None:
         holder = GUI.main_window()
+        holder.GUI = True
     else:
         eq, pes = molecule_gui.molecule_testing(holder)
         holder.setEquilMolecule(eq)
         holder.setPES(pes)
+        holder.GUI = False
 
     ResultObj = datamuncher(holder)
 
@@ -33,6 +35,18 @@ def datagrabber(holder=None):
     D = holder.getD()
     N = holder.getNlist()
     Npts = np.prod(N)
+
+    freq = np.zeros(Neig, dtype=float)
+
+    for i in range(Neig):
+        freq[i] = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
+        print("Eigenvalue #{:d}: {:.1f} cm-1".format(i + 1, freq[i]))
+
+    wfn = np.zeros([Neig, Npts], dtype=float)
+
+    for p in range(Neig):
+        for alpha in range(Npts):
+            wfn[p][alpha] = eigvecs[alpha][wfnorder[p]]
 
     if holder.gui == True:
         try:

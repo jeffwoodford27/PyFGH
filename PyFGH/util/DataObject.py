@@ -1,3 +1,5 @@
+import numpy as np
+
 """
 DataObject is a place to hold data. All values in these classes are first assigned to zero. In GUI.py these values get 
 reassigned new values based on the input of the GUI. When the GUI is terminated, these values change from zero to the 
@@ -72,11 +74,11 @@ class InputData:
         return
 
     def setNlist(self,N):
-        self.N = N
+        self.N = np.array(N,dtype=int)
         return
 
     def setLlist(self,L):
-        self.L = L
+        self.L = np.array(L,dtype=float)
         return
 
     def setEquilMolecule(self,eq):

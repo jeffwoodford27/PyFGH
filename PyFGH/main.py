@@ -53,7 +53,7 @@ def datagrabber(holder=None):
 
     for i in range(Neig):
         freq[i] = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
-        print(freq[i])
+        print("Eigenvalue #{:d}: {:.1f} cm-1".format(i+1,freq[i]))
 
     wfn = np.zeros([Neig, Npts], dtype=float)
 

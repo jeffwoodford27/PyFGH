@@ -3,7 +3,7 @@ import os
 import gc
 import tkinter
 import tkinter as tk
-from tkinter import ttk, messagebox, NW
+from tkinter import ttk, messagebox
 from tkinter.filedialog import askopenfilename
 from tkinter.ttk import Style
 import PyFGH.molecule_gui as molecule_gui
@@ -17,6 +17,9 @@ Author: Josiah Randleman
 
 opened = False
 
+'''
+The main window is a function that calls the GUI window. The method gets called in main.  
+'''
 
 
 def main_window():
@@ -30,7 +33,7 @@ def main_window():
         window.destroy()
         os._exit(0)
 
-    # Creating tkinter window
+    # Creating main tkinter window
     window = tk.Tk()
     window.protocol("WM_DELETE_WINDOW", close_window)
     running = True
@@ -39,6 +42,8 @@ def main_window():
     window.geometry('910x255')
     from pathlib import Path
     # Water molecule icon in the top left conner
+    filepath = Path(__file__).parent / "icon.ico"
+    window.iconbitmap(default=filepath)
 
     # label text for title
     ttk.Label(window, text="A Python implementation of the Fourier Grid Hamiltonian method.",
@@ -54,7 +59,7 @@ def main_window():
     ttk.Label(window, text="Computer Cores:",
               font=("Times New Roman", 10)).place(x=350, y=50)
 
-    # Combobox creation
+    # Combobox creation for cores
     n = tk.StringVar()
     cores = ttk.Combobox(window, values=cores, width=10, textvariable=n)
 
@@ -65,7 +70,7 @@ def main_window():
     d = tk.StringVar()
     N1text = ttk.Combobox(window, width=15, textvariable=d)
 
-    dimensions = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    dimensions = [1, 2, 3, 4, 5, 6]
 
     n10 = tk.StringVar()
     dimensions = ttk.Combobox(window, values=dimensions, width=10, textvariable=n10)
@@ -118,10 +123,7 @@ def main_window():
         eigenvalues.set('')
         calculation.set('')
         calculation2.set('')
-        holder.setNlist(None)
-        holder.setLlist(None)
-        holder.setequilibrium_file(None)
-        holder.setpotential_energy(None)
+        holder.clearEverything()
         gc.collect()
 
     # This gets the N and L values and builds the GUI based on the Dimensions
@@ -190,7 +192,7 @@ def main_window():
                         for i in range(x):
                             valuesL.append(float(x2[i].get()))
                     except ValueError:
-                        messagebox.showerror("PyFGH", "Must include only number values!!!")
+                        messagebox.showerror("PyFGH", "Must include only numeric values!!!")
                         holder.setNlist(None)
                         holder.setLlist(None)
                         gc.collect()
@@ -201,10 +203,11 @@ def main_window():
                     holder.setNlist(valuesN)
                     holder.setLlist(valuesL)
 
-                    print(holder.getNlist())
-                    print(holder.getLlist())
-                    print(holder.getD())
+                    print("Inputted values of N: " + str(holder.getNlist()))
+                    print("Inputted values of L: " + str(holder.getLlist()))
+                    print("Inputted value of D: " + str(holder.getD()))
 
+                    # Enter validation checks
                     for x in holder.getNlist():
                         if x % 2 == 0 or x < 5:
                             messagebox.showerror("PyFGH", "N must be odd, positive integer greater to or equal to 5!!!")
@@ -217,6 +220,8 @@ def main_window():
                                 clearLdimensions()
 
                 yvalue = int(dimensions.get())
+
+
                 enter = tk.Button(window2, text='Enter', bd='20', bg='green', fg='white',
                                   command=enter_button).place(x=110, y=(yvalue * 85 + 20))
 
@@ -334,9 +339,9 @@ def main_window():
         except ValidationError as e:
             print(e)
             raise
-        except:
-            print("problem")
-            raise
+        # except:
+        #     print("Unknown PyFGH error occurred!  Please contact the developers to let them know!")
+        #     raise
 
             # This is the calculate button.
 
@@ -355,8 +360,12 @@ def main_window():
         canvas = tkinter.Canvas(window, width=500, height=235)
         canvas.pack()
 
-        text = "  A Python implementation of the Fourier Grid Hamiltonian \n \n Credits: Dr. Jeffrey Woodford, " \
-               "Nelson Maxey, Tyler Law \n and Josiah Randleman. \n \n GitHub Repository: \n https://github.com/jeffwoodford27/PyFGH/tree/main "
+        text = "  A Python implementation of the Fourier Grid Hamiltonian \n \n Credits: Dr. Jeffrey Woodford, jwoodford@missouriwestern.edu \n" \
+               "Nelson Maxey, Tyler Law \n and Josiah Randleman. \n " \
+               "Department of Chemistry and Department of Computer Science \n" \
+               "Missouri Western State University, St. Joseph, Missouri, USA \n" \
+               "\n GitHub Repository: \n https://github.com/jeffwoodford27/PyFGH/tree/main \n" \
+                " Licensed under LGPL-3.0"
 
         x = ttk.Label(window, text=text, font=("Times New Roman", 15))
         x.pack()
@@ -373,7 +382,9 @@ def main_window():
         canvas = tkinter.Canvas(window, width=500, height=235)
         canvas.pack()
 
-        text = ""
+        text = "Please visit https://github.com/jeffwoodford27/PyFGH \n for a helpful README file with detailed instructions \n" \
+               "on how to run the program. \n \n" \
+               "Send bug reports to jwoodford@missouriwestern.edu"
 
         x = ttk.Label(window, text=text, font=("Times New Roman", 15))
         x.pack()
@@ -384,10 +395,6 @@ def main_window():
     help = tk.Button(window, text='Help', bd='10', bg='#F9BB46', fg='white',
                      command=help_window).place(x=303, y=150)
 
-    """
-    This is a validation checker for the Read Structures button. You can not read in values and also try to run the 
-    GUI interface at the same time.
-    """
 
     # This is a button called Read Structures
     readbutton = tk.Button(window, text='Read Equilibrium Structure from File', bd='10', bg='gray', fg='white',

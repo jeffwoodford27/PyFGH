@@ -1,11 +1,22 @@
 import numpy as np
 
-
+'''
+Custom Exception class for validating calculation data.
+'''
 class ValidationError(Exception):
     pass
 
+'''
+IndexToPoint takes as input a list of length D of indices representing a particular grid point and returns the point number for that point.
+(D = number of dimensions)
+'''
+
 def IndexToPoint(N, idx):
     return np.ravel_multi_index(idx, tuple(N))
+
+'''
+PointToIndex takes as input a point number of one of the grid points and returns a list of length D corresponding to the indicies of that point along each dimension.
+'''
 
 def PointToIndex(N, pt):
     return list(np.unravel_index(pt, tuple(N)))
@@ -159,14 +170,13 @@ class Molecule:
     def getMassByCoord(self,n):
         return self.m[n//3]
 
-
-
-# A class to define a point on the potential energy surface.
-# n = the number of the grid point (indexed from 0)
-# q = a list of length 3 to define the values of q for the grid point
-# x, y, z = a list of the x,y,z coordinates of the atoms at the point
-# en = the value of the potential energy at this point (in atomic units)
-
+'''
+A class to define a point on the potential energy surface.
+n = the number of the grid point (indexed from 0)
+q = a list of length 3 to define the values of q for the grid point
+mol = an instance of the Molecule class corresponding to the molecular structure at this point.
+en = the value of the potential energy at this point (in atomic units)
+'''
 
 class PESpoint:
     def __init__(self,n):

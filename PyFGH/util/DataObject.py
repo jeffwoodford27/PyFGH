@@ -23,6 +23,7 @@ class InputData:
         self.inputobject = None
         self.calculation = None
         self.calculation2 = None
+        self.gui = None
 
     """
     The following methods are setters. These values get set in test1.py

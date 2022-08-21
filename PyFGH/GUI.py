@@ -24,7 +24,7 @@ The main window is a function that calls the GUI window. The method gets called 
 
 def main_window():
     holder = DataObject.InputData()
-
+    holder.gui = True
     # this closes the gui and terminates the program
     def close_window():
         global running

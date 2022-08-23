@@ -106,6 +106,8 @@ The theoretical method behind this work is based on the following paper:
 Stare, J., and Balint-Kurti, G. G., "Fourier Grid Hamiltonian Method for Solving the Vibrational Schrodinger Equation in Internal Coordinates: Theory and Test Applications", J. Phys. Chem. A 2003, 107, 7204-7214
 
 
+
+
 How to use our Python Library
 
 To install do: pip install PyFGH

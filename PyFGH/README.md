@@ -105,3 +105,48 @@ Acknowledgements
 The theoretical method behind this work is based on the following paper:
 Stare, J., and Balint-Kurti, G. G., "Fourier Grid Hamiltonian Method for Solving the Vibrational Schrodinger Equation in Internal Coordinates: Theory and Test Applications", J. Phys. Chem. A 2003, 107, 7204-7214
 
+
+How to use our Python Library
+
+To install do: pip install PyFGH
+
+https://pypi.org/project/PyFGH/
+
+How to call and use the Library:
+import multiprocessing
+import numpy as np
+
+import PyFGH.main as main
+from PyFGH.util import pyfghutil, DataObject
+
+if __name__ == '__main__':
+    holder = DataObject.InputData()
+    valuesN = [11, 11, 11]
+    valuesL = [1.1, 1.1, 1.65]
+
+    holder.setNlist(valuesN)
+    holder.setLlist(valuesL)
+    holder.setD(3)
+
+    print(holder.getNlist())
+    print(holder.getLlist())
+    print(holder.getD())
+
+    holder.setequilibrium_file(r"C:\Users\Josiah Randleman\Downloads\water-equil.csv")
+    holder.setpotential_energy(r"C:\Users\Josiah Randleman\Downloads\water-potential.csv")
+
+    holder.setEigenvalueMethod(False)
+    holder.setcalculation("Full Matrix")
+    holder.setcalculation2("Read from File")
+
+    holder.setcores_amount(max(1, multiprocessing.cpu_count()))
+    holder.setNumberOfEigenvalues(10)
+    holder.setVmethod(holder.getcalculation2())
+
+    holder.setinputobject(holder)
+
+    wfn, freq = main.datagrabber()
+
+    print(freq)
+	
+

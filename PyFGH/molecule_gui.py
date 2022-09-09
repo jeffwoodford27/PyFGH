@@ -318,21 +318,28 @@ def molecule_testing(holder):
     D = holder.getD()
     N = holder.getNlist()
 
-    equil = readEqfile(holder.getEquilFile())
+    eqfile = holder.getEquilFile()
+    if (not eqfile):
+        raise ValidationError("No Equilibrium Structure file input!")
+
+    equil = readEqfile(eqfile)
     if (closeContactTest(equil) == False):
         raise ValidationError("Atoms less than 0.05 bohr apart in the equilibrium structure.")
     if (linearTest(equil) == False):
         raise ValidationError("The equilibrium structure is linear. Linear molecules not yet supported.")
 
     if (holder.getVmethod() == "Read from File"):
-        pes = readPESfile(holder.getPESFile(), equil, D, N)
+        pesfile = holder.getPESFile()
+        if (pesfile == None):
+            raise ValidationError("No Potential Energy file input!")
+        pes = readPESfile(pesfile, equil, D, N)
         Npts = np.prod(N)
         for pt in range(Npts):
             mol = pes.getPointByPt(pt).getMolecule()
             if (closeContactTest(mol) == False):
                 raise ValidationError("Atoms less than 0.05 bohr apart in PES structure " + str(pt + 1))
-            if (linearTest(mol) == False):
-                raise ValidationError("PES structure " + str(pt + 1) + " is linear. Linear molecules not yet supported.")
+#            if (linearTest(mol) == False):
+#                raise ValidationError("PES structure " + str(pt + 1) + " is linear. Linear molecules not yet supported.")
     else:
         L = holder.getLlist()
         pes = generatePESCoordinates_Psi4(D, N, L, equil)

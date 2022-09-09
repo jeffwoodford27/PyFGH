@@ -13,8 +13,8 @@ class InputData:
         self.cores_amount = 1
         self.N = None
         self.L = None
-        self.equilibrium_file = 0
-        self.potential_energy_file = 0
+        self.equilibrium_file = None
+        self.potential_energy_file = None
         self.EquilMolecule = 0
         self.PES = 0
         self.num_eigenvalues = 10

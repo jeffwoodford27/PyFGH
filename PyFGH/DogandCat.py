@@ -1,35 +1,26 @@
-# Import the required libraries
-import tkinter
+
 from tkinter import *
-from tkinter import ttk
+from PIL import ImageTk,Image
 
-# Create an instance of Tkinter Frame
-win = Tk()
-
-# Set the geometry of Tkinter Frame
-win.geometry("700x350")
-
-# Add a canvas widget
-canvas = Canvas(win, width=350)
+import tkinter
+import tkinter as tk
 
 
-# Define a function for dog
-def Dog():
-    frame = tkinter.Toplevel()
-    frame.title = "Dog"
-    frame.geometry = "500 X 500"
-    canvas = tkinter.Canvas(frame, width=500, height=500)
-    img = tkinter.PhotoImage(file='Dog.png')
-    canvas.create_image(500, 500, anchor=NW, image=img)
+def test():
+    root = tkinter.Toplevel()
+    canvas = Canvas(root, width=350, height=350)
     canvas.pack()
+    img = ImageTk.PhotoImage(Image.open("Dog.png"))
+    canvas.create_image(20, 20, anchor=NW, image=img)
+    root.mainloop()
 
 
-# Add a Label widget in the Canvas
+root = Tk()
+canvas = Canvas(root, width=350, height=450)
+canvas.pack()
 label = Label(canvas, text="Click the Button to display an image", font=('Helvetica 17 bold'))
 label.pack(pady=30)
 
-# Create a button in canvas widget
-ttk.Button(canvas, text="Dog", command=Dog).pack()
-canvas.pack()
-
-win.mainloop()
+help = tk.Button(canvas, text='Help', bd='10', bg='#F9BB46', fg='white',
+                     command=test).place(x=20, y=20)
+root.mainloop()

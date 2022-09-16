@@ -4,7 +4,7 @@
 from tkinter import *
 from tkinter.ttk import *
 # this is the array and each element will be a button
-num1 = [34, 42, 72, 99]
+num1 = [34, 42, 72, 99, 100]
 # creates a Tk() object
 master = Tk()
 # sets the geometry of main
@@ -12,6 +12,42 @@ master = Tk()
 master.geometry("400x400")
 # function to open a new window
 # on a button click
+
+class OpenNewWindow:
+    def __init__(self, master, num):
+        self.master = master
+        self.num = num
+        self.graphimage = None
+
+    def generateGraph(self):
+#        method that will generate a graph based on  self.num
+#        y = x^num
+#        store that image in self.graphimage
+
+    def displayWindow(self):
+        # Toplevel object which will
+        # be treated as a new window
+        newWindow = Toplevel(self.master)
+
+        # sets the title of the
+        # Toplevel widget
+        title_str = "New Window"+str(self.num)
+        newWindow.title(title_str)
+
+        # sets the geometry of toplevel
+        newWindow.geometry("200x200")
+
+        # A Label widget to show in toplevel
+        Label(newWindow,
+              text="This is a new window").pack()
+
+        if self.graphimage = None:
+            self.generateGraph()
+
+#        pseudocode: put that image that is now guarnateed to be in self.graphimage into the window
+
+
+'''
 def openNewWindow():
     # Toplevel object which will
     # be treated as a new window
@@ -27,7 +63,7 @@ def openNewWindow():
     # A Label widget to show in toplevel
     Label(newWindow,
           text="This is a new window").pack()
-
+'''
 
 label = Label(master,
         text="This is the main window")
@@ -39,31 +75,11 @@ btnMain = Button(master, text="This will deisplay a graph")
                #,command=Graph)
 
 btn = []
+windows = []
 N = len(num1)
 for i in range(N):
-
-    title_str = "New Window" + str(num1[i])
-
-    def openWindowInLoop():
-        print("in function" + str(i))
-        # Toplevel object which will
-        # be treated as a new window
-        newWindow = Toplevel(master)
-
-        # sets the title of the
-        # Toplevel widget
-#        title_str = "New Window" + str(num1[i])
-        newWindow.title(title_str)
-
-        # sets the geometry of toplevel
-        newWindow.geometry("200x200")
-
-        # A Label widget to show in toplevel
-        Label(newWindow,
-              text="This is a new window").pack()
-
-
-    btn.append(Button(master,text=num1[i],command=openWindowInLoop))
+    windows.append(OpenNewWindow(master,num1[i]))
+    btn.append(Button(master,text=num1[i],command=windows[i].displayWindow))
     btn[i].pack(pady=10)
 
 

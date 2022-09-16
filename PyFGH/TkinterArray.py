@@ -4,7 +4,7 @@
 from tkinter import *
 from tkinter.ttk import *
 # this is the array and each element will be a button
-num1 = [34, 6, 72]
+num1 = [34, 42, 72, 99]
 # creates a Tk() object
 master = Tk()
 # sets the geometry of main
@@ -37,6 +37,37 @@ label = Label(master,
 # new window on button click
 btnMain = Button(master, text="This will deisplay a graph")
                #,command=Graph)
+
+btn = []
+N = len(num1)
+for i in range(N):
+
+    title_str = "New Window" + str(num1[i])
+
+    def openWindowInLoop():
+        print("in function" + str(i))
+        # Toplevel object which will
+        # be treated as a new window
+        newWindow = Toplevel(master)
+
+        # sets the title of the
+        # Toplevel widget
+#        title_str = "New Window" + str(num1[i])
+        newWindow.title(title_str)
+
+        # sets the geometry of toplevel
+        newWindow.geometry("200x200")
+
+        # A Label widget to show in toplevel
+        Label(newWindow,
+              text="This is a new window").pack()
+
+
+    btn.append(Button(master,text=num1[i],command=openWindowInLoop))
+    btn[i].pack(pady=10)
+
+
+'''
 btn = Button(master, text=num1[0], command=openNewWindow)
 btn.pack(pady=10)
 
@@ -45,6 +76,7 @@ btn1.pack(pady=10)
 
 btn2 = Button(master, text=num1[2], command=openNewWindow)
 btn2.pack(pady=10)
+'''
 
 # mainloop, runs infinitely
 mainloop()

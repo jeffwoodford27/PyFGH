@@ -1,86 +1,22 @@
-import csv
-import os
-import PyFGH.GUI as GUI
 import numpy as np
-import PyFGH.GUItoCalc as GTC
-import PyFGH.molecule_gui as molecule_gui
+import matplotlib.pyplot as plt
 
+plt.rcParams["figure.figsize"] = [7.50, 3.50]
+plt.rcParams["figure.autolayout"] = True
 
-# This is the parent process
-def datamuncher(holder):
-    ReturnObj = GTC.passToCalc(holder)
+x = np.array([5, 4, 1, 4, 5])
+plt.xlabel("X-axis")
+y = np.sort(x)
+plt.ylabel("Y-axis")
 
-    return ReturnObj
+plt.title("Example graph")
+plt.plot(x, y, color="red")
 
+# out put on the screen
+#plt.show()
+# will save the image as a jpg
+plt.savefig("Graph1.jpg")
 
-# this is the parent process
-
-def datagrabber(holder=None):
-    if holder is None:
-        holder = GUI.main_window()
-        holder.GUI = True
-    else:
-        eq, pes = molecule_gui.molecule_testing(holder)
-        holder.setEquilMolecule(eq)
-        holder.setPES(pes)
-        holder.GUI = False
-
-    ResultObj = datamuncher(holder)
-
-    eigvals = ResultObj.getEigenvalues()
-    eigvecs = ResultObj.getEigenvectors()
-    Neig = ResultObj.getNumberOfEigenvalues()
-
-    wfnorder = np.argsort(eigvals)
-    D = holder.getD()
-    N = holder.getNlist()
-    Npts = np.prod(N)
-
-    freq = np.zeros(Neig, dtype=float)
-
-    for i in range(Neig):
-        freq[i] = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
-        print("Eigenvalue #{:d}: {:.1f} cm-1".format(i + 1, freq[i]))
-
-    wfn = np.zeros([Neig, Npts], dtype=float)
-
-    for p in range(Neig):
-        for alpha in range(Npts):
-            wfn[p][alpha] = eigvecs[alpha][wfnorder[p]]
-
-    if holder.gui == True:
-        try:
-            from pathlib import Path
-
-            filepath = Path(__file__).parent / "./outputfiles/Eigenvalues.csv"
-
-            with open(filepath, "r") as f:
-                with open(f.name, 'w',
-                          newline='', encoding='UTF8') as f:
-                    writer = csv.writer(f)
-                    for i in range(Neig):
-                        val = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
-                        writer.writerow([val])
-            for p in range(Neig):
-                file = Path(__file__).parent / "./outputfiles/Eigenvector-"
-                filepath = str(file) + str(p) + ".csv"
-
-                with open(filepath, "r") as f:
-                    with open(f.name, 'w', newline='', encoding='UTF8') as f:
-                        writer = csv.writer(f)
-                        for pt in range(Npts):
-                            q = holder.getPES().getPointByPt(pt).getQList()
-                            row = []
-                            for d in range(D):
-                                row.append(q[d])
-                            row.append(wfn[p][pt])
-                            writer.writerow(row)
-        except:
-            raise "Could not write eigenvalues or eigenfunctions to files."
-
-    return wfn, freq
-
-
-if __name__ == '__main__':
-    datagrabber()
-    print('done')
+#img = plt.Image.open('Graph1.jpg')
+#img.show('Graph1.jpg',img)
+# us tkinter to save

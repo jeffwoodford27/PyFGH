@@ -325,8 +325,8 @@ def molecule_testing(holder):
     equil = readEqfile(eqfile)
     if (closeContactTest(equil) == False):
         raise ValidationError("Atoms less than 0.05 bohr apart in the equilibrium structure.")
-    if (linearTest(equil) == False):
-        raise ValidationError("The equilibrium structure is linear. Linear molecules not yet supported.")
+#    if (linearTest(equil) == False):
+#        raise ValidationError("The equilibrium structure is linear. Linear molecules not yet supported.")
 
     if (holder.getVmethod() == "Read from File"):
         pesfile = holder.getPESFile()

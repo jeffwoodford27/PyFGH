@@ -1,5 +1,6 @@
 import csv
-import os
+import time
+import tracemalloc
 import PyFGH.GUI as GUI
 import numpy as np
 import PyFGH.GUItoCalc as GTC
@@ -82,5 +83,10 @@ def datagrabber(holder=None):
 
 
 if __name__ == '__main__':
+    tracemalloc.start()
+    t0 = time.perf_counter()
     datagrabber()
-    print('done')
+    t1 = time.perf_counter()
+    print('done. wall clock time = ' + str(t1-t0))
+    print(tracemalloc.get_traced_memory())
+    tracemalloc.stop()

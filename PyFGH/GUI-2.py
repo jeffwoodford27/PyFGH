@@ -15,37 +15,6 @@ class InputObj:
         self.PEMethod = None
         self.EigenMethod = None
 
-class TextBoxFrame_old(ttk.Frame):
-    def __init__(self, container):
-        super().__init__(container)
-        self.obj = obj
-        self.txtboxlabel = ttk.Label(self, text="bar")
-        self.txtboxlabel.grid(column=0, row=0, sticky=tk.W)
-        self.txtbox = ttk.Entry(self, width=30)
-        self.txtbox.grid(column=1, row=0)
-        self.txtboxbutton = ttk.Button(self, text="enter", command=self.get_text)
-        self.txtboxbutton.grid(columnspan=2, row=1)
-
-    def get_text(self):
-        self.obj.x = self.txtbox.get()
-        print("x = " + self.obj.x)
-        return
-
-class ComboboxFrame_old(ttk.Frame):
-    def __init__(self, container, txt, dropdownlist):
-        super().__init__(container)
-
-        self.lbl = ttk.Label(self,text=txt)
-        self.lbl.config(borderwidth= 50)
-        self.lbl.grid(column=0, row=0)
-
-        self.strvar = tk.StringVar()
-        self.cbox = ttk.Combobox(self, values=dropdownlist, width=10, textvariable=self.strvar)
-        self.cbox.grid(column=1, row=0)
-
-    def get(self):
-        return self.cbox.get()
-
 class TextBoxFrame(ttk.LabelFrame):
     def __init__(self, container, txt):
         super().__init__(container)

@@ -15,7 +15,6 @@ def datamuncher(holder):
 
 
 # this is the parent process
-
 def datagrabber(holder=None):
     if holder is None:
         holder = GUI.main_window()

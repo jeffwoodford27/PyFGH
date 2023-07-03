@@ -172,3 +172,10 @@ class OutputData:
 
     def getNumberOfEigenvalues(self):
         return self.num_eigenvalues
+
+    def getOutputAsJson(self):
+        return {
+            "num_eigenvalues": self.num_eigenvalues,
+            "eigenvalues": self.eigenvalues,
+            "eigenvectors": self.eigenvectors
+        }

@@ -164,8 +164,14 @@ class OutputData:
         self.num_eigenvalues = num
         return
 
+    def getEigenvalue(self, idx):
+        return self.eigenvalues[idx]
+
     def getEigenvalues(self):
         return self.eigenvalues
+
+    def getEigenvector(self, idx):
+        return self.eigenvectors[idx]
 
     def getEigenvectors(self):
         return self.eigenvectors

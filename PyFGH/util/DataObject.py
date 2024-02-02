@@ -1,7 +1,7 @@
 import numpy as np
 
 """
-DataObject is a place to hold data. All values in these classes are first assigned to zero. In GUI.py these values get 
+DataObject is a place to hold data. All values in these classes are first assigned to zero. In GUI_old.py these values get 
 reassigned new values based on the input of the GUI. When the GUI is terminated, these values change from zero to the 
 values from the input. After the GUI is terminated, these new values can be called from any file in this project.
 """

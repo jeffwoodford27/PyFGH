@@ -2,7 +2,7 @@ import csv
 import numpy as np
 from PyFGH.util import pyfghutil as pyfghutil
 from PyFGH.util.pyfghutil import ValidationError as ValidationError
-
+from PyFGH import Constants as co
 
 def readEqfile(eqfile):
     S = []
@@ -328,7 +328,7 @@ def molecule_testing(holder):
 #    if (linearTest(equil) == False):
 #        raise ValidationError("The equilibrium structure is linear. Linear molecules not yet supported.")
 
-    if (holder.getVmethod() == "Read From File"):
+    if (holder.getVmethod() == co.READ):
         pesfile = holder.getPESFile()
         if (pesfile == None):
             raise ValidationError("No Potential Energy file input!")

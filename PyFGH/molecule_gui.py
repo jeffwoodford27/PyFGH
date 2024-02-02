@@ -328,7 +328,7 @@ def molecule_testing(holder):
 #    if (linearTest(equil) == False):
 #        raise ValidationError("The equilibrium structure is linear. Linear molecules not yet supported.")
 
-    if (holder.getVmethod() == "Read from File"):
+    if (holder.getVmethod() == "Read From File"):
         pesfile = holder.getPESFile()
         if (pesfile == None):
             raise ValidationError("No Potential Energy file input!")

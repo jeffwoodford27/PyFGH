@@ -21,7 +21,6 @@ opened = False
 The main window is a function that calls the GUI window. The method gets called in main.  
 '''
 
-
 def main_window():
     holder = DataObject.InputData()
     holder.gui = True

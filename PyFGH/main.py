@@ -7,6 +7,7 @@ import PyFGH.GUItoCalc as GTC
 import PyFGH.molecule_gui as molecule_gui
 import PyFGH.util.pyfghutil as pyfghutil
 import numpy.ma as ma
+import PyFGH.GUI_2 as GUI2
 
 import PyFGH.util.DataObject as DataObject
 
@@ -217,7 +218,11 @@ def datamuncher(holder):
 # this is the parent process
 def datagrabber(holder=None):
     if holder is None:
-        holder = GUI.main_window()
+        obj = DataObject.InputData()
+        win = GUI2.GUI(obj)
+        win.mainloop()
+        # holder = GUI.main_window()
+        holder = win.DataReturner()
         holder.GUI = True
     else:
         eq, pes = molecule_gui.molecule_testing(holder)
@@ -270,7 +275,7 @@ def datagrabber(holder=None):
 
     ResultObj.setEigenvectors(wfn2)
 
-    if holder.gui == True:
+    if holder.getgui() == True:
         try:
             from pathlib import Path
 
@@ -309,9 +314,9 @@ def datagrabber(holder=None):
 if __name__ == '__main__':
     tracemalloc.start()
     t0 = time.perf_counter()
-
+    molecule = ""
 #    molecule = "NITROGEN"
-    molecule = "WATER"
+#    molecule = "WATER"
 
     if (molecule == "NITROGEN"):
         holder = DataObject.InputData()

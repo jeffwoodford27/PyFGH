@@ -158,7 +158,7 @@ def passToCalc(dataObj):
     t1 = time.perf_counter()
     print("Done with G Matrix time = {:.2f} s".format(t1-t0))
 
-    cores = dataObj.cores_amount
+    cores = dataObj.getCoresAmount()
 
     t0 = time.perf_counter()
     print("Creating V Matrix")

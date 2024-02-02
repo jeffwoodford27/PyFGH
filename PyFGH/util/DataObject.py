@@ -18,7 +18,7 @@ class InputData:
         self.EquilMolecule = 0
         self.PES = 0
         self.num_eigenvalues = 10
-        self.eigenvalue_flag = True
+        self.eigenvalue_flag = False
         self.Vmethod = 0
         self.model_data = None
         self.psi4method = None
@@ -94,6 +94,7 @@ class InputData:
         return
 
     def setEigenvalueMethod(self, eigenmethod):
+        print(self.eigenvalue_flag)
         self.eigenvalue_flag = eigenmethod
         return
 
@@ -136,6 +137,7 @@ class InputData:
         return self.num_eigenvalues
 
     def getEigenvalueMethod(self):
+        print(self.eigenvalue_flag)
         return self.eigenvalue_flag
 
     def getVmethod(self):
@@ -144,6 +146,11 @@ class InputData:
     def getPsi4Method(self):
         return self.psi4method
 
+    def getCoresAmount(self):
+        return int(self.cores_amount)
+
+    def getgui(self):
+        return self.gui
 
 #TODO take the values in Eignevalues and Eigenvectos and write them to a CSV file in main on line 104.
 class OutputData:

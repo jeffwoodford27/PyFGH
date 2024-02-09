@@ -33,7 +33,7 @@ class GUI(tk.Tk):
         self.TitleFrame.config(relief='solid')
         self.TitleFrame.grid(columnspan=3, row=0)
 
-        DimensionRange = [i for i in range(1,7)]
+        DimensionRange = [i for i in range(1,co.MDEM+1)]
         self.DimensionInput = guc.ComboboxFrame(self, "Dimensions: ", DimensionRange)
         self.DimensionInput.grid(column=0, row=1)
 
@@ -41,15 +41,15 @@ class GUI(tk.Tk):
         self.CoresInput = guc.ComboboxFrame(self, "Computer Cores: ", CoresRange)
         self.CoresInput.grid(column=0, row=3)
 
-        NumEigen = [i for i in range(1,11)]
+        NumEigen = [i for i in range(1, co.MEIG+1)]
         self.NumEigenInput = guc.ComboboxFrame(self, "Number of Eigenvalues: ", NumEigen)
         self.NumEigenInput.grid(column=1, row=1)
 
-        PEMethod = [co.CPSI, co.READ]
+        PEMethod = co.CMETHOD
         self.PEMethodInput = guc.ComboboxFrame(self, "PE Input Method: ", PEMethod)
         self.PEMethodInput.grid(column=1, row=3)
 
-        EigenMethod = [co.FMAT, co.SMAT]
+        EigenMethod = co.MATRIX
         self.EigenMethodInput = guc.ComboboxFrame(self, "Eigenvalue Calculation Method: ", EigenMethod)
         self.EigenMethodInput.grid(column=1, row=2)
 
@@ -204,7 +204,7 @@ class GUI(tk.Tk):
 
     def GetEquilCoordCommand(self):
         print ('Get Equilibrium Coordinate Button Clicked')
-        self.Read_Structures_Button2()
+        self.obj.setequilibrium_file(self.Read_Structures_Button('File Explorer for Equilibrium Structure'))
         return
 
     def CalculateButtonCommand(self):
@@ -219,10 +219,8 @@ class GUI(tk.Tk):
         self.obj.psi4method = None
         if self.obj.PEMethod == co.READ:
             self.obj.setVmethod(self.obj.PEMethod)
-            self.Read_Structures_Button()
+            self.obj.setpotential_energy(self.Read_Structures_Button('File Explorer for Potential Energy'))
             self.test(self.obj)
-
-
         #destroy window
         self.destroy()
         return
@@ -231,8 +229,7 @@ class GUI(tk.Tk):
     def DataReturner(self):
         return self.obj
 
-
-    def Read_Structures_Button(self):
+    def Read_Structures_Button(self, Etitle):
         global opened
         """
             Note: xlsx files are not accepted. Can only take CSV files or else the code will break.
@@ -241,22 +238,8 @@ class GUI(tk.Tk):
             how to save it to that format, just google it. This is the end of my rant. Happy Coding!
         """
 
-        y = askopenfilename(title='File Explorer for Potential Energy')
-        self.obj.setpotential_energy(y)
-
-    # opens file explorer to have the user to enter file
-    def Read_Structures_Button2(self):
-        global opened
-        """
-            Note: xlsx files are not accepted. Can only take CSV files or else the code will break.
-            XLSX files do not abide by UTF-8 formatting and is a pain to get it to work. So to save everyone
-            time just only use a CSV file format!!!!!!!!!! Excel has the ability to save it to CSV format. To find out 
-            how to save it to that format, just google it. This is the end of my rant. Happy Coding!
-        """
-
-        x = askopenfilename(title='File Explorer for Equilibrium Structure')
-        self.obj.setequilibrium_file(x)
-
+        y = askopenfilename(title=Etitle)
+        return y
 
     def test(self, obj):
         eq, pes = molecule_gui.molecule_testing(obj)

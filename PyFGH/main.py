@@ -7,6 +7,7 @@ import PyFGH.molecule_gui as molecule_gui
 import PyFGH.GUI_2 as GUI2
 import PyFGH.util.DataObject as DataObject
 from PyFGH import GUI_output
+from PyFGH import Constants as co
 
 # This is the parent process
 def datamuncher(holder):
@@ -115,8 +116,8 @@ if __name__ == '__main__':
     tracemalloc.start()
     t0 = time.perf_counter()
     molecule = ""
-#    molecule = "NITROGEN"
-#    molecule = "WATER"
+    # molecule = "NITROGEN"
+    # molecule = "WATER"
 
     if (molecule == "NITROGEN"):
         holder = DataObject.InputData()
@@ -137,12 +138,12 @@ if __name__ == '__main__':
         holder.setD(3)
         holder.setNlist([11,11,11])
         holder.setLlist([1.1,1.1,1.65])
-        holder.setcores_amount(2)
+        holder.setcores_amount(4)
         holder.setequilibrium_file("testingfiles/water-equil.csv")
         holder.setpotential_energy("testingfiles/water-potential.csv")
         holder.setNumberOfEigenvalues(10)
         holder.setEigenvalueMethod(False)
-        holder.setVmethod('Read from File')
+        holder.setVmethod(co.READ)
         holder.setcalculation('Full Method')
         holder.setcalculation2('Read from File')
         datagrabber(holder=holder)

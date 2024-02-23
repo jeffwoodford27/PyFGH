@@ -261,7 +261,7 @@ class App(tk.Tk):
         print(q_idx)
 
         q_idx_mask = ma.array(q_idx,mask=q_mask)
-        z = np.zeros(self.N[q_indx],dtype=float)
+        z = np.zeros((self.N[q_indx],self.N[q_indy]),dtype=float)
 
         Npts = np.prod(self.N)
         for pt in range(Npts):
@@ -269,11 +269,7 @@ class App(tk.Tk):
             idx_mask = ma.array(idx,mask=q_mask)
             if (np.equal(q_idx_mask,idx_mask).all()):
                 print(idx)
-                z[idx[q_indx]] = wfn[pt][self.D]
-
-        #         following is testing purposes only not real calculation
-        zf = np.random.randint(-1,1,(len(z),1))
-        z, zfalse = np.meshgrid(z, zf)
+                z[idx[q_indx],idx[q_indy]] = wfn[pt][self.D]
 
         figure_canvas = self.plot_contour(wfn_no, x, y, z)
 

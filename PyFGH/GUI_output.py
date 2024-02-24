@@ -36,13 +36,27 @@ class App(tk.Tk):
             for i in range(self.D):
                 self.qlist.append(('q{:0d}'.format(i+1), '{:0d}'.format(i)))
 
-            self.scatterframe = guc.ButtonFrame(self, "Scatter Plot", self.scatter_input)
-            self.scatterframe.grid(column=0, row=self.row_current)
+            # self.scatterframe = guc.ButtonFrame(self, "Scatter Plot", self.scatter_input)
+            # self.scatterframe.grid(column=0, row=self.row_current)
+            # self.row_current = self.row_current + 1
+            #
+            # self.contourframe = guc.ButtonFrame(self, "Contour Plot", self.contour_input)
+            # self.contourframe.grid(column=0, row=self.row_current)
+            # self.row_current = self.row_current + 1
+            clist = [("Scatter Plot", 0), ("Contour Plot",1)]
+
+            self.plotTypeFrame = guc.RadioButtonFrame(self, "Plot Choice", clist, self.clear_input)
+            self.plotTypeFrame.grid(column=0, row=self.row_current)
             self.row_current = self.row_current + 1
 
-            self.contourframe = guc.ButtonFrame(self, "Contour Plot", self.contour_input)
-            self.contourframe.grid(column=0, row=self.row_current)
+            self.plotSelectFrame = guc.ButtonFrame(self, "Select", self.choice_selector)
+            self.plotSelectFrame.grid(column=0, row=self.row_current)
             self.row_current = self.row_current + 1
+
+            self.pcFrame = ttk.Frame(self)
+            self.pcFrame.grid(column=0,row=self.row_current)
+            self.row_current = self.row_current + 1
+
 
         else:
             plotbutton = guc.ButtonFrame(self, "plot", self.plot_data)
@@ -50,52 +64,59 @@ class App(tk.Tk):
             self.row_current = self.row_current + 1
 
             self.plotframe = ttk.Frame(self, width=500)
-            self.plotframe.grid(column=1, row=0)
+            self.plotframe.grid(column=0, row=0)
 
+
+    def choice_selector(self):
+        result = int(self.plotTypeFrame.get())
+        if(result == 0):
+            self.scatter_input()
+        else:
+            self.contour_input()
 
     def scatter_input(self):
-        self.indvarframe = guc.RadioButtonFrame(self, "Independent Variable", self.qlist, self.clear_projvarframe)
+        self.indvarframe = guc.RadioButtonFrame(self.pcFrame, "Independent Variable", self.qlist, self.clear_projvarframe)
         self.indvarframe.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
-        self.indvarbutton = guc.ButtonFrame(self, "Select", self.select_indvar)
+        self.indvarbutton = guc.ButtonFrame(self.pcFrame, "Select", self.select_indvar)
         self.indvarbutton.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
-        self.projvarframe = ttk.Frame(self)
+        self.projvarframe = ttk.Frame(self.pcFrame)
         self.projvarframe.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
-        plotbutton = guc.ButtonFrame(self, "plot", self.plot_data)
+        plotbutton = guc.ButtonFrame(self.pcFrame, "plot", self.plot_data)
         plotbutton.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
         self.plotframe = ttk.Frame(self, width=500)
-        self.plotframe.grid(column=1, row=0)
+        self.plotframe.grid(column=2, row=0)
 
     def contour_input(self):
-        self.xframe = guc.RadioButtonFrame(self, "X Coordinate", self.qlist, self.clear_projvarframe)
+        self.xframe = guc.RadioButtonFrame(self.pcFrame, "X Coordinate", self.qlist, self.clear_projvarframe)
         self.xframe.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
-        self.yframe = guc.RadioButtonFrame(self, "Y Coordinate", self.qlist, self.clear_projvarframe)
+        self.yframe = guc.RadioButtonFrame(self.pcFrame, "Y Coordinate", self.qlist, self.clear_projvarframe)
         self.yframe.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
-        self.maskframe = guc.ButtonFrame(self, "Projections", self.projselect)
+        self.maskframe = guc.ButtonFrame(self.pcFrame, "Projections", self.projselect)
         self.maskframe.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
-        self.projvarframe = ttk.Frame(self)
+        self.projvarframe = ttk.Frame(self.pcFrame)
         self.projvarframe.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
-        plotbutton = guc.ButtonFrame(self, "plot", self.plot_data_contour)
+        plotbutton = guc.ButtonFrame(self.pcFrame, "plot", self.plot_data_contour)
         plotbutton.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
         self.plotframe = ttk.Frame(self, width=500)
-        self.plotframe.grid(column=1, row=0)
+        self.plotframe.grid(column=2, row=0)
 
     def null(self):
         return
@@ -105,13 +126,8 @@ class App(tk.Tk):
             child.destroy()
         return
 
-    def clear_scatter(self):
-        for child in self.scatterframe.winfo_children():
-            child.destroy()
-        return
-
-    def clear_contour(self):
-        for child in self.contourframe.winfo_children():
+    def clear_input(self):
+        for child in self.pcFrame.winfo_children():
             child.destroy()
         return
 
@@ -175,13 +191,16 @@ class App(tk.Tk):
         plot1.plot(x,y)
         return figure_canvas
 
-    def plot_contour(self, no, x, y, z):
+    def plot_contour(self, no, x, y, z, qx, qy):
         x2d, y2d = np.meshgrid(x, y)
         fig, ax = plt.subplots(1, 1)
         figure_canvas = FigureCanvasTkAgg(fig, self.plotframe)
         cp = ax.contourf(x2d, y2d, z)
         fig.colorbar(cp)  # Add a colorbar to a plot
         ax.set_title("Wavefunction {:0d}".format(no))
+        ax.set_xlabel('q{:0d}'.format(qx+1))
+        ax.set_ylabel('q{:0d}'.format(qy+1))
+
 
         return figure_canvas
 
@@ -271,7 +290,7 @@ class App(tk.Tk):
                 print(idx)
                 z[idx[q_indx],idx[q_indy]] = wfn[pt][self.D]
 
-        figure_canvas = self.plot_contour(wfn_no, x, y, z)
+        figure_canvas = self.plot_contour(wfn_no, x, y, z, q_indx, q_indy)
 
         figure_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         print(self.plotframe.winfo_children())

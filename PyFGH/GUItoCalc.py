@@ -10,6 +10,7 @@ from PyFGH.util.DataObject import OutputData as OutputData
 from PyFGH.util import pyfghutil as pyfghutil
 import time
 
+
 '''
 eckartTranslation enforces the translational Eckart condition on the input structure by translating each structure to the center of mass.
 Input:

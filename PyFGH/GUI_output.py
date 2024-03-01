@@ -57,6 +57,9 @@ class App(tk.Tk):
             self.pcFrame.grid(column=0,row=self.row_current)
             self.row_current = self.row_current + 1
 
+            self.plotframe = ttk.Frame(self, width=500)
+            self.plotframe.grid(column=2, row=0, rowspan=2)
+
 
         else:
             plotbutton = guc.ButtonFrame(self, "plot", self.plot_data)
@@ -65,6 +68,9 @@ class App(tk.Tk):
 
             self.plotframe = ttk.Frame(self, width=500)
             self.plotframe.grid(column=0, row=0)
+
+            self.plotframe = ttk.Frame(self, width=500)
+            self.plotframe.grid(column=2, row=0, rowspan=2)
 
 
     def choice_selector(self):
@@ -91,8 +97,6 @@ class App(tk.Tk):
         plotbutton.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
-        self.plotframe = ttk.Frame(self, width=500)
-        self.plotframe.grid(column=2, row=0)
 
     def contour_input(self):
         self.xframe = guc.RadioButtonFrame(self.pcFrame, "X Coordinate", self.qlist, self.clear_projvarframe)
@@ -115,8 +119,7 @@ class App(tk.Tk):
         plotbutton.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
-        self.plotframe = ttk.Frame(self, width=500)
-        self.plotframe.grid(column=2, row=0)
+
 
     def null(self):
         return
@@ -198,9 +201,8 @@ class App(tk.Tk):
         cp = ax.contourf(x2d, y2d, z)
         fig.colorbar(cp)  # Add a colorbar to a plot
         ax.set_title("Wavefunction {:0d}".format(no))
-        ax.set_xlabel('q{:0d}'.format(qx+1))
-        ax.set_ylabel('q{:0d}'.format(qy+1))
-
+        ax.set_xlabel('q{:0d} (bohr)'.format(qx+1))
+        ax.set_ylabel('q{:0d} (bohr)'.format(qy+1))
 
         return figure_canvas
 

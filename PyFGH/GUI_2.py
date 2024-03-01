@@ -208,7 +208,10 @@ class GUI(tk.Tk):
         return
 
     def CalculateButtonCommand(self):
+        print(self.obj.getEquilFile())
         if self.obj.getEquilFile() == "":
+            self.GetEquilCoordCommand()
+        if self.obj.getEquilFile() is None:
             self.GetEquilCoordCommand()
         self.obj.cores_amount = self.CoresInput.get()
         self.obj.NoEigen = self.NumEigenInput.get()

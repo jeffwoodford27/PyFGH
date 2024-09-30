@@ -207,6 +207,24 @@ class GUI(tk.Tk):
         self.obj.setequilibrium_file(self.Read_Structures_Button('File Explorer for Equilibrium Structure'))
         return
 
+    def InputSci4Method(self):
+        window = tk.Toplevel(self)
+        window.title("Enter SCI4 Method")
+        window.geometry("500x235")
+        window.attributes("-topmost", 1)
+
+        Smethod = guc.TextBoxFrame(window, "Method")
+        Smethod.grid(column=0, row=0)
+
+        def InputSci4Methodget():
+            self.obj.psi4method = Smethod.get()
+            window.destroy()
+            return
+
+        getMethodButton = guc.ButtonFrame(window, "Get Method", InputSci4Methodget)
+        getMethodButton.grid(column=0, row=1)
+        return
+
     def CalculateButtonCommand(self):
         print(self.obj.getEquilFile())
         if self.obj.getEquilFile() == "":
@@ -221,11 +239,14 @@ class GUI(tk.Tk):
             self.obj.setEigenvalueMethod(True)
         else:
             self.obj.setEigenvalueMethod(False)
-        self.obj.psi4method = None
         if self.obj.PEMethod == co.READ:
+            self.obj.psi4method = None
             self.obj.setVmethod(self.obj.PEMethod)
             self.obj.setpotential_energy(self.Read_Structures_Button('File Explorer for Potential Energy'))
             self.test(self.obj)
+        if self.obj.PEMethod == co.CPSI:
+            self.InputSci4Method()
+
         #destroy window
         self.destroy()
         return

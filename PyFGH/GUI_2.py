@@ -45,9 +45,8 @@ class GUI(tk.Tk):
         self.NumEigenInput = guc.ComboboxFrame(self, "Number of Eigenvalues: ", NumEigen)
         self.NumEigenInput.grid(column=1, row=1)
 
-        PEMethod = co.CMETHOD
-        self.PEMethodInput = guc.ComboboxFrame(self, "PE Input Method: ", PEMethod)
-        self.PEMethodInput.grid(column=1, row=3)
+        self.PEButton = guc.ButtonFrame(self, "Choose Energy Method", self.ChoosePEMethod)
+        self.PEButton.grid(column=1, row=3)
 
         EigenMethod = co.MATRIX
         self.EigenMethodInput = guc.ComboboxFrame(self, "Eigenvalue Calculation Method: ", EigenMethod)
@@ -207,13 +206,39 @@ class GUI(tk.Tk):
         self.obj.setequilibrium_file(self.Read_Structures_Button('File Explorer for Equilibrium Structure'))
         return
 
+    def ChoosePEMethod(self):
+        window = tk.Toplevel(self)
+        window.title("Choose potential energy method")
+        window.geometry("500x235")
+        window.attributes("-topmost", 1)
+        PEMethod = co.CMETHOD
+        PEMethodInput = guc.ComboboxFrame(window, "PE Input Method: ", PEMethod)
+        PEMethodInput.grid(column=0, row=0)
+
+        def PEMethodget():
+            self.obj.PEMethod = PEMethodInput.get()
+            if self.obj.PEMethod == co.READ:
+                self.obj.psi4method = None
+                self.obj.setVmethod(self.obj.PEMethod)
+                self.obj.setpotential_energy(self.Read_Structures_Button('File Explorer for Potential Energy'))
+                self.test(self.obj)
+                window.destroy()
+            if self.obj.PEMethod == co.CPSI:
+                self.InputSci4Method()
+            return
+
+        getMethodButton = guc.ButtonFrame(window, "Get Method", PEMethodget)
+        getMethodButton.grid(column=0, row=1)
+        return
+
+
     def InputSci4Method(self):
         window = tk.Toplevel(self)
         window.title("Enter SCI4 Method")
         window.geometry("500x235")
         window.attributes("-topmost", 1)
 
-        Smethod = guc.TextBoxFrame(window, "Method")
+        Smethod = guc.ComboboxFrame(window,"Choose Method", ["HF/6-31G", "B3LYP/cc-pVTZ"])
         Smethod.grid(column=0, row=0)
 
         def InputSci4Methodget():
@@ -233,17 +258,11 @@ class GUI(tk.Tk):
             self.GetEquilCoordCommand()
         self.obj.cores_amount = self.CoresInput.get()
         self.obj.NoEigen = self.NumEigenInput.get()
-        self.obj.PEMethod = self.PEMethodInput.get()
         self.obj.gui = True
         if self.EigenMethodInput.get() == co.SMAT:
             self.obj.setEigenvalueMethod(True)
         else:
             self.obj.setEigenvalueMethod(False)
-        if self.obj.PEMethod == co.READ:
-            self.obj.psi4method = None
-            self.obj.setVmethod(self.obj.PEMethod)
-            self.obj.setpotential_energy(self.Read_Structures_Button('File Explorer for Potential Energy'))
-            self.test(self.obj)
         if self.obj.PEMethod == co.CPSI:
             self.InputSci4Method()
 

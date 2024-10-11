@@ -238,11 +238,13 @@ class GUI(tk.Tk):
         window.geometry("500x235")
         window.attributes("-topmost", 1)
 
-        Smethod = guc.ComboboxFrame(window,"Choose Method", ["HF/6-31G", "B3LYP/cc-pVTZ"])
+        Smethod = guc.ComboboxFrame(window,"Choose Method", ["SCF/6-31G", "B3LYP/cc-pVTZ"])
         Smethod.grid(column=0, row=0)
 
         def InputSci4Methodget():
             self.obj.psi4method = Smethod.get()
+            self.obj.setVmethod(co.CPSI)
+            self.test(self.obj)
             window.destroy()
             return
 

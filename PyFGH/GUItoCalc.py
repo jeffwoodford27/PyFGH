@@ -166,6 +166,7 @@ def passToCalc(dataObj):
     gc.collect()
     Vmethod = dataObj.getVmethod()
     psi4method = dataObj.getPsi4Method()
+    print(D,N,Vmethod,equil,pes,psi4method,cores)
     V = Vmatrix.VMatrixCalc(D, N, Vmethod, equil, pes, psi4method, cores)
     t1 = time.perf_counter()
     print("Done with V Matrix time = {:.2f} s".format(t1-t0))

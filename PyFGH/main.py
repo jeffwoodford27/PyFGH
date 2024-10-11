@@ -117,7 +117,7 @@ if __name__ == '__main__':
     t0 = time.perf_counter()
     molecule = ""
     # molecule = "NITROGEN"
-    # molecule = "WATER"
+    #molecule = "WATER"
 
     if (molecule == "NITROGEN"):
         holder = DataObject.InputData()

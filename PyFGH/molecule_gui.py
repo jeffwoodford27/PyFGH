@@ -33,9 +33,9 @@ def readEqfile(eqfile):
                 try:
                     S.append(row[0])
                     A.append(int(row[1]))
-                    x.append(float(row[2]))
-                    y.append(float(row[3]))
-                    z.append(float(row[4]))
+                    x.append(float(row[2])/0.529177249)
+                    y.append(float(row[3])/0.529177249)
+                    z.append(float(row[4])/0.529177249)
                 except IndexError:
                     raise ValidationError('In Equilibrium File: Missing Data on Line {0}'.format(Nat + 2))
                 except ValueError:
@@ -187,6 +187,7 @@ def generatePESCoordinates_Psi4(D, N, L, equil):
                 dq = L[d] / N[d]
                 q[d] = idx[d] * dq - L[d] / 2 + dq / 2
 
+
             x = np.zeros(Nat, dtype=float)
             y = np.zeros(Nat, dtype=float)
             z = np.zeros(Nat, dtype=float)
@@ -228,7 +229,7 @@ def generatePESCoordinates_Psi4(D, N, L, equil):
         yeq[2] = yeq[0] + R2eqlen * np.cos(theta_eq / 2.0)
         zeq[0] = zeq[1] = zeq[2] = 0
 
-        equil.x = xeq
+        equil.setXList(xeq)
         equil.setYList(yeq)
         equil.setZList(zeq)
 
@@ -239,6 +240,7 @@ def generatePESCoordinates_Psi4(D, N, L, equil):
             for d in range(D):
                 dq = L[d] / N[d]
                 q[d] = idx[d] * dq - L[d] / 2 + dq / 2
+            print(pt, q)
 
             x = np.zeros(Nat, dtype=float)
             y = np.zeros(Nat, dtype=float)
@@ -341,6 +343,7 @@ def molecule_testing(holder):
 #            if (linearTest(mol) == False):
 #                raise ValidationError("PES structure " + str(pt + 1) + " is linear. Linear molecules not yet supported.")
     else:
+        print("Reading from pes")
         L = holder.getLlist()
         pes = generatePESCoordinates_Psi4(D, N, L, equil)
 

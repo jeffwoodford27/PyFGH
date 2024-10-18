@@ -189,7 +189,7 @@ def calcPESfromPsi4(D, N, equil, pes, psi4method, cores):
                                                s3=S[2], x3=x[2], y3=y[2], z3=0))
 
         try:
-            emin = calcPsi4Energy("SCF/6-31G", psimol)
+            emin = calcPsi4Energy(psi4method, psimol)
         except:
             raise Exception("Unknown/unsupported method " + psi4method + " or other Psi4 error.")
 

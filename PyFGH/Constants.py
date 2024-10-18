@@ -1,3 +1,4 @@
+# These are variable constants to contain text or numbers that should be consistent through the whole program
 READ = "Read From File"
 SMAT = "Sparse Matrix"
 FMAT = "Full Matrix"

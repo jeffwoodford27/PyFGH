@@ -1,4 +1,6 @@
 import numpy as np
+from PyFGH import molecule_gui
+import gc
 
 """
 DataObject is a place to hold data. All values in these classes are first assigned to zero. In GUI_old.py these values get 
@@ -151,6 +153,55 @@ class InputData:
 
     def getgui(self):
         return self.gui
+
+    def validate(self):
+        if not self.checkD():
+            return False
+        if not self.checkN():
+            return False
+        if not self.checkL():
+            return False
+        if not self.checkEqPes():
+            return False
+        return True
+
+    def checkD(self):
+        if self.D > 0 & self.D is int:
+            print("D must be an integer")
+            return True
+        else:
+            return False
+
+    def checkN(self):
+        for i in range(self.D):
+            if(self.N[i] is not int):
+                print("N must be an integer")
+                return False
+            if (self.N[i] < 5):
+                print("N must be greater than 5")
+                return False
+            if (self.N[i] % 2 == 0):
+                print("N must be an odd number")
+                return False
+            return True
+
+    def checkL(self):
+        for i in range(self.D):
+            if(self.L[i] is not float):
+                print("L must be a float")
+                return False
+            if (self.L[i] <= 0):
+                print("L must be greater than 0")
+                return False
+            return True
+
+    def checkEqPes(self):
+        eq, pes = molecule_gui.molecule_testing(self)
+        gc.collect()
+        self.setEquilMolecule(eq)
+        self.setPES(pes)
+
+
 
 #TODO take the values in Eignevalues and Eigenvectos and write them to a CSV file in main on line 104.
 class OutputData:

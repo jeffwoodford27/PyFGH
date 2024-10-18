@@ -269,6 +269,7 @@ class GUI(tk.Tk):
             self.InputSci4Method()
 
         #destroy window
+
         self.destroy()
         return
 
@@ -293,3 +294,5 @@ class GUI(tk.Tk):
         gc.collect()
         self.obj.setEquilMolecule(eq)
         self.obj.setPES(pes)
+
+

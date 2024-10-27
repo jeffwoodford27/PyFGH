@@ -116,7 +116,7 @@ if __name__ == '__main__':
     tracemalloc.start()
     t0 = time.perf_counter()
     molecule = ""
-    # molecule = "NITROGEN"
+    #molecule = "NITROGEN"
     #molecule = "WATER"
 
     if (molecule == "NITROGEN"):
@@ -146,7 +146,9 @@ if __name__ == '__main__':
         holder.setVmethod(co.READ)
         holder.setcalculation('Full Method')
         holder.setcalculation2('Read from File')
+        holder.validate()
         datagrabber(holder=holder)
+
     else:
         datagrabber()
 

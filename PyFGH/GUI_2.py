@@ -1,4 +1,3 @@
-import gc
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
@@ -7,17 +6,20 @@ import multiprocessing
 import sys
 import numpy as np
 from PyFGH import GUI_Classes as guc
-from PyFGH import molecule_gui
 from PyFGH import Constants as co
-from PyFGH.util import DataObject as DataObject
 
+# This is the second and current GUI implementation
+# It will be given an object of type DataObject that the GUI will input values into
+# The calculate button command will drive the placing of values
+# The majority of error checking happens here or in the DataObject
 
 class GUI(tk.Tk):
     def __init__(self, obj):
         super().__init__()
-
+        # Sets the obj given to DataObject type
         self.obj = obj
-
+        self.obj.gui = True
+        # Creation of the GUI window and buttons along with it onward
         self.title('PyFGH')
         self.geometry('910x255')
         self.resizable(False, False)
@@ -73,6 +75,8 @@ class GUI(tk.Tk):
         self.CalculateButton = guc.ButtonFrame(self, "CALCULATE!", self.CalculateButtonCommand)
         self.CalculateButton.grid(column=1, row=4)
 
+    # getNLvalues will take the value of D and generate corresponding amount of N L values
+    # User will then directly type N and L into boxes in a new window
     def getNLvalues(self):
         D = self.DimensionInput.get()
         if (D == ''):
@@ -100,7 +104,8 @@ class GUI(tk.Tk):
             Lobj = guc.TextBoxFrame(NLwindow, "L"+str(i+1))
             Lobj.grid(column=1, row=i)
             LFrame.append(Lobj)
-
+        # Function within getNLValues to error check values inputted
+        # If correct it will proceed to set the values
         def get_values():
             self.obj.N = None
             self.obj.L = None
@@ -155,6 +160,7 @@ class GUI(tk.Tk):
         getValuesButton.grid(columnspan=2, row=D)
         return
 
+    # Minor command buttons onward
     def AboutButtonCommand(self):
         window = tk.Toplevel(self)
         window.title("About")
@@ -201,11 +207,13 @@ class GUI(tk.Tk):
         sys.exit()
         return
 
+    # This will open file explorer to input the equilibrium file
     def GetEquilCoordCommand(self):
         print ('Get Equilibrium Coordinate Button Clicked')
         self.obj.setequilibrium_file(self.Read_Structures_Button('File Explorer for Equilibrium Structure'))
         return
 
+    # This method prompts the user to choose read from file or calculate with psi4
     def ChoosePEMethod(self):
         window = tk.Toplevel(self)
         window.title("Choose potential energy method")
@@ -215,13 +223,13 @@ class GUI(tk.Tk):
         PEMethodInput = guc.ComboboxFrame(window, "PE Input Method: ", PEMethod)
         PEMethodInput.grid(column=0, row=0)
 
+        # Internal method that directs the user depending on the choice from above
         def PEMethodget():
             self.obj.PEMethod = PEMethodInput.get()
             if self.obj.PEMethod == co.READ:
                 self.obj.psi4method = None
                 self.obj.setVmethod(self.obj.PEMethod)
                 self.obj.setpotential_energy(self.Read_Structures_Button('File Explorer for Potential Energy'))
-                self.test(self.obj)
                 window.destroy()
             if self.obj.PEMethod == co.CPSI:
                 self.InputSci4Method()
@@ -231,20 +239,20 @@ class GUI(tk.Tk):
         getMethodButton.grid(column=0, row=1)
         return
 
-
+    # This method runs if user selected psi4 calculation
     def InputSci4Method(self):
         window = tk.Toplevel(self)
         window.title("Enter SCI4 Method")
         window.geometry("500x235")
         window.attributes("-topmost", 1)
-
+        # IMPORTANT: This line underneath are the options of psi4 calculation
         Smethod = guc.ComboboxFrame(window,"Choose Method", ["SCF/6-31G", "B3LYP/cc-pVTZ"])
         Smethod.grid(column=0, row=0)
 
+        # Internal method to receive choice user selected
         def InputSci4Methodget():
             self.obj.psi4method = Smethod.get()
             self.obj.setVmethod(co.CPSI)
-            self.test(self.obj)
             window.destroy()
             return
 
@@ -252,7 +260,11 @@ class GUI(tk.Tk):
         getMethodButton.grid(column=0, row=1)
         return
 
+    # This command drives the entire GUI, many values are set here
+    # The calculation will proceed if the validate function returns True
+    # Otherwise the user will have to fix any errors
     def CalculateButtonCommand(self):
+        self.obj.setD(int(self.DimensionInput.get()))
         print(self.obj.getEquilFile())
         if self.obj.getEquilFile() == "":
             self.GetEquilCoordCommand()
@@ -260,7 +272,6 @@ class GUI(tk.Tk):
             self.GetEquilCoordCommand()
         self.obj.cores_amount = self.CoresInput.get()
         self.obj.NoEigen = self.NumEigenInput.get()
-        self.obj.gui = True
         if self.EigenMethodInput.get() == co.SMAT:
             self.obj.setEigenvalueMethod(True)
         else:
@@ -269,14 +280,18 @@ class GUI(tk.Tk):
             self.InputSci4Method()
 
         #destroy window
-
-        self.destroy()
-        return
+        if self.obj.validate():
+            self.destroy()
+            return
+        else:
+            print("Wrong Input")
+            return
 
     #collect data function and return self.obj
     def DataReturner(self):
         return self.obj
 
+    # Method that opens the file explorer
     def Read_Structures_Button(self, Etitle):
         global opened
         """
@@ -288,11 +303,3 @@ class GUI(tk.Tk):
 
         y = askopenfilename(title=Etitle)
         return y
-
-    def test(self, obj):
-        eq, pes = molecule_gui.molecule_testing(obj)
-        gc.collect()
-        self.obj.setEquilMolecule(eq)
-        self.obj.setPES(pes)
-
-

@@ -16,7 +16,7 @@ from PyFGH import Constants as co
 class GUI(tk.Tk):
     def __init__(self, obj):
         super().__init__()
-        # Sets the obj given to DataObject type
+        # Sets the self.obj to the input data object
         self.obj = obj
         self.obj.gui = True
         # Creation of the GUI window and buttons along with it onward
@@ -218,7 +218,6 @@ class GUI(tk.Tk):
         window = tk.Toplevel(self)
         window.title("Choose potential energy method")
         window.geometry("500x235")
-        window.attributes("-topmost", 1)
         PEMethod = co.CMETHOD
         PEMethodInput = guc.ComboboxFrame(window, "PE Input Method: ", PEMethod)
         PEMethodInput.grid(column=0, row=0)
@@ -232,7 +231,7 @@ class GUI(tk.Tk):
                 self.obj.setpotential_energy(self.Read_Structures_Button('File Explorer for Potential Energy'))
                 window.destroy()
             if self.obj.PEMethod == co.CPSI:
-                self.InputSci4Method()
+                self.InputSci4Method(window)
             return
 
         getMethodButton = guc.ButtonFrame(window, "Get Method", PEMethodget)
@@ -240,14 +239,11 @@ class GUI(tk.Tk):
         return
 
     # This method runs if user selected psi4 calculation
-    def InputSci4Method(self):
-        window = tk.Toplevel(self)
-        window.title("Enter SCI4 Method")
-        window.geometry("500x235")
-        window.attributes("-topmost", 1)
+    def InputSci4Method(self, window):
+
         # IMPORTANT: This line underneath are the options of psi4 calculation
-        Smethod = guc.ComboboxFrame(window,"Choose Method", ["SCF/6-31G", "B3LYP/cc-pVTZ"])
-        Smethod.grid(column=0, row=0)
+        Smethod = guc.ComboboxFrame(window,"Choose Method", co.PSI4M)
+        Smethod.grid(column=1, row=0)
 
         # Internal method to receive choice user selected
         def InputSci4Methodget():
@@ -257,7 +253,7 @@ class GUI(tk.Tk):
             return
 
         getMethodButton = guc.ButtonFrame(window, "Get Method", InputSci4Methodget)
-        getMethodButton.grid(column=0, row=1)
+        getMethodButton.grid(column=1, row=1)
         return
 
     # This command drives the entire GUI, many values are set here
@@ -270,14 +266,12 @@ class GUI(tk.Tk):
             self.GetEquilCoordCommand()
         if self.obj.getEquilFile() is None:
             self.GetEquilCoordCommand()
-        self.obj.cores_amount = self.CoresInput.get()
-        self.obj.NoEigen = self.NumEigenInput.get()
+        self.obj.cores_amount = int(self.CoresInput.get())
+        self.obj.NoEigen = int(self.NumEigenInput.get())
         if self.EigenMethodInput.get() == co.SMAT:
             self.obj.setEigenvalueMethod(True)
         else:
             self.obj.setEigenvalueMethod(False)
-        if self.obj.PEMethod == co.CPSI:
-            self.InputSci4Method()
 
         #destroy window
         if self.obj.validate():

@@ -3,6 +3,10 @@ import gc
 import csv
 from PyFGH import Constants as co
 from PyFGH.util import pyfghutil
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from numpy import ma
 
 """
 DataObject is a place to hold data. All values in these classes are first assigned to zero. In GUI_old.py these values get 
@@ -19,11 +23,11 @@ class InputData:
         self.L = None
         self.equilibrium_file = None
         self.potential_energy_file = None
-        self.EquilMolecule = 0
-        self.PES = 0
+        self.EquilMolecule = None
+        self.PES = None
         self.num_eigenvalues = 10
         self.eigenvalue_flag = False
-        self.Vmethod = 0
+        self.Vmethod = None
         self.model_data = None
         self.psi4method = None
         self.inputobject = None
@@ -31,6 +35,7 @@ class InputData:
         self.calculation2 = None
         self.gui = None
         self.EPFlag = False
+        self.debug = False
 
     """
     The following methods are setters. These values get set in test1.py
@@ -177,9 +182,6 @@ class InputData:
         if not self.checkNumEig():
             print("prob eig")
             return False
-        if not self.checkMType():
-            print("prob matrix")
-            return False
         if not self.checkVMethod():
             print("prob V")
             return False
@@ -229,14 +231,14 @@ class InputData:
         return True
 
     def checkNumEig(self):
-        if np.int32(self.num_eigenvalues) > 0 and isinstance(np.int32(self.num_eigenvalues), np.int32):
+        if self.num_eigenvalues > 0 and isinstance(self.num_eigenvalues, int):
             return True
         else:
             print("Number of eigenvalues must be an integer")
             return False
 
     def checkCores(self):
-        if np.int32(self.cores_amount) > 0 and isinstance(np.int32(self.cores_amount), np.int32):
+        if self.cores_amount > 0 and isinstance(self.cores_amount, int):
             return True
         else:
             print("Cores must be an integer")
@@ -249,12 +251,12 @@ class InputData:
             print("Vmethod should be either 'Read From File' or 'Calculate With Psi4'")
             return False
 
-    def checkMType(self):
-        if self.eigenvalue_flag or not self.eigenvalue_flag:
+    def checkPsi4(self):
+        if self.psi4method in co.PSI4M:
             return True
         else:
-            print("Matrix type should be True or False")
             return False
+
 
     # Former molecule_gui file
     # Now used as part of the checkEqPes section of validate
@@ -505,7 +507,7 @@ class InputData:
                 for d in range(self.D):
                     dq = self.L[d] / self.N[d]
                     q[d] = idx[d] * dq - self.L[d] / 2 + dq / 2
-                print(pt, q)
+                if self.debug: print(pt, q)
 
                 x = np.zeros(Nat, dtype=float)
                 y = np.zeros(Nat, dtype=float)
@@ -581,6 +583,8 @@ class InputData:
     def molecule_testing(self):
         D = self.getD()
         N = self.getNlist()
+        if self.debug: print(D)
+        if self.debug: print(N)
 
         eqfile = self.getEquilFile()
         if (not eqfile):
@@ -608,7 +612,7 @@ class InputData:
         #            if (linearTest(mol) == False):
         #                raise ValidationError("PES structure " + str(pt + 1) + " is linear. Linear molecules not yet supported.")
         else:
-            print("Reading from pes")
+            if self.debug: print("Generating pes")
             L = self.getLlist()
             pes = self.generatePESCoordinates_Psi4(equil)
 
@@ -656,5 +660,91 @@ class OutputData:
             "eigenvectors": self.eigenvectors
         }
 
+    def plot_data(self,wfn_no, q_ind, D, N, L, qprojlist):
+        wfn = self.getEigenvector(wfn_no)
+
+        q_mask = np.zeros(D,dtype=int)
+        q_mask[q_ind] = 1
+
+        n = (N[q_ind]-1)//2
+        dx = L[q_ind]/N[q_ind]
+        x = np.array([(j - n) * dx for j in range(N[q_ind])],dtype=float)
+
+        q_idx = np.zeros(D,dtype=int)
+        i = 0
+        for d in range(D):
+            if (d != q_ind):
+                q_idx[d] = int(qprojlist[i].current())
+                i = i + 1
+
+        q_idx_mask = ma.array(q_idx,mask=q_mask)
+        y = np.zeros(N[q_ind],dtype=float)
+
+        Npts = np.prod(N)
+        for pt in range(Npts):
+            idx = np.array(pyfghutil.PointToIndex(N, pt),dtype=int)
+            idx_mask = ma.array(idx,mask=q_mask)
+            if (np.equal(q_idx_mask,idx_mask).all()):
+                y[idx[q_ind]] = wfn[pt][D]
+
+        figure = self.plot_scatter(wfn_no, q_ind, x, y)
+
+        return figure
 
 
+    def plot_scatter(self, no, q_ind, x, y):
+        figure = Figure(figsize=(6,4), dpi=100)
+        titlestr = "Wavefunction {:0d}".format(no)
+        xlabel = "q{:0d} (bohr)".format(q_ind)
+        plot1 = figure.add_subplot(xlabel=xlabel, ylabel="Normalized Wavefunction",title=titlestr)
+        plot1.plot(x,y)
+        return figure
+
+    def plot_data_contour(self, wfn_no, q_indx, q_indy, D, N, L, qprojlist):
+
+        wfn = self.getEigenvector(wfn_no)
+
+        q_mask = np.zeros(D,dtype=int)
+        q_mask[q_indx] = 1
+        q_mask[q_indy] = 1
+
+        nx = (N[q_indx]-1)//2
+        dx = L[q_indx]/N[q_indx]
+        x = np.array([(j - nx) * dx for j in range(N[q_indx])],dtype=float)
+
+        ny = (N[q_indy]-1)//2
+        dy = L[q_indy]/N[q_indy]
+        y = np.array([(j - ny) * dy for j in range(N[q_indy])],dtype=float)
+
+        q_idx = np.zeros(D,dtype=int)
+        i = 0
+        for d in range(D):
+            if ((d != q_indx) and (d != q_indy)):
+                q_idx[d] = int(qprojlist[i].current())
+                i = i + 1
+
+        q_idx_mask = ma.array(q_idx,mask=q_mask)
+        z = np.zeros((N[q_indx],N[q_indy]),dtype=float)
+
+        Npts = np.prod(N)
+        for pt in range(Npts):
+            idx = np.array(pyfghutil.PointToIndex(N, pt),dtype=int)
+            idx_mask = ma.array(idx,mask=q_mask)
+            if (np.equal(q_idx_mask,idx_mask).all()):
+                z[idx[q_indx],idx[q_indy]] = wfn[pt][D]
+
+        fig = self.plot_contour(wfn_no, x, y, z, q_indx, q_indy)
+
+        return fig
+
+
+    def plot_contour(self, no, x, y, z, qx, qy):
+        x2d, y2d = np.meshgrid(x, y)
+        fig, ax = plt.subplots(1, 1)
+        cp = ax.contourf(x2d, y2d, z)
+        fig.colorbar(cp)  # Add a colorbar to a plot
+        ax.set_title("Wavefunction {:0d}".format(no))
+        ax.set_xlabel('q{:0d} (bohr)'.format(qx+1))
+        ax.set_ylabel('q{:0d} (bohr)'.format(qy+1))
+
+        return fig

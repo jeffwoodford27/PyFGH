@@ -31,9 +31,7 @@ class InputData:
         self.model_data = None
         self.psi4method = None
         self.inputobject = None
-        self.calculation = None
-        self.calculation2 = None
-        self.gui = None
+        self.gui = False
         self.EPFlag = False
         self.debug = False
 
@@ -49,19 +47,6 @@ class InputData:
     def getinputobject(self):
         return self.inputobject
 
-    def setcalculation(self, calculation):
-        self.calculation = calculation
-        return
-
-    def getcalculation(self):
-        return self.calculation
-
-    def setcalculation2(self, calculation2):
-        self.calculation2 = calculation2
-        return
-
-    def getcalculation2(self):
-        return self.calculation2
 
     def getD(self):
         return self.D
@@ -112,6 +97,10 @@ class InputData:
     """
     The following methods are setters. These values get set in test1.py
     """
+
+    def setgui(self, gui):
+        self.gui = gui
+        return
 
     def setcores_amount(self, cores):
         self.cores_amount = cores

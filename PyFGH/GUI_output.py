@@ -1,12 +1,7 @@
-
-import numpy as np
 import tkinter as tk
 from tkinter import ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from numpy import ma
 from PyFGH import GUI_Classes as guc
-
-from PyFGH.util import pyfghutil
 
 
 class App(tk.Tk):
@@ -23,9 +18,9 @@ class App(tk.Tk):
 
         plots = []
         for i in range(self.Nplot):
-            plots.append(('Plot {:0d}'.format(i), '{:0d}'.format(i)))
+            plots.append(i)
 
-        self.wfnframe = guc.RadioButtonFrame(self, "Plot Option", plots, self.null)
+        self.wfnframe = guc.ComboboxFrame(self, "Plot Option", plots)
         self.wfnframe.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
@@ -49,7 +44,7 @@ class App(tk.Tk):
             self.row_current = self.row_current + 1
 
             self.plotframe = ttk.Frame(self, width=500)
-            self.plotframe.grid(column=2, row=0, rowspan=2)
+            self.plotframe.grid(column=2, row=0, rowspan=4)
 
 
         else:
@@ -161,6 +156,7 @@ class App(tk.Tk):
 
         return
 
+# rename
     def plot_data(self):
         for child in self.plotframe.winfo_children():
             child.destroy()

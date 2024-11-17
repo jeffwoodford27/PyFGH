@@ -106,10 +106,10 @@ def datagrabber(holder=None):
         except:
             raise "Could not write eigenvalues or eigenfunctions to files."
 
-    obj = GUI_output.App(D, N, L, ResultObj)
-    obj.mainloop()
+        obj = GUI_output.App(D, N, L, ResultObj)
+        obj.mainloop()
 
-    return wfn, freq
+    return ResultObj
 
 
 if __name__ == '__main__':
@@ -117,7 +117,7 @@ if __name__ == '__main__':
     t0 = time.perf_counter()
     molecule = ""
     #molecule = "NITROGEN"
-    #molecule = "WATER"
+    molecule = "WATER"
 
     if (molecule == "NITROGEN"):
         holder = DataObject.InputData()
@@ -130,8 +130,6 @@ if __name__ == '__main__':
         holder.setNumberOfEigenvalues(10)
         holder.setEigenvalueMethod(False)
         holder.setVmethod('Read from File')
-        holder.setcalculation('Full Method')
-        holder.setcalculation2('Read from File')
         datagrabber(holder=holder)
     elif (molecule == "WATER"):
         holder = DataObject.InputData()
@@ -144,8 +142,7 @@ if __name__ == '__main__':
         holder.setNumberOfEigenvalues(10)
         holder.setEigenvalueMethod(False)
         holder.setVmethod(co.READ)
-        holder.setcalculation('Full Method')
-        holder.setcalculation2('Read from File')
+        holder.setgui(True)
         holder.validate()
         datagrabber(holder=holder)
 

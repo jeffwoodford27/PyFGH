@@ -5,7 +5,6 @@ from PyFGH import Constants as co
 from PyFGH.util import pyfghutil
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from numpy import ma
 
 """
@@ -34,6 +33,7 @@ class InputData:
         self.gui = False
         self.EPFlag = False
         self.debug = False
+
 
     """
     The following methods are setters. These values get set in test1.py
@@ -188,6 +188,9 @@ class InputData:
             return False
 
     def checkN(self):
+        if self.N is None:
+            print("N must be set")
+            return False
         for i in range(self.D):
             if isinstance(self.N[i], np.int32):
                 if self.N[i] < 5:
@@ -202,6 +205,9 @@ class InputData:
                 return False
 
     def checkL(self):
+        if self.L is None:
+            print("L must be set")
+            return False
         for i in range(self.D):
             if(isinstance(self.L[i], np.float64)):
                 if (self.L[i] <= 0):
@@ -608,6 +614,7 @@ class InputData:
         return equil, pes
     # End of former molecule_gui
 
+
 #TODO take the values in Eignevalues and Eigenvectos and write them to a CSV file in main on line 104.
 class OutputData:
     def __init__(self):
@@ -648,6 +655,46 @@ class OutputData:
             "eigenvalues": self.eigenvalues,
             "eigenvectors": self.eigenvectors
         }
+
+    def generateValues(self, holder):
+        D = holder.getD()
+        N = holder.getNlist()
+        L = holder.getLlist()
+        Npts = np.prod(N)
+        Neig = self.getNumberOfEigenvalues()
+        eigvals = self.getEigenvalues()
+        eigvecs = self.getEigenvectors()
+        wfnorder = np.argsort(eigvals)
+        freq = np.zeros(Neig, dtype=float)
+
+        for i in range(Neig):
+            freq[i] = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
+            print("Eigenvalue #{:d}: {:.1f} cm-1".format(i + 1, freq[i]))
+
+        self.setEigenvalues(freq)
+
+        wfn = np.zeros([Neig, Npts], dtype=float)
+        wfn2 = np.zeros([Neig, Npts, D + 1], dtype=float)
+
+        for p in range(Neig):
+            for alpha in range(Npts):
+                wfn[p][alpha] = eigvecs[alpha][wfnorder[p]]
+
+                q = holder.getPES().getPointByPt(alpha).getQList()
+                for d in range(D):
+                    wfn2[p][alpha][d] = q[d]
+                wfn2[p][alpha][D] = eigvecs[alpha][wfnorder[p]]
+
+        for p in range(Neig):
+            norm = 0
+            for pt in range(Npts):
+                norm = norm + wfn2[p][pt][D] * wfn2[p][pt][D]
+            print(norm)
+            norm = 1 / np.sqrt(norm)
+            for pt in range(Npts):
+                wfn2[p][pt][D] = wfn2[p][pt][D] * norm
+
+        self.setEigenvectors(wfn2)
 
     def plot_data(self,wfn_no, q_ind, D, N, L, qprojlist):
         wfn = self.getEigenvector(wfn_no)

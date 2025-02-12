@@ -21,6 +21,44 @@ PointToIndex takes as input a point number of one of the grid points and returns
 def PointToIndex(N, pt):
     return list(np.unravel_index(pt, tuple(N)))
 
+def isEven(x):
+    return x % 2 == 0
+
+def isOdd(x):
+    return not isEven(x)
+
+def closeContactTest(mol, dist_cutoff=0.05):
+    Nat = mol.getNatom()
+    x = mol.getXList()
+    y = mol.getYList()
+    z = mol.getZList()
+    for i in range(Nat):
+        for j in range(i + 1, Nat):
+            d = np.sqrt(
+                (x[j] - x[i]) * (x[j] - x[i]) + (y[j] - y[i]) * (y[j] - y[i]) + (z[j] - z[i]) * (z[j] - z[i]))
+            if (d < dist_cutoff):
+                return False
+    return True
+
+def linearTest(mol, cutoff=0.05):
+    Nat = mol.getNatom()
+    x = mol.getXList()
+    y = mol.getYList()
+    z = mol.getZList()
+    for at1 in range(Nat):
+        for at2 in range(at1 + 1, Nat):
+            for at3 in range(at2 + 1, Nat):
+                v12 = np.array([x[at2] - x[at1], y[at2] - y[at1], z[at2] - z[at1]])
+                v13 = np.array([x[at3] - x[at1], y[at3] - y[at1], z[at3] - z[at1]])
+                dot1213 = np.dot(v12, v13)
+                v12len = np.linalg.norm(v12)
+                v13len = np.linalg.norm(v13)
+                costheta = dot1213 / (v12len * v13len)
+                if (costheta > (1 - cutoff)) or (costheta < (-1 + cutoff)):
+                    return False
+    return True
+
+
 '''
 The Molecule class.  Defines a chemical molecule.
 Nat = number of atoms in the molecule
@@ -204,6 +242,9 @@ class PESpoint:
 
     def getMolecule(self):
         return(self.mol)
+
+    def getNatom(self):
+        return self.getMolecule().getNatom()
 
     def setXList(self, x):
         self.getMolecule().setXList(x)

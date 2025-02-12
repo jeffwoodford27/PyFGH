@@ -8,6 +8,7 @@ from scipy import linalg
 from scipy.sparse import linalg as sparse_linalg
 from PyFGH.util.DataObject import OutputData as OutputData
 from PyFGH.util import pyfghutil as pyfghutil
+from PyFGH import Constants as co
 import time
 
 
@@ -138,12 +139,12 @@ def eckartRotation(N,equil,pes):
     return
 
 def passToCalc(dataObj):
-    D = dataObj.getD()
-    N = dataObj.getNlist()
-    L = dataObj.getLlist()
+    D = dataObj.get("D")
+    N = dataObj.get("N")
+    L = dataObj.get("L")
 
-    equil = dataObj.getEquilMolecule()
-    pes = dataObj.getPES()
+    equil = dataObj.get("EqMol")
+    pes = dataObj.get("PES")
 
     print("Imposing Eckart conditions")
     eckartTranslation(N, equil, pes)
@@ -151,21 +152,21 @@ def passToCalc(dataObj):
 
     print("Creating G Matrix")
 
-    equil = dataObj.getEquilMolecule()
-    pes = dataObj.getPES()
+    equil = dataObj.get("EqMol")
+    pes = dataObj.get("PES")
 
     t0 = time.perf_counter()
     G = Gmatrix.calcGMatrix(D, N, pes, equil)
     t1 = time.perf_counter()
     print("Done with G Matrix time = {:.2f} s".format(t1-t0))
 
-    cores = dataObj.getCoresAmount()
+    cores = dataObj.get("NCores")
 
     t0 = time.perf_counter()
     print("Creating V Matrix")
     gc.collect()
-    Vmethod = dataObj.getVmethod()
-    psi4method = dataObj.getPsi4Method()
+    Vmethod = dataObj.get("PEMethod")
+    psi4method = dataObj.get("Psi4Method")
     print(D,N,Vmethod,equil,pes,psi4method,cores)
     V = Vmatrix.VMatrixCalc(D, N, Vmethod, equil, pes, psi4method, cores)
     t1 = time.perf_counter()
@@ -178,13 +179,17 @@ def passToCalc(dataObj):
     print("Done with T Matrix time = {:.2f} s".format(t1-t0))
 
     print("Calculating eigenvalues")
-    Neigen = dataObj.getNumberOfEigenvalues()
-    EigenSparseMethod = dataObj.getEigenvalueMethod()
+    Neigen = dataObj.get("NEigen")
+    EigenMethod = dataObj.get("EigenMethod")
     Npts = np.prod(N)
 
     H = V + T
+#    np.savetxt("Vmatrix-water.csv", V.toarray(), delimiter=',')
+#    np.savetxt("Tmatrix-water.csv", T.toarray(), delimiter=',')
+#    np.savetxt("Hmatrix-water.csv", H.toarray(), delimiter=',')
 
-    if (EigenSparseMethod):
+
+    if (EigenMethod == co.SMAT):
         NIter = 10*Npts
         try:
             eigenval, eigenvec = sparse_linalg.eigsh(H, k=Neigen, which='SM', tol=1.0e-6, maxiter=NIter)

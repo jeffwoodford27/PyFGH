@@ -7,6 +7,7 @@ import sys
 import numpy as np
 from PyFGH import GUI_Classes as guc
 from PyFGH import Constants as co
+from PyFGH.util import DataObject
 
 # This is the second and current GUI implementation
 # It will be given an object of type DataObject that the GUI will input values into
@@ -14,11 +15,11 @@ from PyFGH import Constants as co
 # The majority of error checking happens here or in the DataObject
 
 class GUI(tk.Tk):
-    def __init__(self, obj):
+    def __init__(self):
         super().__init__()
         # Sets the self.obj to the input data object
-        self.obj = obj
-        self.obj.gui = True
+        self.obj = DataObject.InputData()
+        self.obj.setgui(True)
         # Creation of the GUI window and buttons along with it onward
         self.title('PyFGH')
         self.geometry('910x255')
@@ -35,16 +36,19 @@ class GUI(tk.Tk):
         self.TitleFrame.config(relief='solid')
         self.TitleFrame.grid(columnspan=3, row=0)
 
-        DimensionRange = [i for i in range(1,co.MDEM+1)]
+        DimensionRange = [i for i in range(1,co.MAXDIM+1)]
         self.DimensionInput = guc.ComboboxFrame(self, "Dimensions: ", DimensionRange)
+        self.DimensionInput.set(DimensionRange.index(self.obj.get("D")))
         self.DimensionInput.grid(column=0, row=1)
 
         CoresRange = [i for i in range(1,multiprocessing.cpu_count()+1)]
         self.CoresInput = guc.ComboboxFrame(self, "Computer Cores: ", CoresRange)
+        self.CoresInput.set(CoresRange.index(self.obj.get("NCores")))
         self.CoresInput.grid(column=0, row=3)
 
-        NumEigen = [i for i in range(1, co.MEIG+1)]
-        self.NumEigenInput = guc.ComboboxFrame(self, "Number of Eigenvalues: ", NumEigen)
+        NumEigenRange = [i for i in range(1, co.MAXEIG+1)]
+        self.NumEigenInput = guc.ComboboxFrame(self, "Number of Eigenvalues: ", NumEigenRange)
+        self.NumEigenInput.set(NumEigenRange.index(self.obj.get("NEigen")))
         self.NumEigenInput.grid(column=1, row=1)
 
         self.PEButton = guc.ButtonFrame(self, "Choose Energy Method", self.ChoosePEMethod)
@@ -52,6 +56,7 @@ class GUI(tk.Tk):
 
         EigenMethod = co.MATRIX
         self.EigenMethodInput = guc.ComboboxFrame(self, "Eigenvalue Calculation Method: ", EigenMethod)
+        self.EigenMethodInput.set(EigenMethod.index(self.obj.get("EigenMethod")))
         self.EigenMethodInput.grid(column=1, row=2)
 
         self.GetValuesButton = guc.ButtonFrame(self, "Get N, L Values", self.getNLvalues)
@@ -69,7 +74,7 @@ class GUI(tk.Tk):
         self.ExitButton = guc.ButtonFrame(self, "Exit", self.ExitButtonCommand)
         self.ExitButton.grid(column=2, row=4)
 
-        self.GetEquilCoordButton = guc.ButtonFrame(self, "Get Equilibrium Coordinates", self.GetEquilCoordCommand)
+        self.GetEquilCoordButton = guc.ButtonFrame(self, "Get Equilibrium Coordinates", self.GetEquilFileCommand)
         self.GetEquilCoordButton.grid(column=0, row=4)
 
         self.CalculateButton = guc.ButtonFrame(self, "CALCULATE!", self.CalculateButtonCommand)
@@ -84,7 +89,7 @@ class GUI(tk.Tk):
             return
 
         D = int(D)
-        self.obj.D = D
+        self.obj.set("D",D)
 
         w = 200
         h = 20 + 50 * D
@@ -96,62 +101,50 @@ class GUI(tk.Tk):
 
         NFrame = []
         LFrame = []
+
+        Ndefault = self.obj.get("N")
+        Ldefault = self.obj.get("L")
         for i in range(D):
             Nobj = guc.TextBoxFrame(NLwindow, "N"+str(i+1))
+            if (i < len(Ndefault)):
+                Nobj.insert(Ndefault[i])
             Nobj.grid(column=0, row=i)
             NFrame.append(Nobj)
 
             Lobj = guc.TextBoxFrame(NLwindow, "L"+str(i+1))
+            if (i < len(Ldefault)):
+                Lobj.insert(Ldefault[i])
             Lobj.grid(column=1, row=i)
             LFrame.append(Lobj)
         # Function within getNLValues to error check values inputted
         # If correct it will proceed to set the values
         def get_values():
-            self.obj.N = None
-            self.obj.L = None
-            Nval = np.zeros(D, dtype=int)
-            Lval = np.zeros(D, dtype=float)
+            Nval = []
+            Lval = []
 
             error_state = False
             msg = ""
-            for i in range(D):
-                try:
-                    Nval[i] = int(NFrame[i].get())
-                except ValueError:
-                    msg = msg + "Error: N" + str(i+1) + " must be an integer\n"
-                    NFrame[i].clear()
-                    error_state = True
-                else:
-                    if (Nval[i] < 5):
-                        msg = msg + "Error: N" + str(i+1) + " must be greater than or equal to 5\n"
-                        NFrame[i].clear()
-                        error_state = True
-                    if (Nval[i] % 2 == 0):
-                        msg = msg + "Error: N" + str(i+1) + " must be an odd integer\n"
-                        NFrame[i].clear()
-                        error_state = True
 
-            for i in range(D):
-                try:
-                    Lval[i] = float(LFrame[i].get())
-                except ValueError:
-                    msg = msg + "Error: L" + str(i + 1) + " must be a floating point number\n"
-                    LFrame[i].clear()
-                    error_state = True
-                else:
-                    if (Lval[i] <= 0):
-                        msg = msg + "Error: L" + str(i + 1) + " must be greater than zero\n"
-                        LFrame[i].clear()
-                        error_state = True
 
-            if (error_state):
+            [Nval.append(NFrame[i].get()) for i in range(D)]
+            self.obj.set("N",Nval)
+            error_state = not self.obj.validate(param="N")
+            if error_state:
+                msg = msg + self.obj.validate_msg
+                [NFrame[i].clear() for i in range(D)]
+                self.obj.set("N",[])
+
+            [Lval.append(LFrame[i].get()) for i in range(D)]
+            self.obj.set("L",Lval)
+            error_state = not self.obj.validate(param="L")
+            if error_state:
+                msg = msg + self.obj.validate_msg
+                [LFrame[i].clear() for i in range(D)]
+                self.obj.set("L",[])
+
+            if error_state:
                 tk.messagebox.showerror(title="Error", message=msg)
             else:
-                self.obj.N = np.zeros(D,dtype=int)
-                self.obj.L = np.zeros(D,dtype=float)
-                for i in range(D):
-                    self.obj.N[i] = Nval[i]
-                    self.obj.L[i] = Lval[i]
                 NLwindow.destroy()
 
             return
@@ -208,9 +201,9 @@ class GUI(tk.Tk):
         return
 
     # This will open file explorer to input the equilibrium file
-    def GetEquilCoordCommand(self):
+    def GetEquilFileCommand(self):
         print ('Get Equilibrium Coordinate Button Clicked')
-        self.obj.setequilibrium_file(self.Read_Structures_Button('File Explorer for Equilibrium Structure'))
+        self.obj.set("EqFile",self.Read_Structures_Button('File Explorer for Equilibrium Structure'))
         return
 
     # This method prompts the user to choose read from file or calculate with psi4
@@ -218,20 +211,22 @@ class GUI(tk.Tk):
         window = tk.Toplevel(self)
         window.title("Choose potential energy method")
         window.geometry("500x235")
-        PEMethod = co.CMETHOD
-        PEMethodInput = guc.ComboboxFrame(window, "PE Input Method: ", PEMethod)
+        PEMethodInput = guc.ComboboxFrame(window, "PE Input Method: ", co.CMETHOD)
+        PEMethodInput.set(co.CMETHOD.index(self.obj.get("PEMethod")))
         PEMethodInput.grid(column=0, row=0)
 
         # Internal method that directs the user depending on the choice from above
         def PEMethodget():
-            self.obj.PEMethod = PEMethodInput.get()
-            if self.obj.PEMethod == co.READ:
-                self.obj.psi4method = None
-                self.obj.setVmethod(self.obj.PEMethod)
-                self.obj.setpotential_energy(self.Read_Structures_Button('File Explorer for Potential Energy'))
+            PEMethod = PEMethodInput.get()
+            if PEMethod == co.READ:
+                self.obj.set("PEMethod",co.READ)
+                self.obj.set("Psi4Method",None)
+                self.obj.set("PEFile",self.Read_Structures_Button('File Explorer for Potential Energy'))
                 window.destroy()
-            if self.obj.PEMethod == co.CPSI:
-                self.InputSci4Method(window)
+            if PEMethod == co.CPSI:
+                self.obj.set("PEMethod",co.CPSI)
+                self.obj.set("PEFile",None)
+                self.InputPsi4Method(window)
             return
 
         getMethodButton = guc.ButtonFrame(window, "Get Method", PEMethodget)
@@ -239,20 +234,20 @@ class GUI(tk.Tk):
         return
 
     # This method runs if user selected psi4 calculation
-    def InputSci4Method(self, window):
+    def InputPsi4Method(self, window):
 
         # IMPORTANT: This line underneath are the options of psi4 calculation
-        Smethod = guc.ComboboxFrame(window,"Choose Method", co.PSI4M)
-        Smethod.grid(column=1, row=0)
+        Psi4method = guc.ComboboxFrame(window,"Choose Method", co.PSI4M)
+        Psi4method.set(co.PSI4M.index(self.obj.get("Psi4Method")))
+        Psi4method.grid(column=1, row=0)
 
         # Internal method to receive choice user selected
-        def InputSci4Methodget():
-            self.obj.psi4method = Smethod.get()
-            self.obj.setVmethod(co.CPSI)
+        def InputPsi4Methodget():
+            self.obj.set("Psi4Method",Psi4method.get())
             window.destroy()
             return
 
-        getMethodButton = guc.ButtonFrame(window, "Get Method", InputSci4Methodget)
+        getMethodButton = guc.ButtonFrame(window, "Get Method", InputPsi4Methodget)
         getMethodButton.grid(column=1, row=1)
         return
 
@@ -260,21 +255,16 @@ class GUI(tk.Tk):
     # The calculation will proceed if the validate function returns True
     # Otherwise the user will have to fix any errors
     def CalculateButtonCommand(self):
-        self.obj.setD(int(self.DimensionInput.get()))
-        print(self.obj.getEquilFile())
-        if self.obj.getEquilFile() == "":
-            self.GetEquilCoordCommand()
-        if self.obj.getEquilFile() is None:
-            self.GetEquilCoordCommand()
-        self.obj.cores_amount = int(self.CoresInput.get())
-        self.obj.NoEigen = int(self.NumEigenInput.get())
-        if self.EigenMethodInput.get() == co.SMAT:
-            self.obj.setEigenvalueMethod(True)
-        else:
-            self.obj.setEigenvalueMethod(False)
+        self.obj.set("D",int(self.DimensionInput.get()))
+        print(self.obj.get("EqFile"))
+        if self.obj.get("EqFile") is None or self.obj.get("EqFile") == "":
+            self.GetEquilFileCommand()
+        self.obj.set("NCores",int(self.CoresInput.get()))
+        self.obj.set("NEigen",int(self.NumEigenInput.get()))
+        self.obj.set("EigenMethod",self.EigenMethodInput.get())
 
         #destroy window
-        if self.obj.validate():
+        if self.obj.validate_all():
             self.destroy()
             return
         else:

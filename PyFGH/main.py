@@ -11,13 +11,13 @@ from PyFGH import Constants as co
 # this is the parent process
 def run(holder=None):
     if holder is None:
-        obj = DataObject.InputData()
-        win = GUI2.GUI(obj)
+        win = GUI2.GUI()
         win.mainloop()
         holder = win.DataReturner()
-        holder.GUI = True
     else:
-        holder.GUI = False
+        holder.setgui(False)
+
+    holder.validate_all()
 
     ResultObj = GTC.passToCalc(holder)
     ResultObj.generateValues(holder)
@@ -65,10 +65,10 @@ def run(holder=None):
     #
     # ResultObj.setEigenvectors(wfn2)
 
-    if holder.getgui() == True:
-        D = holder.getD()
-        N = holder.getNlist()
-        L = holder.getLlist()
+    if holder.getgui():
+        D = holder.get("D")
+        N = holder.get("N")
+        L = holder.get("L")
         Neig=ResultObj.getNumberOfEigenvalues()
         eigvals=ResultObj.getEigenvalues()
         wfnorder = np.argsort(eigvals)
@@ -98,7 +98,7 @@ def run(holder=None):
                     with open(f.name, 'w', newline='', encoding='UTF8') as f:
                         writer = csv.writer(f)
                         for pt in range(Npts):
-                            q = holder.getPES().getPointByPt(pt).getQList()
+                            q = holder.get("PES").getPointByPt(pt).getQList()
                             row = []
                             for d in range(D):
                                 row.append(q[d])
@@ -118,33 +118,33 @@ if __name__ == '__main__':
     t0 = time.perf_counter()
     molecule = ""
     #molecule = "NITROGEN"
-    molecule = "WATER"
+    #molecule = "WATER"
 
     if (molecule == "NITROGEN"):
         holder = DataObject.InputData()
-        holder.setD(1)
-        holder.setNlist([15])
-        holder.setLlist([0.75])
-        holder.setcores_amount(2)
-        holder.setequilibrium_file("testingfiles/n2-ccsd-equil.csv")
-        holder.setpotential_energy("testingfiles/n2-ccsd-potential.csv")
-        holder.setNumberOfEigenvalues(10)
-        holder.setEigenvalueMethod(False)
-        holder.setVmethod('Read from File')
+        holder.set("D",1)
+        holder.set("N",[15])
+        holder.set("L",[0.75])
+        holder.set("NCores",2)
+        holder.set("EqFile","testingfiles/n2-ccsd-equil.csv")
+        holder.set("PEFile","testingfiles/n2-ccsd-potential.csv")
+        holder.set("NEigen",10)
+        holder.set("EigenMethod",co.FMAT)
+        holder.set("PEMethod",co.READ)
         run(holder=holder)
     elif (molecule == "WATER"):
         holder = DataObject.InputData()
-        holder.setD(3)
-        holder.setNlist([11,11,11])
-        holder.setLlist([1.1,1.1,1.65])
-        holder.setcores_amount(4)
-        holder.setequilibrium_file("testingfiles/water-equil.csv")
-        holder.setpotential_energy("testingfiles/water-potential.csv")
-        holder.setNumberOfEigenvalues(10)
-        holder.setEigenvalueMethod(False)
-        holder.setVmethod(co.READ)
+        holder.set("D",3)
+        holder.set("N",[11,11,11])
+        holder.set("L",[1.1,1.1,1.65])
+        holder.set("NCores",4)
+        holder.set("EqFile","testingfiles/water-equil.csv")
+        holder.set("PEFile","testingfiles/water-potential.csv")
+        holder.set("NEigen",10)
+        holder.set("EigenMethod",co.FMAT)
+        holder.set("PEMethod",co.READ)
         holder.setgui(True)
-        holder.validate()
+        holder.validate_all()
         run(holder=holder)
 
     else:

@@ -16,6 +16,10 @@ class TextBoxFrame(ttk.LabelFrame):
     def get(self):
         return self.txtbox.get()
 
+    def insert(self,txt):
+        self.txtbox.insert(0,txt)
+        return
+
     def clear(self):
         self.txtboxstrvar.set('')
         return
@@ -51,6 +55,10 @@ class ComboboxFrame(ttk.LabelFrame):
 
     def get(self):
         return self.cbox.get()
+
+    def set(self, index):
+        self.cbox.current(index)
+        return
 
     def clear(self):
         self.cboxstrvar.set('')

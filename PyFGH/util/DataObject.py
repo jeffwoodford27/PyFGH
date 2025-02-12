@@ -1,11 +1,11 @@
 import numpy as np
-import gc
 import csv
 from PyFGH import Constants as co
 from PyFGH.util import pyfghutil
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from numpy import ma
+import os
 
 """
 DataObject is a place to hold data. All values in these classes are first assigned to zero. In GUI_old.py these values get 
@@ -13,250 +13,403 @@ reassigned new values based on the input of the GUI. When the GUI is terminated,
 values from the input. After the GUI is terminated, these new values can be called from any file in this project.
 """
 
-class InputData:
+class ValidationError(Exception):
+    def __init__(self,p,msg):
+        self.param = p
+        self.message = msg
+        super().__init__(self.message)
 
-    def __init__(self):
-        self.D = 0
-        self.cores_amount = 1
-        self.N = None
-        self.L = None
-        self.equilibrium_file = None
-        self.potential_energy_file = None
-        self.EquilMolecule = None
-        self.PES = None
-        self.num_eigenvalues = 10
-        self.eigenvalue_flag = False
-        self.Vmethod = None
-        self.model_data = None
-        self.psi4method = None
-        self.inputobject = None
-        self.gui = False
-        self.EPFlag = False
-        self.debug = False
+    def __str__(self):
+        return ("Validation Error for {0}: {1}".format(self.param,self.message))
 
+class Parameter:
+    def __init__(self,label,value=None,state=False,stateDependency=[]):
+        self.label = label
+        self.value = value
+        self.state = state
+        self.stateDependency = stateDependency
 
-    """
-    The following methods are setters. These values get set in test1.py
-    """
+    def getStateDependency(self):
+        return self.stateDependency
 
+    def getState(self):
+        return self.state
 
-    def setinputobject(self, inputobject):
-        self.inputobject = inputobject
+    def setState(self, state):
+        self.state = state
         return
 
-    def getinputobject(self):
-        return self.inputobject
+    def get(self):
+        return self.value
 
+    def set(self, value,state=None):
+        self.value = value
+        if state is not None:
+            self.setState(state)
+        return
 
-    def getD(self):
-        return self.D
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = {}
 
-    def getNlist(self):
-        return self.N
+    def add_vertex(self,v):
+        self.graph[v] = []
+        return
 
-    def getN(self,j):
-        return self.N[j]
+    def add_edge(self,u,v):
+        self.graph[u].append(v)
+        self.graph[v].append(u)
+        return
 
-    def getLlist(self):
-        return self.L
+    def dfs_iterative(self, start):
+        visited = self.graph.copy()
+        for key in visited.keys():
+            visited[key] = False
+        stack = []
+        dfs_list = []
 
-    def getL(self,j):
-        return self.L[j]
+        stack.append(start)
+        visited[start] = True
 
-    def getEquilFile(self):
-        return self.equilibrium_file
+        while stack:
+            current = stack.pop()
+            dfs_list.append(current)
 
-    def getPESFile(self):
-        return self.potential_energy_file
+            for neighbor in self.graph[current]:
+                if not visited[neighbor]:
+                    stack.append(neighbor)
+                    visited[neighbor] = True
+        return dfs_list[1:]
 
-    def getEquilMolecule(self):
-        return self.EquilMolecule
+defaultdict = {
+    "D":Parameter("D",3,True),
+    "N":Parameter("N",[11,11,11],True,["D"]),
+    "L":Parameter("L",[1.1,1.1,1.65],True,["D"]),
+    "NCores":Parameter("NCores",1,True),
+    "EqFile":Parameter("EqFile"),
+    "PEFile":Parameter("PEFile",None,False,["PEMethod"]),
+    "NEigen":Parameter("NEigen",10,True),
+    "EigenMethod":Parameter("EigenMethod",co.FMAT,True),
+    "PEMethod":Parameter("PEMethod",co.READ,True),
+    "Psi4Method":Parameter("Psi4Method",co.PSI4M[0],True,["PEMethod"])
+}
 
-    def getPES(self):
-        return self.PES
+config_file = "testingfiles/test.json"
 
-    def getNumberOfEigenvalues(self):
-        return self.num_eigenvalues
+class InputData:
+    def __init__(self):
+        self.nparam = 12
+        self.paramdict = defaultdict.copy()
+        self.paramdict["EqMol"] = Parameter("EqMol", None, False, ["EqFile"])
+        self.paramdict["PES"] = Parameter("PES", None, False, ["D", "N", "L", "EqMol", "PEMethod"])
+        self.gui = False
+        self.debug = False
 
-    def getEigenvalueMethod(self):
-        print(self.eigenvalue_flag)
-        return self.eigenvalue_flag
+        self.validate_func = {
+            "D": self.checkD,
+            "N": self.checkN,
+            "L": self.checkL,
+            "NEigen": self.checkNEigen,
+            "NCores": self.checkNCores,
+            "PEMethod": self.checkPEMethod,
+            "Psi4Method": self.checkPsi4Method,
+            "EigenMethod": self.checkEigenMethod,
+            "EqFile": self.checkEqFile,
+            "PEFile": self.checkPEFile,
+            "EqMol": self.checkEqMol,
+            "PES": self.checkPES
+        }
 
-    def getVmethod(self):
-        return self.Vmethod
+        self.validate_msg = None
 
-    def getPsi4Method(self):
-        return self.psi4method
+        self.paramgraph = Graph(self.nparam)
+        for key in self.paramdict.keys():
+            self.paramgraph.add_vertex(key)
+        for key, param in self.paramdict.items():
+            for dep in param.getStateDependency():
+                self.paramgraph.add_edge(key, dep)
 
-    def getCoresAmount(self):
-        return int(self.cores_amount)
+    """
+    The following methods are setters and getters.
+    """
+
+    def setgui(self,val):
+        self.gui = val
+        return
 
     def getgui(self):
         return self.gui
 
-    """
-    The following methods are setters. These values get set in test1.py
-    """
-
-    def setgui(self, gui):
-        self.gui = gui
+    def setdebug(self,val):
+        self.debug = val
         return
 
-    def setcores_amount(self, cores):
-        self.cores_amount = cores
+    def getStateDependency(self, param):
+        try:
+            val = self.paramdict[param].getStateDependency()
+        except KeyError:
+            print("error: trying to get state dependency of unknown parameter {0}".format(param))
+            raise
+        return val
+
+    def getState(self, param):
+        try:
+            val = self.paramdict[param].getState()
+        except KeyError:
+            print("error: trying to get state of unknown parameter {0}".format(param))
+            raise
+        return val
+
+    def setState(self, param, state):
+        try:
+            self.paramdict[param].setState(state)
+        except KeyError:
+            print("error: trying to set state for unknown parameter {0}".format(param))
+            raise
         return
 
-    def setequilibrium_file(self, equilibrium_file):
-        self.equilibrium_file = equilibrium_file
+    def printAllState(self):
+        for p in self.paramdict.keys():
+            print(p, self.getState(p))
         return
 
-    def setpotential_energy(self, potential_energy):
-        self.potential_energy_file = potential_energy
+    def get(self, param):
+        try:
+            val = self.paramdict[param].get()
+        except KeyError:
+            print("error: trying to get unknown parameter {0}".format(param))
+            raise
+        return val
+
+    def set(self, param, value):
+        try:
+            self.paramdict[param].set(value)
+        except KeyError:
+            print("error: trying to set value for unknown parameter {0}".format(param))
+            raise
+#        for p in self.paramgraph.dfs_iterative(param):
+#            self.setState(p,False)
+        for p in self.paramdict.keys():
+            for dep in self.getStateDependency(p):
+                if param == dep:
+                    self.setState(dep, False)
         return
 
-    def setD(self,D):
-        self.D = D
-        return
+    def validate(self,param):
+        print("working on validation parameter "+param)
+        deps = self.getStateDependency(param)
+        print(deps)
+        for dep in deps:
+            if self.getState(dep):
+                print("don't need to validate "+dep+", already validated")
+            elif not self.validate(param=dep):
+                return False
+        try:
+            return self.validate_func[param]()
+        except KeyError:
+            raise ValidationError(param,"error: missing validation function for {0}".format(param))
 
-    def setNlist(self,N):
-        self.N = np.array(N,dtype=int)
-        return
-
-    def setLlist(self,L):
-        self.L = np.array(L,dtype=float)
-        return
-
-    def setEquilMolecule(self,eq):
-        self.EquilMolecule = eq
-        return
-
-    def setPES(self,pes):
-        self.PES = pes
-        return
-
-    def setNumberOfEigenvalues(self, num):
-        self.num_eigenvalues = num
-        return
-
-    def setEigenvalueMethod(self, eigenmethod):
-        print(self.eigenvalue_flag)
-        self.eigenvalue_flag = eigenmethod
-        return
-
-    def setVmethod(self,vmethod):
-        self.Vmethod = vmethod
-        return
-
-    def setPsi4Method(self,method):
-        self.psi4method = method
-        return
-
-
-    # This is the validate method
-    # It will check all user accessible values to see if valid
-    # It will return True if everything is correct
-    def validate(self):
-        if not self.checkD():
-            print("prob D")
-            return False
-        if not self.checkN():
-            print("prob N")
-            return False
-        if not self.checkL():
-            print("prob L")
-            return False
-        if not self.checkCores():
-            print("prob cores")
-            return False
-        if not self.checkNumEig():
-            print("prob eig")
-            return False
-        if not self.checkVMethod():
-            print("prob V")
-            return False
-        if not self.checkEqPes():
-            print("prob eqpes")
-            return False
+    def validate_all(self):
+        paramlist = self.paramdict.keys()
+        print(paramlist)
+        for p in paramlist:
+            self.setState(p,False)
+        for p in paramlist:
+            res = self.validate(p)
+            print(res)
+            if not res:
+                raise ValidationError(p,self.validate_msg)
         return True
 
     # The following are the individual checks used in validate
     def checkD(self):
-        if self.D > 0 and isinstance(self.D, int):
-            return True
-        else:
-            print("D must be an integer")
+        self.setState("D",False)
+        D = self.get("D")
+        if not isinstance(D,int):
+            self.validate_msg = "D is not an integer"
             return False
-
-    def checkN(self):
-        if self.N is None:
-            print("N must be set")
+        if D > co.MAXDIM:
+            self.validate_msg = "D must be {0} or less".format(co.MAXDIM)
             return False
-        for i in range(self.D):
-            if isinstance(self.N[i], np.int32):
-                if self.N[i] < 5:
-                    print("N must be greater than 5")
-                    return False
-                if self.N[i] % 2 == 0:
-                    print("N must be an odd number")
-                    return False
-                return True
-            else:
-                print("N must be an integer")
-                return False
-
-    def checkL(self):
-        if self.L is None:
-            print("L must be set")
-            return False
-        for i in range(self.D):
-            if(isinstance(self.L[i], np.float64)):
-                if (self.L[i] <= 0):
-                    print("L must be greater than 0")
-                    return False
-                return True
-            else:
-                print("L must be a float")
-                return False
-
-    def checkEqPes(self):
-        eq, pes = self.molecule_testing()
-        gc.collect()
-        self.setEquilMolecule(eq)
-        self.setPES(pes)
+        self.setState("D",True)
+        print("validated D")
         return True
 
-    def checkNumEig(self):
-        if self.num_eigenvalues > 0 and isinstance(self.num_eigenvalues, int):
+    def checkN(self):
+        self.setState("N", False)
+        D = self.get("D")
+        N = self.get("N")
+
+        if not isinstance(N, np.ndarray):
+            try:
+                N = np.array(N,dtype=int)
+            except ValueError:
+                self.validate_msg = "N values are not integers"
+                return False
+            self.set("N",N)
+        if len(N) != D:
+            self.validate_msg = "length of N is not equal to D"
+            return False
+        for i in range(D):
+            if pyfghutil.isEven(N[i]):
+                self.validate_msg = "N values must be odd"
+                return False
+            if N[i] < 5:
+                self.validate_msg = "N values are less than 5"
+                return False
+        self.setState("N", True)
+        print("validated N")
+        return True
+
+    def checkL(self):
+        self.setState("L",False)
+        D = self.get("D")
+        L = self.get("L")
+
+        if not isinstance(L, np.ndarray):
+            try:
+                L = np.array(L,dtype=float)
+            except ValueError:
+                self.validate_msg = "L values are not floats"
+                return False
+            self.set("L",L)
+        if len(L) != D:
+            self.validate_msg = "length of L is not equal to D"
+            return False
+        for i in range(D):
+            if (L[i] <= 0):
+                self.validate_msg = "L values are not positive"
+                return False
+        self.setState("L", True)
+        print("validated L")
+        return True
+
+    def checkNEigen(self):
+        self.setState("NEigen",False)
+        NEigen = self.get("NEigen")
+        if not isinstance(NEigen,int):
+            self.validate_msg = "error: number of eigenvalues must be an integer"
+            return False
+        if (NEigen < 1) or (NEigen > co.MAXEIG):
+            self.validate_msg = "error: number of eigenvalues must be between 1 and {0}".format(co.MAXEIG)
+            return False
+        self.setState("NEigen",True)
+        print("validated NEigen")
+        return True
+
+    def checkNCores(self):
+        self.setState("NCores",False)
+        NCores = self.get("NCores")
+        if not isinstance(NCores,int):
+            self.validate_msg = "error: number of cores must be an integer"
+            return False
+        if NCores < 1:
+            self.validate_msg = "error: number of cores must be a positive integer"
+            return False
+        self.setState("NCores",True)
+        print("validated NCores")
+        return True
+
+    def checkPEMethod(self):
+        self.setState("PEMethod",False)
+        if self.get("PEMethod") not in co.CMETHOD:
+            self.validate_msg = "error: Potential Energy method must be one of the following: {0}".format(co.PSI4M)
+            return False
+        self.setState("PEMethod",True)
+        print("validated PEMethod")
+        return True
+
+    def checkPsi4Method(self):
+        self.setState("Psi4Method",False)
+        PEMethod = self.get("PEMethod")
+        if PEMethod == co.CPSI:
+            psi4method = self.get("Psi4Method")
+            if psi4method not in co.PSI4M:
+                self.validate_msg = "error: unsupported Psi4 method {0}".format(psi4method)
+                return False
+            self.setState("Psi4Method",True)
+            print("validated Psi4Method")
             return True
         else:
-            print("Number of eigenvalues must be an integer")
+            self.setState("Psi4Method",True)
+            print("fake validated Psi4Method")
+            return True
+
+    def checkEigenMethod(self):
+        self.setState("EigenMethod",False)
+        eigenmethod = self.get("EigenMethod")
+        if eigenmethod not in co.MATRIX:
+            self.validate_msg = "error: unrecognized eigenvalue method {0}".format(eigenmethod)
+        self.setState("EigenMethod",True)
+        print("validated EigenMethod")
+        return True
+
+    def checkEqFile(self):
+        self.setState("EqFile",False)
+        eqfile = self.get("EqFile")
+        try:
+            if os.path.isfile(eqfile) and os.access(eqfile, os.R_OK):
+                self.setState("EqFile",True)
+                print("validated EqFile")
+                return True
+            else:
+                self.validate_msg = "file {0} either does not exist or is not readable".format(eqfile)
+                return False
+        except TypeError:
+            self.validate_msg = "invalid input for equilibrium filename"
             return False
 
-    def checkCores(self):
-        if self.cores_amount > 0 and isinstance(self.cores_amount, int):
+    def checkPEFile(self):
+        self.setState("PEFile",False)
+        if self.get("PEMethod") == co.READ:
+            pefile = self.get("PEFile")
+            try:
+                if os.path.isfile(pefile) and os.access(pefile, os.R_OK):
+                    self.setState("PEFile",True)
+                    print("validated PEFile")
+                    return True
+                else:
+                    self.validate_msg = "error: file {0} either does not exist or is not readable".format(pefile)
+                    return False
+            except TypeError:
+                self.validate_msg = "error: invalid input for PES filename"
+                return False
+        else:
+            self.setState("PEFile",True)
+            print("fake validated PEFile")
+            return True
+
+    def checkEqMol(self):
+        self.setState("EqMol",False)
+        if self.readEqFile():
+            self.setState("EqMol",True)
+            print("validated EqMol")
             return True
         else:
-            print("Cores must be an integer")
+            self.set("EqMol",None)
+            self.setState("EqMol",False)
             return False
 
-    def checkVMethod(self):
-        if self.Vmethod == co.CMETHOD[0] or self.Vmethod == co.CMETHOD[1]:
-            return True
-        else:
-            print("Vmethod should be either 'Read From File' or 'Calculate With Psi4'")
-            return False
+    def checkPES(self):
+        self.setState("PES",False)
+        PEMethod = self.get("PEMethod")
+        if (PEMethod == co.READ):
+            if self.readPESfile():
+                self.setState("PES",True)
+                print("validated PES for READ")
+                return True
+        if (PEMethod == co.CPSI):
+            if self.generatePESCoordinates_Psi4():
+                self.setState("PES",True)
+                print("validated PES for CPSI")
+                return True
+        self.set("PES",None)
+        self.setState("PES",False)
+        return False
 
-    def checkPsi4(self):
-        if self.psi4method in co.PSI4M:
-            return True
-        else:
-            return False
-
-
-    # Former molecule_gui file
-    # Now used as part of the checkEqPes section of validate
-    # It will calculate the potential energies and generate the points
-    def readEqfile(self):
+    def readEqFile(self):
+        eqfile = self.get("EqFile")
         S = []
         A = []
         Z = []
@@ -264,46 +417,60 @@ class InputData:
         y = []
         z = []
         m = []
-        try:
-            with open(self.equilibrium_file, newline='') as f:
-                reader = csv.reader(f, delimiter=',')
-                row = next(reader)
+        with open(eqfile, newline='') as f:
+            reader = csv.reader(f, delimiter=',')
+            row = next(reader)
+            try:
+                Q = int(row[0])
+                Mult = int(row[1])
+            except (IndexError, ValueError):
+                self.validate_msg = 'In Equilibrium File: First Line Should Contain Charge and Multiplicity'
+                return False
+            if (Mult < 1):
+                self.validate_msg = 'Read Multiplicity of {0}, Should Be A Positive Integer'.format(Mult)
+                return False
+
+            print("Charge is {0}, Multiplicity is {1}".format(Q, Mult))
+
+            Nat = 0
+            for row in reader:
                 try:
-                    Q = int(row[0])
-                    Mult = int(row[1])
-                except IndexError:
-                    print('In Equilibrium File: First Line Should Contain Charge and Multiplicity')
-                    self.EPFlag = False
-                    return
-                except ValueError:
-                    print('In Equilibrium File: First Line Should Contain Charge and Multiplicity')
-                    self.EPFlag = False
-                if (Mult < 1):
-                    print('Read Multiplicity of {0}, Should Be A Positive Integer'.format(Mult))
-                    self.EPFlag = False
-
-                print("Charge is {0}, Multiplicity is {1}".format(Q, Mult))
-
-                Nat = 0
-                for row in reader:
-                    try:
-                        S.append(row[0])
-                        A.append(int(row[1]))
-                        x.append(float(row[2]) / 0.529177249)
-                        y.append(float(row[3]) / 0.529177249)
-                        z.append(float(row[4]) / 0.529177249)
-                    except IndexError:
-                        print('In Equilibrium File: Missing Data on Line {0}'.format(Nat + 2))
-                        self.EPFlag = False
-                    except ValueError:
-                        print('In Equilibrium File, Wrong Format Found on Line {0}'.format(Nat + 2))
-                        self.EPFlag = False
-                    Nat = Nat + 1
-
-        except FileNotFoundError:
-            raise
+                    S.append(row[0])
+                    A.append(int(row[1]))
+                    x.append(float(row[2]) / 0.529177249)
+                    y.append(float(row[3]) / 0.529177249)
+                    z.append(float(row[4]) / 0.529177249)
+                except (IndexError, ValueError):
+                    self.validate_msg = 'In Equilibrium File: Missing Data or Wrong Format Found on Line {0}'.format(Nat + 2)
+                    return False
+                Nat = Nat + 1
 
         print("Read {0} Atoms from Equilibrium File".format(Nat))
+
+        for n in range(Nat):
+            symbolFound = False
+            for key, value in pyfghutil.AtomicSymbolLookup.items():
+                if (value == S[n]):
+                    Z.append(key)
+                    symbolFound = True
+                    break
+            if (not symbolFound):
+                self.validate_msg = 'Atom {0} Symbol {1} Not Found In Dictionary'.format(n + 1, S[n])
+                return False
+
+        Nel = np.sum(Z) - Q
+        if ((Nel % 2) == (Mult % 2)):
+            self.validate_msg = 'Charge {0} And Multiplicity {1} Are Inconsistent'.format(Q, Mult)
+            return False
+
+        for n in range(Nat):
+            nucl = S[n] + "-" + str(A[n])
+            m.append(pyfghutil.MassLookup.get(nucl))
+            if (m[n] == None):
+                self.validate_msg = 'Atom {0} Nuclide {1} Not Found In Dictionary'.format(n + 1, nucl)
+                return False
+            else:
+                m[n] = float(m[n]) * 1822.89
 
         eqmol = pyfghutil.Molecule()
         eqmol.setNatom(Nat)
@@ -314,94 +481,79 @@ class InputData:
         eqmol.setXList(np.array(x))
         eqmol.setYList(np.array(y))
         eqmol.setZList(np.array(z))
-        for n in range(Nat):
-            symbolFound = False
-            for key, value in pyfghutil.AtomicSymbolLookup.items():
-                if (value == S[n]):
-                    Z.append(key)
-                    symbolFound = True
-                    break
-            if (not symbolFound):
-                print('Atom {0} Symbol {1} Not Found In Dictionary'.format(n + 1, S[n]))
-                self.EPFlag = False
-
         eqmol.setAtomicNoList(np.array(Z))
-
-        Nel = np.sum(Z) - Q
-        if ((Nel % 2) == (Mult % 2)):
-            print('Charge {0} And Multiplicity {1} Are Inconsistent'.format(Q, Mult))
-            self.EPFlag = False
-
-        for n in range(Nat):
-            nucl = S[n] + "-" + str(A[n])
-            m.append(pyfghutil.MassLookup.get(nucl))
-            if (m[n] == None):
-                print('Atom {0} Nuclide {1} Not Found In Dictionary'.format(n + 1, nucl))
-                self.EPFlag = False
-            else:
-                m[n] = float(m[n]) * 1822.89
         eqmol.setMassList(np.array(m))
 
-        return eqmol
+        if not pyfghutil.closeContactTest(eqmol):
+            self.validate_msg = "error: in equilibrium structure, atoms are too close together"
+            return False
+        self.set("EqMol",eqmol)
+        print("Equilibrium molecule successfully read and validated")
+        return True
 
-    def readPESfile(self, equil):
-        Npts = np.prod(self.N)
-        Nat = equil.getNatom()
+    def readPESfile(self):
+        self.set("PES",None)
+        self.setState("PES",False)
+        PEFile = self.get("PEFile")
+        D = self.get("D")
+        N = self.get("N")
+        Npts = np.prod(N)
+        L = self.get("L")
+        EqMol = self.get("EqMol")
+        Nat = EqMol.getNatom()
 
-        pes = pyfghutil.PotentialEnergySurface(self.N)
-        try:
-            with open(self.getPESFile(), newline='') as f:
-                reader = csv.reader(f)
+        pes = pyfghutil.PotentialEnergySurface(N)
+        with open(PEFile, newline='') as f:
+            reader = csv.reader(f)
 
-                n = 0
-                for row in reader:
-                    pespt = pyfghutil.PESpoint(n)
+            n = 0
+            for row in reader:
+                try:
+                    q = np.zeros(D, dtype=float)
+                    for i in range(D):
+                        q[i] = float(row[i])
 
-                    try:
-                        q = np.zeros(self.D, dtype=float)
-                        for i in range(self.D):
-                            q[i] = float(row[i])
+                    x = np.zeros(Nat, dtype=float)
+                    y = np.zeros(Nat, dtype=float)
+                    z = np.zeros(Nat, dtype=float)
+                    for i in range(Nat):
+                        x[i] = float(row[D + 3 * i])
+                        y[i] = float(row[D + 3 * i + 1])
+                        z[i] = float(row[D + 3 * i + 2])
 
-                        x = np.zeros(Nat, dtype=float)
-                        y = np.zeros(Nat, dtype=float)
-                        z = np.zeros(Nat, dtype=float)
-                        for i in range(Nat):
-                            x[i] = float(row[self.D + 3 * i])
-                            y[i] = float(row[self.D + 3 * i + 1])
-                            z[i] = float(row[self.D + 3 * i + 2])
+                    en = float(row[D + 3 * Nat])
+                except (IndexError, ValueError):
+                    self.validate_msg = "In PES file: Missing data or wrong format found on line {0}".format(n + 1)
+                    return False
 
-                        en = float(row[self.D + 3 * Nat])
-                    except IndexError:
-                        print("In PES file: Missing data on line {0}".format(n + 1))
-                        self.EPFlag = False
-                    except ValueError:
-                        print('In PES file, Wrong Format Found on Line {0}'.format(n + 1))
-                        self.EPFlag = False
+                pespt = pyfghutil.PESpoint(n)
+                pespt.setQList(q)
+                pespt.setXList(x)
+                pespt.setYList(y)
+                pespt.setZList(z)
+                pespt.getMolecule().setNatom(Nat)
+                pespt.getMolecule().setCharge(EqMol.getCharge())
+                pespt.getMolecule().setMultiplicity(EqMol.getMultiplicity())
+                pespt.getMolecule().setSymbolList(EqMol.getSymbolList())
+                pespt.getMolecule().setAtomicNoList(EqMol.getAtomicNoList())
+                pespt.getMolecule().setMassNoList(EqMol.getMassNoList())
+                pespt.getMolecule().setMassList(EqMol.getMassList())
+                pespt.setEnergy(en)
 
-                    pespt.setQList(q)
-                    pespt.setXList(x)
-                    pespt.setYList(y)
-                    pespt.setZList(z)
-                    pespt.getMolecule().setNatom(Nat)
-                    pespt.getMolecule().setCharge(equil.getCharge())
-                    pespt.getMolecule().setMultiplicity(equil.getMultiplicity())
-                    pespt.getMolecule().setSymbolList(equil.getSymbolList())
-                    pespt.getMolecule().setAtomicNoList(equil.getAtomicNoList())
-                    pespt.getMolecule().setMassNoList(equil.getMassNoList())
-                    pespt.getMolecule().setMassList(equil.getMassList())
-                    pespt.setEnergy(en)
-                    pes.setPESpt(n, pespt)
-                    n = n + 1
-        except FileNotFoundError:
-            raise
+                if not pyfghutil.closeContactTest(pespt):
+                    self.validate_msg = "error: in PES point {0}, atoms are too close together".format(n)
+                    return False
+
+                pes.setPESpt(n, pespt)
+                n = n + 1
 
         if (Npts != n):
-            print("Error: Expecting {0} lines in PES file, read {1}".format(Npts, n))
-            self.EPFlag = False
+            self.validate_msg = "Error: Expecting {0} lines in PES file, read {1}".format(Npts, n)
+            return False
 
         print("Read {0} lines from potential energy file".format(n))
-
-        return pes
+        self.set("PES",pes)
+        return True
 
     '''
     Function generatePESCoordinates_Psi4 generates a PES object if the user chooses "Compute With Psi4".  It fills the PES object
@@ -415,40 +567,47 @@ class InputData:
     PotentialEnergySurface object
     '''
 
-    def generatePESCoordinates_Psi4(self, equil):
-        Nat = equil.getNatom()
+    def generatePESCoordinates_Psi4(self):
+        self.set("PES",None)
+        self.setState("PES",False)
+        EqMol = self.get("EqMol")
+        D = self.get("D")
+        N = self.get("N")
+        L = self.get("L")
+        Nat = EqMol.getNatom()
 
-        if not (((self.D == 1) and (Nat == 2)) or ((self.D == 3) and (Nat == 3))):
-            print("Psi4 Calculation Method only implemented for diatomic and triatomic molecules.")
-            self.EPFlag = False
+        if not (((D == 1) and (Nat == 2)) or ((D == 3) and (Nat == 3))):
+            self.validate_msg = "Psi4 Calculation Method only implemented for diatomic and nonlinear triatomic molecules."
+            return False
 
-        Npts = np.prod(self.N)
-        xeq = equil.getXList()
-        yeq = equil.getYList()
-        zeq = equil.getZList()
-        Z = equil.getAtomicNoList()
-        A = equil.getMassNoList()
-        m = equil.getMassList()
+        Npts = np.prod(N)
+        xeq = EqMol.getXList()
+        yeq = EqMol.getYList()
+        zeq = EqMol.getZList()
+        Z = EqMol.getAtomicNoList()
+        A = EqMol.getMassNoList()
+        m = EqMol.getMassList()
 
-        pes = pyfghutil.PotentialEnergySurface(self.N)
-        if (self.D == 1):
+        pes = pyfghutil.PotentialEnergySurface(N)
+
+        if (D == 1):
             Req = np.linalg.norm(np.array([xeq[1] - xeq[0], yeq[1] - yeq[0], zeq[1] - zeq[0]]))
 
             xeq[0] = xeq[1] = yeq[0] = yeq[1] = 0
             zeq[0] = -Req / 2
             zeq[1] = Req / 2
 
-            equil.setXList(xeq)
-            equil.setYList(yeq)
-            equil.setZList(zeq)
+            EqMol.setXList(xeq)
+            EqMol.setYList(yeq)
+            EqMol.setZList(zeq)
 
             for pt in Npts:
                 pespt = pyfghutil.PESpoint(pt)
-                idx = pyfghutil.PointToIndex(self.N, pt)
-                q = np.zeros(self.D, dtype=float)
-                for d in range(self.D):
-                    dq = self.L[d] / self.N[d]
-                    q[d] = idx[d] * dq - self.L[d] / 2 + dq / 2
+                idx = pyfghutil.PointToIndex(N, pt)
+                q = np.zeros(D, dtype=float)
+                for d in range(D):
+                    dq = L[d] / N[d]
+                    q[d] = idx[d] * dq - L[d] / 2 + dq / 2
 
                 x = np.zeros(Nat, dtype=float)
                 y = np.zeros(Nat, dtype=float)
@@ -462,16 +621,16 @@ class InputData:
                 pespt.setYList(y)
                 pespt.setZList(z)
                 pespt.getMolecule().setNatom(Nat)
-                pespt.getMolecule().setCharge(equil.getCharge())
-                pespt.getMolecule().setMultiplicity(equil.getMultiplicity())
-                pespt.getMolecule().setSymbolList(equil.getSymbolList())
+                pespt.getMolecule().setCharge(EqMol.getCharge())
+                pespt.getMolecule().setMultiplicity(EqMol.getMultiplicity())
+                pespt.getMolecule().setSymbolList(EqMol.getSymbolList())
                 pespt.getMolecule().setAtomicNoList(Z)
                 pespt.getMolecule().setMassNoList(A)
                 pespt.getMolecule().setMassList(m)
                 pespt.setEnergy(0)
                 pes.setPESpt(pt, pespt)
 
-        elif (self.D == 3):
+        elif (D == 3):
             R1eq = np.array([xeq[1] - xeq[0], yeq[1] - yeq[0], zeq[1] - zeq[0]])
             R1eqlen = np.linalg.norm(R1eq)
             R2eq = np.array([xeq[2] - xeq[0], yeq[2] - yeq[0], zeq[2] - zeq[0]])
@@ -491,17 +650,17 @@ class InputData:
             yeq[2] = yeq[0] + R2eqlen * np.cos(theta_eq / 2.0)
             zeq[0] = zeq[1] = zeq[2] = 0
 
-            equil.setXList(xeq)
-            equil.setYList(yeq)
-            equil.setZList(zeq)
+            EqMol.setXList(xeq)
+            EqMol.setYList(yeq)
+            EqMol.setZList(zeq)
 
             for pt in range(Npts):
                 pespt = pyfghutil.PESpoint(pt)
-                idx = pyfghutil.PointToIndex(self.N, pt)
-                q = np.zeros(self.D, dtype=float)
-                for d in range(self.D):
-                    dq = self.L[d] / self.N[d]
-                    q[d] = idx[d] * dq - self.L[d] / 2 + dq / 2
+                idx = pyfghutil.PointToIndex(N, pt)
+                q = np.zeros(D, dtype=float)
+                for d in range(D):
+                    dq = L[d] / N[d]
+                    q[d] = idx[d] * dq - L[d] / 2 + dq / 2
                 if self.debug: print(pt, q)
 
                 x = np.zeros(Nat, dtype=float)
@@ -529,9 +688,9 @@ class InputData:
                 pespt.setYList(y)
                 pespt.setZList(z)
                 pespt.getMolecule().setNatom(Nat)
-                pespt.getMolecule().setCharge(equil.getCharge())
-                pespt.getMolecule().setMultiplicity(equil.getMultiplicity())
-                pespt.getMolecule().setSymbolList(equil.getSymbolList())
+                pespt.getMolecule().setCharge(EqMol.getCharge())
+                pespt.getMolecule().setMultiplicity(EqMol.getMultiplicity())
+                pespt.getMolecule().setSymbolList(EqMol.getSymbolList())
                 pespt.getMolecule().setAtomicNoList(Z)
                 pespt.getMolecule().setMassNoList(A)
                 pespt.getMolecule().setMassList(m)
@@ -541,79 +700,14 @@ class InputData:
         else:
             print("this shouldn't happen")
 
-        return pes
+        for pt in Npts:
+            pespt = pes.getPointByPt(pt)
+            if not pyfghutil.closeContactTest(pespt.getMolecule()):
+                self.validate_msg = "in PES point {0}, atoms are too close together".format(pt)
+                return False
 
-    def closeContactTest(self, mol, dist_cutoff=0.05):
-        Nat = mol.getNatom()
-        x = mol.getXList()
-        y = mol.getYList()
-        z = mol.getZList()
-        for i in range(Nat):
-            for j in range(i + 1, Nat):
-                d = np.sqrt(
-                    (x[j] - x[i]) * (x[j] - x[i]) + (y[j] - y[i]) * (y[j] - y[i]) + (z[j] - z[i]) * (z[j] - z[i]))
-                if (d < dist_cutoff):
-                    return False
-
+        self.set("PES",pes)
         return True
-
-    def linearTest(self, mol, cutoff=0.05):
-        Nat = mol.getNatom()
-        x = mol.getXList()
-        y = mol.getYList()
-        z = mol.getZList()
-        for at1 in range(Nat):
-            for at2 in range(at1 + 1, Nat):
-                for at3 in range(at2 + 1, Nat):
-                    v12 = np.array([x[at2] - x[at1], y[at2] - y[at1], z[at2] - z[at1]])
-                    v13 = np.array([x[at3] - x[at1], y[at3] - y[at1], z[at3] - z[at1]])
-                    dot1213 = np.dot(v12, v13)
-                    v12len = np.linalg.norm(v12)
-                    v13len = np.linalg.norm(v13)
-                    costheta = dot1213 / (v12len * v13len)
-                    if (costheta > (1 - cutoff)) or (costheta < (-1 + cutoff)):
-                        return False
-        return True
-
-    def molecule_testing(self):
-        D = self.getD()
-        N = self.getNlist()
-        if self.debug: print(D)
-        if self.debug: print(N)
-
-        eqfile = self.getEquilFile()
-        if (not eqfile):
-            print("No Equilibrium Structure file input!")
-            self.EPFlag = False
-
-        equil = self.readEqfile()
-        if (self.closeContactTest(equil) == False):
-            print("Atoms less than 0.05 bohr apart in the equilibrium structure.")
-            self.EPFlag = False
-        #    if (linearTest(equil) == False):
-        #        raise ValidationError("The equilibrium structure is linear. Linear molecules not yet supported.")
-
-        if (self.getVmethod() == co.READ):
-            pesfile = self.getPESFile()
-            if (pesfile == None):
-                print("No Potential Energy file input!")
-            pes = self.readPESfile(equil)
-            Npts = np.prod(N)
-            for pt in range(Npts):
-                mol = pes.getPointByPt(pt).getMolecule()
-                if (self.closeContactTest(mol) == False):
-                    print("Atoms less than 0.05 bohr apart in PES structure " + str(pt + 1))
-                    self.EPFlag = False
-        #            if (linearTest(mol) == False):
-        #                raise ValidationError("PES structure " + str(pt + 1) + " is linear. Linear molecules not yet supported.")
-        else:
-            if self.debug: print("Generating pes")
-            L = self.getLlist()
-            pes = self.generatePESCoordinates_Psi4(equil)
-
-        return equil, pes
-    # End of former molecule_gui
-
 
 #TODO take the values in Eignevalues and Eigenvectos and write them to a CSV file in main on line 104.
 class OutputData:
@@ -657,9 +751,9 @@ class OutputData:
         }
 
     def generateValues(self, holder):
-        D = holder.getD()
-        N = holder.getNlist()
-        L = holder.getLlist()
+        D = holder.get("D")
+        N = holder.get("N")
+        L = holder.get("L")
         Npts = np.prod(N)
         Neig = self.getNumberOfEigenvalues()
         eigvals = self.getEigenvalues()
@@ -680,7 +774,7 @@ class OutputData:
             for alpha in range(Npts):
                 wfn[p][alpha] = eigvecs[alpha][wfnorder[p]]
 
-                q = holder.getPES().getPointByPt(alpha).getQList()
+                q = holder.get("PES").getPointByPt(alpha).getQList()
                 for d in range(D):
                     wfn2[p][alpha][d] = q[d]
                 wfn2[p][alpha][D] = eigvecs[alpha][wfnorder[p]]

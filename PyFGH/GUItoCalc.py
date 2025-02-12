@@ -206,9 +206,12 @@ def passToCalc(dataObj):
     eigenval = eigenval * 219474.6  # conversion from hartree to cm-1
 
     ResultObj = OutputData()
-    ResultObj.setNumberOfEigenvalues(Neigen)
-    ResultObj.setEigenvalues(eigenval)
-    ResultObj.setEigenvectors(eigenvec)
+    ResultObj.set("D",D)
+    ResultObj.set("N",N)
+    ResultObj.set("L",L)
+    ResultObj.set("NEigen",Neigen)
+    ResultObj.set("EVal",eigenval)
+    ResultObj.set("EVec",eigenvec)
 
     return ResultObj
 

@@ -51,7 +51,7 @@ class GUI(tk.Tk):
         self.NumEigenInput.set(NumEigenRange.index(self.obj.get("NEigen")))
         self.NumEigenInput.grid(column=1, row=1)
 
-        self.PEButton = guc.ButtonFrame(self, "Choose Energy Method", self.ChoosePEMethod)
+        self.PEButton = guc.ButtonFrame(self, "Choose Potential Energy Method", self.ChoosePEMethod)
         self.PEButton.grid(column=1, row=3)
 
         EigenMethod = co.MATRIX

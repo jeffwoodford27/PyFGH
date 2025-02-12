@@ -20,7 +20,7 @@ def run(holder=None):
     holder.validate_all()
 
     ResultObj = GTC.passToCalc(holder)
-    ResultObj.generateValues(holder)
+    ResultObj.generateValues(holder.get("PES"))
 
     # eigvals = ResultObj.getEigenvalues()
     # eigvecs = ResultObj.getEigenvectors()
@@ -66,14 +66,14 @@ def run(holder=None):
     # ResultObj.setEigenvectors(wfn2)
 
     if holder.getgui():
-        D = holder.get("D")
-        N = holder.get("N")
-        L = holder.get("L")
-        Neig=ResultObj.getNumberOfEigenvalues()
-        eigvals=ResultObj.getEigenvalues()
+        D = ResultObj.get("D")
+        N = ResultObj.get("N")
+        L = ResultObj.get("L")
+        Neig=ResultObj.get("NEigen")
+        eigvals=ResultObj.get("EVal")
         wfnorder = np.argsort(eigvals)
         Npts = np.prod(N)
-        wfn = np.zeros([Neig, Npts], dtype=float)
+        wfn = ResultObj.get("EVec")
 
 
         Npts = np.prod(N)
@@ -107,7 +107,7 @@ def run(holder=None):
         except:
             raise "Could not write eigenvalues or eigenfunctions to files."
 
-        obj = GUI_output.App(D, N, L, ResultObj)
+        obj = GUI_output.App(ResultObj)
         obj.mainloop()
 
     return ResultObj

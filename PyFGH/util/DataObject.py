@@ -712,52 +712,42 @@ class InputData:
 #TODO take the values in Eignevalues and Eigenvectos and write them to a CSV file in main on line 104.
 class OutputData:
     def __init__(self):
-        self.num_eigenvalues = 0
-        self.eigenvalues = []
-        self.eigenvectors = []
+        self.nparam = 6
+        self.paramdict = {
+            "D":0,
+            "N":[],
+            "L":[],
+            "NEigen":0,
+            "EVal":[],
+            "EVec":[]
+        }
 
-    def setEigenvalues(self, evalues):
-        self.eigenvalues = evalues
-        return
+    def get(self,param):
+        try:
+            return self.paramdict[param]
+        except KeyError:
+            raise ("error: trying to get unknown parameter {0} in OutputData".format(param))
 
-    def setEigenvectors(self, evectors):
-        self.eigenvectors = evectors
-        return
-
-    def setNumberOfEigenvalues(self, num):
-        self.num_eigenvalues = num
-        return
-
-    def getEigenvalue(self, idx):
-        return self.eigenvalues[idx]
-
-    def getEigenvalues(self):
-        return self.eigenvalues
-
-    def getEigenvector(self, idx):
-        return self.eigenvectors[idx]
-
-    def getEigenvectors(self):
-        return self.eigenvectors
-
-    def getNumberOfEigenvalues(self):
-        return self.num_eigenvalues
+    def set(self,param,value):
+        try:
+            self.paramdict[param] = value
+        except KeyError:
+            raise ("error: trying to set unknown parameter {0} in OutputData".format(param))
 
     def getOutputAsJson(self):
         return {
-            "num_eigenvalues": self.num_eigenvalues,
-            "eigenvalues": self.eigenvalues,
-            "eigenvectors": self.eigenvectors
+            "num_eigenvalues": self.get("NEigen"),
+            "eigenvalues": self.get("EVal"),
+            "eigenvectors": self.get("EVec")
         }
 
-    def generateValues(self, holder):
-        D = holder.get("D")
-        N = holder.get("N")
-        L = holder.get("L")
+    def generateValues(self, pes):
+        D = self.get("D")
+        N = self.get("N")
         Npts = np.prod(N)
-        Neig = self.getNumberOfEigenvalues()
-        eigvals = self.getEigenvalues()
-        eigvecs = self.getEigenvectors()
+        Neig = self.get("NEigen")
+        eigvals = self.get("EVal")
+        eigvecs = self.get("EVec")
         wfnorder = np.argsort(eigvals)
         freq = np.zeros(Neig, dtype=float)
 
@@ -765,7 +755,7 @@ class OutputData:
             freq[i] = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
             print("Eigenvalue #{:d}: {:.1f} cm-1".format(i + 1, freq[i]))
 
-        self.setEigenvalues(freq)
+        self.set("EVal", freq)
 
         wfn = np.zeros([Neig, Npts], dtype=float)
         wfn2 = np.zeros([Neig, Npts, D + 1], dtype=float)
@@ -774,7 +764,7 @@ class OutputData:
             for alpha in range(Npts):
                 wfn[p][alpha] = eigvecs[alpha][wfnorder[p]]
 
-                q = holder.get("PES").getPointByPt(alpha).getQList()
+                q = pes.getPointByPt(alpha).getQList()
                 for d in range(D):
                     wfn2[p][alpha][d] = q[d]
                 wfn2[p][alpha][D] = eigvecs[alpha][wfnorder[p]]
@@ -788,10 +778,14 @@ class OutputData:
             for pt in range(Npts):
                 wfn2[p][pt][D] = wfn2[p][pt][D] * norm
 
-        self.setEigenvectors(wfn2)
+        self.set("EVec", wfn2)
+        return
 
-    def plot_data(self,wfn_no, q_ind, D, N, L, qprojlist):
-        wfn = self.getEigenvector(wfn_no)
+    def plot_data(self,wfn_no, q_ind, qprojlist):
+        D = self.get("D")
+        N = self.get("N")
+        L = self.get("L")
+        wfn = self.get("EVec")[wfn_no]
 
         q_mask = np.zeros(D,dtype=int)
         q_mask[q_ind] = 1
@@ -830,9 +824,11 @@ class OutputData:
         plot1.plot(x,y)
         return figure
 
-    def plot_data_contour(self, wfn_no, q_indx, q_indy, D, N, L, qprojlist):
-
-        wfn = self.getEigenvector(wfn_no)
+    def plot_data_contour(self, wfn_no, q_indx, q_indy, qprojlist):
+        D = self.get("D")
+        N = self.get("N")
+        L = self.get("L")
+        wfn = self.get("EVec")[wfn_no]
 
         q_mask = np.zeros(D,dtype=int)
         q_mask[q_indx] = 1

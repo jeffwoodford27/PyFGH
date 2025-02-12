@@ -5,14 +5,14 @@ from PyFGH import GUI_Classes as guc
 
 
 class App(tk.Tk):
-    def __init__(self, D, N, L, obj):
+    def __init__(self, obj):
         super().__init__()
 
-        self.D = D
-        self.N = N
-        self.L = L
         self.obj = obj
-        self.Nplot = self.obj.getNumberOfEigenvalues()
+        self.D = self.obj.get("D")
+        self.N = self.obj.get("N")
+        self.L = self.obj.get("L")
+        self.Nplot = self.obj.get("NEigen")
 
         self.row_current = 0
 
@@ -162,7 +162,7 @@ class App(tk.Tk):
             child.destroy()
 
         figure = self.obj.plot_data(
-            int(self.wfnframe.get()), int(self.indvarframe.get()), self.D, self.N, self.L, self.qprojlist)
+            int(self.wfnframe.get()), int(self.indvarframe.get()), self.qprojlist)
 
         figure_canvas = FigureCanvasTkAgg(figure, self.plotframe)
         figure_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
@@ -173,7 +173,7 @@ class App(tk.Tk):
             child.destroy()
 
         fig = self.obj.plot_data_contour(int(self.wfnframe.get()), int(self.xframe.get()),
-                                         int(self.yframe.get()), self.D, self.N, self.L, self.qprojlist)
+                                         int(self.yframe.get()), self.qprojlist)
         figure_canvas = FigureCanvasTkAgg(fig, self.plotframe)
 
         figure_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)

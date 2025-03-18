@@ -22,49 +22,6 @@ def run(holder=None):
     ResultObj = GTC.passToCalc(holder)
     ResultObj.generateValues(holder.get("PES"))
 
-    # eigvals = ResultObj.getEigenvalues()
-    # eigvecs = ResultObj.getEigenvectors()
-    # Neig = ResultObj.getNumberOfEigenvalues()
-    #
-    # wfnorder = np.argsort(eigvals)
-    # D = holder.getD()
-    # N = holder.getNlist()
-    # L = holder.getLlist()
-    # Npts = np.prod(N)
-    #
-    # freq = np.zeros(Neig, dtype=float)
-    #
-    # for i in range(Neig):
-    #     freq[i] = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
-    #     print("Eigenvalue #{:d}: {:.1f} cm-1".format(i + 1, freq[i]))
-    #
-    # ResultObj.setEigenvalues(freq)
-    #
-    # wfn = np.zeros([Neig, Npts], dtype=float)
-    # wfn2 = np.zeros([Neig, Npts, D+1], dtype=float)
-    #
-    # for p in range(Neig):
-    #     for alpha in range(Npts):
-    #         wfn[p][alpha] = eigvecs[alpha][wfnorder[p]]
-    #
-    #         q = holder.getPES().getPointByPt(alpha).getQList()
-    #         for d in range(D):
-    #             wfn2[p][alpha][d] = q[d]
-    #         wfn2[p][alpha][D] = eigvecs[alpha][wfnorder[p]]
-    #
-    # for p in range(Neig):
-    #     norm = 0
-    #     for pt in range(Npts):
-    #         norm = norm + wfn2[p][pt][D] * wfn2[p][pt][D]
-    #     print(norm)
-    #     norm = 1/np.sqrt(norm)
-    #     for pt in range(Npts):
-    #         wfn2[p][pt][D] = wfn2[p][pt][D] * norm
-    #
-    #
-    #
-    # ResultObj.setEigenvectors(wfn2)
-
     if holder.getgui():
         D = ResultObj.get("D")
         N = ResultObj.get("N")
@@ -94,7 +51,7 @@ def run(holder=None):
                 file = Path(__file__).parent / "./outputfiles/Eigenvector-"
                 filepath = str(file) + str(p) + ".csv"
 
-                with open(filepath, "r") as f:
+                with open(filepath, "w") as f:
                     with open(f.name, 'w', newline='', encoding='UTF8') as f:
                         writer = csv.writer(f)
                         for pt in range(Npts):
@@ -110,6 +67,7 @@ def run(holder=None):
         obj = GUI_output.App(ResultObj)
         obj.mainloop()
 
+
     return ResultObj
 
 
@@ -120,6 +78,7 @@ if __name__ == '__main__':
     #molecule = "NITROGEN"
     #molecule = "WATER"
 
+    # These are default cases as examples
     if (molecule == "NITROGEN"):
         holder = DataObject.InputData()
         holder.set("D",1)

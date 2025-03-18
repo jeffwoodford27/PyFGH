@@ -4,7 +4,6 @@ from tkinter.filedialog import askopenfilename
 from tkinter.messagebox import showerror
 import multiprocessing
 import sys
-import numpy as np
 from PyFGH import GUI_Classes as guc
 from PyFGH import Constants as co
 from PyFGH.util import DataObject
@@ -162,7 +161,7 @@ class GUI(tk.Tk):
         canvas.pack()
 
         text = "  A Python implementation of the Fourier Grid Hamiltonian \n \n Credits: Dr. Jeffrey Woodford, jwoodford@missouriwestern.edu \n" \
-               "Nelson Maxey, Tyler Law \n and Josiah Randleman. \n " \
+               "Nelson Maxey, Tyler Law, \n Josiah Randleman, and Weston Henning. \n " \
                "Department of Chemistry and Department of Computer Science \n" \
                "Missouri Western State University, St. Joseph, Missouri, USA \n" \
                "\n GitHub Repository: \n https://github.com/jeffwoodford27/PyFGH/tree/main \n" \
@@ -202,7 +201,7 @@ class GUI(tk.Tk):
 
     # This will open file explorer to input the equilibrium file
     def GetEquilFileCommand(self):
-        print ('Get Equilibrium Coordinate Button Clicked')
+        print('Get Equilibrium Coordinate Button Clicked')
         self.obj.set("EqFile",self.Read_Structures_Button('File Explorer for Equilibrium Structure'))
         return
 

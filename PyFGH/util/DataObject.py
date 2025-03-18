@@ -781,7 +781,7 @@ class OutputData:
         self.set("EVec", wfn2)
         return
 
-    def plot_data(self,wfn_no, q_ind, qprojlist):
+    def plot_data_2d(self, wfn_no, q_ind, qprojlist):
         D = self.get("D")
         N = self.get("N")
         L = self.get("L")
@@ -819,7 +819,7 @@ class OutputData:
     def plot_scatter(self, no, q_ind, x, y):
         figure = Figure(figsize=(6,4), dpi=100)
         titlestr = "Wavefunction {:0d}".format(no)
-        xlabel = "q{:0d} (bohr)".format(q_ind)
+        xlabel = "q{:0d} (bohr)".format(q_ind+1)
         plot1 = figure.add_subplot(xlabel=xlabel, ylabel="Normalized Wavefunction",title=titlestr)
         plot1.plot(x,y)
         return figure

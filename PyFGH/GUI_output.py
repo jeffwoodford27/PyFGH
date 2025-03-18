@@ -2,12 +2,17 @@ import tkinter as tk
 from tkinter import ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from PyFGH import GUI_Classes as guc
+import sys
 
 
+# Output GUI, it does the plotting here but values are generated in DataObject in output object
 class App(tk.Tk):
+    def close_gui(self):
+        self.destroy()
+        sys.exit()
     def __init__(self, obj):
         super().__init__()
-
+        self.protocol('WM_DELETE_WINDOW', self.close_gui)
         self.obj = obj
         self.D = self.obj.get("D")
         self.N = self.obj.get("N")
@@ -18,11 +23,12 @@ class App(tk.Tk):
 
         plots = []
         for i in range(self.Nplot):
-            plots.append(i)
+            plots.append(i+1)
 
         self.wfnframe = guc.ComboboxFrame(self, "Plot Option", plots)
         self.wfnframe.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
+        self.wfnframe.set(0)
 
         if (self.D > 1):
             self.qlist = []
@@ -48,7 +54,7 @@ class App(tk.Tk):
 
 
         else:
-            plotbutton = guc.ButtonFrame(self, "plot", self.plot_data)
+            plotbutton = guc.ButtonFrame(self, "plot", self.plot_data_2d)
             plotbutton.grid(column=0, row=self.row_current)
             self.row_current = self.row_current + 1
 
@@ -59,7 +65,9 @@ class App(tk.Tk):
             self.plotframe.grid(column=2, row=0, rowspan=2)
 
 
+    # Chooses between plot types
     def choice_selector(self):
+        self.clear_input()
         result = int(self.plotTypeFrame.get())
         if(result == 0):
             self.scatter_input()
@@ -79,7 +87,7 @@ class App(tk.Tk):
         self.projvarframe.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
-        plotbutton = guc.ButtonFrame(self.pcFrame, "plot", self.plot_data)
+        plotbutton = guc.ButtonFrame(self.pcFrame, "plot", self.plot_data_2d)
         plotbutton.grid(column=0, row=self.row_current)
         self.row_current = self.row_current + 1
 
@@ -106,7 +114,6 @@ class App(tk.Tk):
         self.row_current = self.row_current + 1
 
 
-
     def null(self):
         return
 
@@ -120,15 +127,15 @@ class App(tk.Tk):
             child.destroy()
         return
 
+    # This will choose which projection for scatter
     def select_indvar(self):
         rb_result = int(self.indvarframe.get())
-
         self.qprojlist = []
         row_count = 0
         for d in [x for x in range(self.D) if x != rb_result]:
             n = (self.N[d]-1)//2
             dx = self.L[d]/self.N[d]
-            q = [(j-n)*dx for j in range(self.N[d])]
+            q = [round((j-n)*dx, 3) for j in range(self.N[d])]
             txt = "q{:0d} projection".format(d+1)
             cb = guc.ComboboxFrame(self.projvarframe, txt, q)
             cb.grid(column=0, row=row_count)
@@ -137,6 +144,7 @@ class App(tk.Tk):
 
         return
 
+    # This will select the projection that the graph will use for contour
     def projselect(self):
         x = int(self.xframe.get())
         y = int(self.yframe.get())
@@ -147,7 +155,7 @@ class App(tk.Tk):
             if (d != x and d != y):
                 n = (self.N[d]-1)//2
                 dx = self.L[d]/self.N[d]
-                q = [(j-n)*dx for j in range(self.N[d])]
+                q = [round((j-n)*dx,3) for j in range(self.N[d])]
                 txt = "q{:0d} projection".format(d+1)
                 cb = guc.ComboboxFrame(self.projvarframe, txt, q)
                 cb.grid(column=0, row=row_count)
@@ -156,25 +164,26 @@ class App(tk.Tk):
 
         return
 
-# rename
-    def plot_data(self):
+    # This will simply plot the data as a scatter
+    def plot_data_2d(self):
         for child in self.plotframe.winfo_children():
             child.destroy()
 
-        figure = self.obj.plot_data(
+        figure = self.obj.plot_data_2d(
             int(self.wfnframe.get()), int(self.indvarframe.get()), self.qprojlist)
 
         figure_canvas = FigureCanvasTkAgg(figure, self.plotframe)
         figure_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         return
 
+    # This will plot the data as a contour
     def plot_data_contour(self):
         for child in self.plotframe.winfo_children():
             child.destroy()
 
         fig = self.obj.plot_data_contour(int(self.wfnframe.get()), int(self.xframe.get()),
                                          int(self.yframe.get()), self.qprojlist)
-        figure_canvas = FigureCanvasTkAgg(fig, self.plotframe)
 
+        figure_canvas = FigureCanvasTkAgg(fig, self.plotframe)
         figure_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         return

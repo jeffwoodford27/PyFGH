@@ -57,13 +57,6 @@ class NBlock:
         elif (self.D == 1):
             return ([(self.xboffset, self.yboffset)])
 
-    def print1x1(self):
-        if (self.D != 1):
-            blank = 0
-            # Nothing
-        else:
-            pass
-
     def accessPoint(self, alpha, beta):
         if (self.D > 1):
             return (

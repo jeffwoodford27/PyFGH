@@ -16,8 +16,11 @@ def run(holder=None):
         holder = win.DataReturner()
     else:
         holder.setgui(False)
+        holder.validate_all()
 
-    holder.validate_all()
+    holder.logfile.write("Kicking off PyFGH calculation with the following input:")
+    for key in holder.paramdict.keys():
+        holder.logfile.write("{0}: {1}".format(key,holder.get(key)))
 
     ResultObj = GTC.passToCalc(holder)
     ResultObj.generateValues(holder.get("PES"))

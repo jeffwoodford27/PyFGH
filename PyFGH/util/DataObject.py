@@ -6,6 +6,32 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from numpy import ma
 import os
+import datetime
+
+class Logger:
+    def __init__(self, filename):
+        self.filename = filename
+        self.logfile = open(self.filename, 'w', encoding='utf-8')
+        if self.logfile.writable():
+            self.writable = True
+            self.logfile.write("{0}: PyFGH invoked\n".format(datetime.datetime.now()))
+            self.logfile.close()
+        else:
+            self.writable = False
+
+    def write(self, txt):
+        if self.writable:
+            self.logfile = open(self.filename, 'a', encoding='utf-8')
+            self.logfile.write("{0}: {1}\n".format(datetime.datetime.now(),txt))
+            self.logfile.close()
+        return
+
+    def close(self):
+        if self.writable:
+            self.logfile = open(self.filename, 'a', encoding='utf-8')
+            self.logfile.write("{0}: PyFGH terminated\n".format(datetime.datetime.now()))
+            self.logfile.close()
+        return
 
 """
 DataObject is a place to hold data. All values in these classes are first assigned to zero. In GUI_old.py these values get 
@@ -48,40 +74,6 @@ class Parameter:
             self.setState(state)
         return
 
-class Graph:
-    def __init__(self, vertices):
-        self.V = vertices
-        self.graph = {}
-
-    def add_vertex(self,v):
-        self.graph[v] = []
-        return
-
-    def add_edge(self,u,v):
-        self.graph[u].append(v)
-        self.graph[v].append(u)
-        return
-
-    def dfs_iterative(self, start):
-        visited = self.graph.copy()
-        for key in visited.keys():
-            visited[key] = False
-        stack = []
-        dfs_list = []
-
-        stack.append(start)
-        visited[start] = True
-
-        while stack:
-            current = stack.pop()
-            dfs_list.append(current)
-
-            for neighbor in self.graph[current]:
-                if not visited[neighbor]:
-                    stack.append(neighbor)
-                    visited[neighbor] = True
-        return dfs_list[1:]
-
 defaultdict = {
     "D":Parameter("D",3,True),
     "N":Parameter("N",[11,11,11],True,["D"]),
@@ -103,6 +95,7 @@ class InputData:
         self.paramdict = defaultdict.copy()
         self.paramdict["EqMol"] = Parameter("EqMol", None, False, ["EqFile"])
         self.paramdict["PES"] = Parameter("PES", None, False, ["D", "N", "L", "EqMol", "PEMethod"])
+        self.logfile = Logger("testingfiles/PyFGH.log")
         self.gui = False
         self.debug = False
 
@@ -122,13 +115,6 @@ class InputData:
         }
 
         self.validate_msg = None
-
-        self.paramgraph = Graph(self.nparam)
-        for key in self.paramdict.keys():
-            self.paramgraph.add_vertex(key)
-        for key, param in self.paramdict.items():
-            for dep in param.getStateDependency():
-                self.paramgraph.add_edge(key, dep)
 
     """
     The following methods are setters and getters.
@@ -188,8 +174,6 @@ class InputData:
         except KeyError:
             print("error: trying to set value for unknown parameter {0}".format(param))
             raise
-#        for p in self.paramgraph.dfs_iterative(param):
-#            self.setState(p,False)
         for p in self.paramdict.keys():
             for dep in self.getStateDependency(p):
                 if param == dep:
@@ -197,12 +181,11 @@ class InputData:
         return
 
     def validate(self,param):
-        print("working on validation parameter "+param)
+        self.logfile.write("working on validation parameter "+param)
         deps = self.getStateDependency(param)
-        print(deps)
         for dep in deps:
             if self.getState(dep):
-                print("don't need to validate "+dep+", already validated")
+                self.logfile.write("don't need to validate "+dep+", already validated")
             elif not self.validate(param=dep):
                 return False
         try:
@@ -211,15 +194,15 @@ class InputData:
             raise ValidationError(param,"error: missing validation function for {0}".format(param))
 
     def validate_all(self):
+        self.logfile.write("Begin all parameter validation method")
         paramlist = self.paramdict.keys()
-        print(paramlist)
         for p in paramlist:
             self.setState(p,False)
         for p in paramlist:
             res = self.validate(p)
-            print(res)
             if not res:
                 raise ValidationError(p,self.validate_msg)
+        self.logfile.write("All parameters successfully validated")
         return True
 
     # The following are the individual checks used in validate
@@ -233,7 +216,7 @@ class InputData:
             self.validate_msg = "D must be {0} or less".format(co.MAXDIM)
             return False
         self.setState("D",True)
-        print("validated D")
+        self.logfile.write("validated D")
         return True
 
     def checkN(self):
@@ -259,7 +242,7 @@ class InputData:
                 self.validate_msg = "N values are less than 5"
                 return False
         self.setState("N", True)
-        print("validated N")
+        self.logfile.write("validated N")
         return True
 
     def checkL(self):
@@ -282,7 +265,7 @@ class InputData:
                 self.validate_msg = "L values are not positive"
                 return False
         self.setState("L", True)
-        print("validated L")
+        self.logfile.write("validated L")
         return True
 
     def checkNEigen(self):
@@ -295,7 +278,7 @@ class InputData:
             self.validate_msg = "error: number of eigenvalues must be between 1 and {0}".format(co.MAXEIG)
             return False
         self.setState("NEigen",True)
-        print("validated NEigen")
+        self.logfile.write("validated NEigen")
         return True
 
     def checkNCores(self):
@@ -308,7 +291,7 @@ class InputData:
             self.validate_msg = "error: number of cores must be a positive integer"
             return False
         self.setState("NCores",True)
-        print("validated NCores")
+        self.logfile.write("validated NCores")
         return True
 
     def checkPEMethod(self):
@@ -317,7 +300,7 @@ class InputData:
             self.validate_msg = "error: Potential Energy method must be one of the following: {0}".format(co.PSI4M)
             return False
         self.setState("PEMethod",True)
-        print("validated PEMethod")
+        self.logfile.write("validated PEMethod")
         return True
 
     def checkPsi4Method(self):
@@ -329,11 +312,11 @@ class InputData:
                 self.validate_msg = "error: unsupported Psi4 method {0}".format(psi4method)
                 return False
             self.setState("Psi4Method",True)
-            print("validated Psi4Method")
+            self.logfile.write("validated Psi4Method")
             return True
         else:
             self.setState("Psi4Method",True)
-            print("fake validated Psi4Method")
+            self.logfile.write("Since Psi4 potential energies were not chosen, Psi4Method parameter was ignored.")
             return True
 
     def checkEigenMethod(self):
@@ -342,7 +325,7 @@ class InputData:
         if eigenmethod not in co.MATRIX:
             self.validate_msg = "error: unrecognized eigenvalue method {0}".format(eigenmethod)
         self.setState("EigenMethod",True)
-        print("validated EigenMethod")
+        self.logfile.write("validated EigenMethod")
         return True
 
     def checkEqFile(self):
@@ -351,7 +334,7 @@ class InputData:
         try:
             if os.path.isfile(eqfile) and os.access(eqfile, os.R_OK):
                 self.setState("EqFile",True)
-                print("validated EqFile")
+                self.logfile.write("validated EqFile")
                 return True
             else:
                 self.validate_msg = "file {0} either does not exist or is not readable".format(eqfile)
@@ -367,7 +350,7 @@ class InputData:
             try:
                 if os.path.isfile(pefile) and os.access(pefile, os.R_OK):
                     self.setState("PEFile",True)
-                    print("validated PEFile")
+                    self.logfile.write("validated PEFile")
                     return True
                 else:
                     self.validate_msg = "error: file {0} either does not exist or is not readable".format(pefile)
@@ -377,14 +360,14 @@ class InputData:
                 return False
         else:
             self.setState("PEFile",True)
-            print("fake validated PEFile")
+            self.logfile.write("Since reading PE from file was not selected, PEFile parameter was ignored.")
             return True
 
     def checkEqMol(self):
         self.setState("EqMol",False)
         if self.readEqFile():
             self.setState("EqMol",True)
-            print("validated EqMol")
+            self.logfile.write("validated EqMol")
             return True
         else:
             self.set("EqMol",None)
@@ -397,12 +380,12 @@ class InputData:
         if (PEMethod == co.READ):
             if self.readPESfile():
                 self.setState("PES",True)
-                print("validated PES for READ")
+                self.logfile.write("validated PES for READ")
                 return True
         if (PEMethod == co.CPSI):
             if self.generatePESCoordinates_Psi4():
                 self.setState("PES",True)
-                print("validated PES for CPSI")
+                self.logfile.write("validated PES for CPSI")
                 return True
         self.set("PES",None)
         self.setState("PES",False)
@@ -430,7 +413,7 @@ class InputData:
                 self.validate_msg = 'Read Multiplicity of {0}, Should Be A Positive Integer'.format(Mult)
                 return False
 
-            print("Charge is {0}, Multiplicity is {1}".format(Q, Mult))
+            self.logfile.write("Charge is {0}, Multiplicity is {1}".format(Q, Mult))
 
             Nat = 0
             for row in reader:
@@ -445,7 +428,7 @@ class InputData:
                     return False
                 Nat = Nat + 1
 
-        print("Read {0} Atoms from Equilibrium File".format(Nat))
+        self.logfile.write("Read {0} Atoms from Equilibrium File".format(Nat))
 
         for n in range(Nat):
             symbolFound = False
@@ -488,7 +471,7 @@ class InputData:
             self.validate_msg = "error: in equilibrium structure, atoms are too close together"
             return False
         self.set("EqMol",eqmol)
-        print("Equilibrium molecule successfully read and validated")
+        self.logfile.write("Equilibrium molecule successfully read and validated")
         return True
 
     def readPESfile(self):
@@ -551,7 +534,7 @@ class InputData:
             self.validate_msg = "Error: Expecting {0} lines in PES file, read {1}".format(Npts, n)
             return False
 
-        print("Read {0} lines from potential energy file".format(n))
+        self.logfile.write("Read {0} lines from potential energy file".format(n))
         self.set("PES",pes)
         return True
 
@@ -661,7 +644,6 @@ class InputData:
                 for d in range(D):
                     dq = L[d] / N[d]
                     q[d] = idx[d] * dq - L[d] / 2 + dq / 2
-                if self.debug: print(pt, q)
 
                 x = np.zeros(Nat, dtype=float)
                 y = np.zeros(Nat, dtype=float)
@@ -709,9 +691,12 @@ class InputData:
         self.set("PES",pes)
         return True
 
+
+
+
 #TODO take the values in Eignevalues and Eigenvectos and write them to a CSV file in main on line 104.
 class OutputData:
-    def __init__(self):
+    def __init__(self,logfile):
         self.nparam = 6
         self.paramdict = {
             "D":0,
@@ -721,6 +706,7 @@ class OutputData:
             "EVal":[],
             "EVec":[]
         }
+        self.logfile = logfile
 
     def get(self,param):
         try:
@@ -754,6 +740,7 @@ class OutputData:
         for i in range(Neig):
             freq[i] = eigvals[wfnorder[i]] - eigvals[wfnorder[0]]
             print("Eigenvalue #{:d}: {:.1f} cm-1".format(i + 1, freq[i]))
+            self.logfile.write("Eigenvalue #{:d}: {:.1f} cm-1".format(i + 1, freq[i]))
 
         self.set("EVal", freq)
 
@@ -773,7 +760,6 @@ class OutputData:
             norm = 0
             for pt in range(Npts):
                 norm = norm + wfn2[p][pt][D] * wfn2[p][pt][D]
-            print(norm)
             norm = 1 / np.sqrt(norm)
             for pt in range(Npts):
                 wfn2[p][pt][D] = wfn2[p][pt][D] * norm

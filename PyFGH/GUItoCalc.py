@@ -146,16 +146,19 @@ def passToCalc(dataObj):
     equil = dataObj.get("EqMol")
     pes = dataObj.get("PES")
 
+    t0 = t_start = time.perf_counter()
     print("Imposing Eckart conditions")
     eckartTranslation(N, equil, pes)
     eckartRotation(N, equil, pes)
+    t1 = time.perf_counter()
+    print("Done with Eckart conditions time = {:.2f} s".format(t1-t0))
 
     print("Creating G Matrix")
 
     equil = dataObj.get("EqMol")
     pes = dataObj.get("PES")
 
-    t0 = time.perf_counter()
+    t0 = t_start = time.perf_counter()
     G = Gmatrix.calcGMatrix(D, N, pes, equil)
     t1 = time.perf_counter()
     print("Done with G Matrix time = {:.2f} s".format(t1-t0))
@@ -167,7 +170,6 @@ def passToCalc(dataObj):
     gc.collect()
     Vmethod = dataObj.get("PEMethod")
     psi4method = dataObj.get("Psi4Method")
-    print(D,N,Vmethod,equil,pes,psi4method,cores)
     V = Vmatrix.VMatrixCalc(D, N, Vmethod, equil, pes, psi4method, cores)
     t1 = time.perf_counter()
     print("Done with V Matrix time = {:.2f} s".format(t1-t0))
@@ -178,16 +180,13 @@ def passToCalc(dataObj):
     t1 = time.perf_counter()
     print("Done with T Matrix time = {:.2f} s".format(t1-t0))
 
+    t0 = time.perf_counter()
     print("Calculating eigenvalues")
     Neigen = dataObj.get("NEigen")
     EigenMethod = dataObj.get("EigenMethod")
     Npts = np.prod(N)
 
     H = V + T
-#    np.savetxt("Vmatrix-water.csv", V.toarray(), delimiter=',')
-#    np.savetxt("Tmatrix-water.csv", T.toarray(), delimiter=',')
-#    np.savetxt("Hmatrix-water.csv", H.toarray(), delimiter=',')
-
 
     if (EigenMethod == co.SMAT):
         NIter = 10*Npts
@@ -197,7 +196,7 @@ def passToCalc(dataObj):
             eigenval = error_obj.eigenvalues
             eigenvec = error_obj.eigenvectors
             Neigen = np.size(eigenval)
-            print("could not find {0} eigenvalues in {1} iterations, found {2} instead.".format(dataObj.getNumberOfEigenvalues(),NIter, Neigen))
+            print("could not find {0} eigenvalues in {1} iterations, found {2} instead.".format(dataObj.get("NEigen"),NIter, Neigen))
             print()
     else:
         H = H.toarray("C")
@@ -205,7 +204,12 @@ def passToCalc(dataObj):
 
     eigenval = eigenval * 219474.6  # conversion from hartree to cm-1
 
-    ResultObj = OutputData()
+    t1 = t_end = time.perf_counter()
+    print("Done with eigenvalue calculation time = {:.2f} s".format(t1-t0))
+
+    print("Total calculation time = {:.2f} s".format(t_end - t_start))
+
+    ResultObj = OutputData(dataObj.logfile)
     ResultObj.set("D",D)
     ResultObj.set("N",N)
     ResultObj.set("L",L)

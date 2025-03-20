@@ -189,19 +189,16 @@ class GUI(tk.Tk):
         return
 
     def ClearButtonCommand(self):
-        print("Clear Button Clicked")
         self.DimensionInput.clear()
         return
 
     def ExitButtonCommand(self):
-        print("Exit Button Clicked")
         self.destroy()
         sys.exit()
         return
 
     # This will open file explorer to input the equilibrium file
     def GetEquilFileCommand(self):
-        print('Get Equilibrium Coordinate Button Clicked')
         self.obj.set("EqFile",self.Read_Structures_Button('File Explorer for Equilibrium Structure'))
         return
 
@@ -255,7 +252,6 @@ class GUI(tk.Tk):
     # Otherwise the user will have to fix any errors
     def CalculateButtonCommand(self):
         self.obj.set("D",int(self.DimensionInput.get()))
-        print(self.obj.get("EqFile"))
         if self.obj.get("EqFile") is None or self.obj.get("EqFile") == "":
             self.GetEquilFileCommand()
         self.obj.set("NCores",int(self.CoresInput.get()))
@@ -276,7 +272,6 @@ class GUI(tk.Tk):
 
     # Method that opens the file explorer
     def Read_Structures_Button(self, Etitle):
-        global opened
         """
             Note: xlsx files are not accepted. Can only take CSV files or else the code will break.
             XLSX files do not abide by UTF-8 formatting and is a pain to get it to work. So to save everyone

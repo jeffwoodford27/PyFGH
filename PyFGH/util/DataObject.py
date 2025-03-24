@@ -613,74 +613,8 @@ class InputData:
                 pespt.setEnergy(0)
                 pes.setPESpt(pt, pespt)
 
-        elif (D == 3):
-            R1eq = np.array([xeq[1] - xeq[0], yeq[1] - yeq[0], zeq[1] - zeq[0]])
-            R1eqlen = np.linalg.norm(R1eq)
-            R2eq = np.array([xeq[2] - xeq[0], yeq[2] - yeq[0], zeq[2] - zeq[0]])
-            R2eqlen = np.linalg.norm(R2eq)
-            theta_eq = np.arccos((np.dot(R1eq, R2eq)) / (R1eqlen * R2eqlen))
-
-            m1 = m[0]
-            m2 = m[1]
-            m3 = m[2]
-            M = m1 + m2 + m3
-
-            xeq[0] = (m2 * R1eqlen - m3 * R2eqlen) * np.sin(theta_eq / 2.0) / M
-            yeq[0] = -(m3 * R2eqlen + m2 * R1eqlen) * np.cos(theta_eq / 2.0) / M
-            xeq[1] = xeq[0] - R1eqlen * np.sin(theta_eq / 2.0)
-            yeq[1] = yeq[0] + R1eqlen * np.cos(theta_eq / 2.0)
-            xeq[2] = xeq[0] + R2eqlen * np.sin(theta_eq / 2.0)
-            yeq[2] = yeq[0] + R2eqlen * np.cos(theta_eq / 2.0)
-            zeq[0] = zeq[1] = zeq[2] = 0
-
-            EqMol.setXList(xeq)
-            EqMol.setYList(yeq)
-            EqMol.setZList(zeq)
-
-            for pt in range(Npts):
-                pespt = pyfghutil.PESpoint(pt)
-                idx = pyfghutil.PointToIndex(N, pt)
-                q = np.zeros(D, dtype=float)
-                for d in range(D):
-                    dq = L[d] / N[d]
-                    q[d] = idx[d] * dq - L[d] / 2 + dq / 2
-
-                x = np.zeros(Nat, dtype=float)
-                y = np.zeros(Nat, dtype=float)
-                z = np.zeros(Nat, dtype=float)
-
-                if (A[1] == A[2]) and (Z[1] == Z[2]):
-                    R1 = R1eqlen + q[0] + q[1]
-                    R2 = R1eqlen + q[1] - q[0]
-                else:
-                    R1 = R1eqlen + q[0]
-                    R2 = R2eqlen + q[1]
-
-                theta = theta_eq + q[2]
-
-                x[0] = (m2 * R1 - m3 * R2) * np.sin(theta / 2.0) / M
-                y[0] = -(m3 * R2 + m2 * R1) * np.cos(theta / 2.0) / M
-                x[1] = x[0] - R1 * np.sin(theta / 2.0)
-                y[1] = y[0] + R1 * np.cos(theta / 2.0)
-                x[2] = x[0] + R2 * np.sin(theta / 2.0)
-                y[2] = y[0] + R2 * np.cos(theta / 2.0)
-
-                pespt.setQList(q)
-                pespt.setXList(x)
-                pespt.setYList(y)
-                pespt.setZList(z)
-                pespt.getMolecule().setNatom(Nat)
-                pespt.getMolecule().setCharge(EqMol.getCharge())
-                pespt.getMolecule().setMultiplicity(EqMol.getMultiplicity())
-                pespt.getMolecule().setSymbolList(EqMol.getSymbolList())
-                pespt.getMolecule().setAtomicNoList(Z)
-                pespt.getMolecule().setMassNoList(A)
-                pespt.getMolecule().setMassList(m)
-                pespt.setEnergy(0)
-                pes.setPESpt(pt, pespt)
-
         else:
-            print("this shouldn't happen")
+            raise ValidationError("PyFGH calculations with Psi4 are only currently implemented for diatomic molecules.")
 
         for pt in Npts:
             pespt = pes.getPointByPt(pt)
@@ -690,9 +624,6 @@ class InputData:
 
         self.set("PES",pes)
         return True
-
-
-
 
 #TODO take the values in Eignevalues and Eigenvectos and write them to a CSV file in main on line 104.
 class OutputData:

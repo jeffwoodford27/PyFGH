@@ -547,7 +547,8 @@ class InputData:
     L: numpy array of length D of the length of each grid, in bohr (float)
     equil: Molecule object with the equilibrium molecular structure
     Output:
-    PotentialEnergySurface object
+    PotentialEnergySurface object is placed in the object.
+    Returns True/False on success/failure.
     '''
 
     def generatePESCoordinates_Psi4(self):
@@ -559,8 +560,8 @@ class InputData:
         L = self.get("L")
         Nat = EqMol.getNatom()
 
-        if not (((D == 1) and (Nat == 2)) or ((D == 3) and (Nat == 3))):
-            self.validate_msg = "Psi4 Calculation Method only implemented for diatomic and nonlinear triatomic molecules."
+        if not ((D == 1) and (Nat == 2)):
+            self.validate_msg = "Psi4 Calculation Method only implemented for diatomic molecules."
             return False
 
         Npts = np.prod(N)
@@ -573,48 +574,44 @@ class InputData:
 
         pes = pyfghutil.PotentialEnergySurface(N)
 
-        if (D == 1):
-            Req = np.linalg.norm(np.array([xeq[1] - xeq[0], yeq[1] - yeq[0], zeq[1] - zeq[0]]))
+        Req = np.linalg.norm(np.array([xeq[1] - xeq[0], yeq[1] - yeq[0], zeq[1] - zeq[0]]))
 
-            xeq[0] = xeq[1] = yeq[0] = yeq[1] = 0
-            zeq[0] = -Req / 2
-            zeq[1] = Req / 2
+        xeq[0] = xeq[1] = yeq[0] = yeq[1] = 0
+        zeq[0] = -Req / 2
+        zeq[1] = Req / 2
 
-            EqMol.setXList(xeq)
-            EqMol.setYList(yeq)
-            EqMol.setZList(zeq)
+        EqMol.setXList(xeq)
+        EqMol.setYList(yeq)
+        EqMol.setZList(zeq)
 
-            for pt in Npts:
-                pespt = pyfghutil.PESpoint(pt)
-                idx = pyfghutil.PointToIndex(N, pt)
-                q = np.zeros(D, dtype=float)
-                for d in range(D):
-                    dq = L[d] / N[d]
-                    q[d] = idx[d] * dq - L[d] / 2 + dq / 2
+        for pt in Npts:
+            pespt = pyfghutil.PESpoint(pt)
+            idx = pyfghutil.PointToIndex(N, pt)
+            q = np.zeros(D, dtype=float)
+            for d in range(D):
+                dq = L[d] / N[d]
+                q[d] = idx[d] * dq - L[d] / 2 + dq / 2
 
-                x = np.zeros(Nat, dtype=float)
-                y = np.zeros(Nat, dtype=float)
-                z = np.zeros(Nat, dtype=float)
+            x = np.zeros(Nat, dtype=float)
+            y = np.zeros(Nat, dtype=float)
+            z = np.zeros(Nat, dtype=float)
 
-                z[0] = -(Req + q[0]) / 2
-                z[1] = (Req + q[0]) / 2
+            z[0] = -(Req + q[0]) / 2
+            z[1] = (Req + q[0]) / 2
 
-                pespt.setQList(q)
-                pespt.setXList(x)
-                pespt.setYList(y)
-                pespt.setZList(z)
-                pespt.getMolecule().setNatom(Nat)
-                pespt.getMolecule().setCharge(EqMol.getCharge())
-                pespt.getMolecule().setMultiplicity(EqMol.getMultiplicity())
-                pespt.getMolecule().setSymbolList(EqMol.getSymbolList())
-                pespt.getMolecule().setAtomicNoList(Z)
-                pespt.getMolecule().setMassNoList(A)
-                pespt.getMolecule().setMassList(m)
-                pespt.setEnergy(0)
-                pes.setPESpt(pt, pespt)
-
-        else:
-            raise ValidationError("PyFGH calculations with Psi4 are only currently implemented for diatomic molecules.")
+            pespt.setQList(q)
+            pespt.setXList(x)
+            pespt.setYList(y)
+            pespt.setZList(z)
+            pespt.getMolecule().setNatom(Nat)
+            pespt.getMolecule().setCharge(EqMol.getCharge())
+            pespt.getMolecule().setMultiplicity(EqMol.getMultiplicity())
+            pespt.getMolecule().setSymbolList(EqMol.getSymbolList())
+            pespt.getMolecule().setAtomicNoList(Z)
+            pespt.getMolecule().setMassNoList(A)
+            pespt.getMolecule().setMassList(m)
+            pespt.setEnergy(0)
+            pes.setPESpt(pt, pespt)
 
         for pt in Npts:
             pespt = pes.getPointByPt(pt)

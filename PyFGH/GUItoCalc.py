@@ -220,7 +220,3 @@ def passToCalc(dataObj):
     return ResultObj
 
 
-    # r = process_map(main, range(0, 30), max_workers=12)
-    # if __name__ == '__main__':
-    #     main()
-

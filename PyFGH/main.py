@@ -70,7 +70,7 @@ def run(holder=None):
         obj = GUI_output.App(ResultObj)
         obj.mainloop()
 
-
+    ResultObj.logfile.close()
     return ResultObj
 
 
